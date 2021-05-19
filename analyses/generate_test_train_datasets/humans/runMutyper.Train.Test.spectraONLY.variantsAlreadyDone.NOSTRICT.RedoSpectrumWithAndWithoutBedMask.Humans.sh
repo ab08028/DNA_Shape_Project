@@ -40,6 +40,8 @@ mkdir -p $outdir
 mkdir -p $variantsdir
 mkdir -p $testtraindir_withoutMask
 mkdir -p $testtraindir_withMask
+mkdir -p $spectrumdir_withMask
+mkdir -p $spectrumdir_withoutMask
 
 # refdir=/net/harris/vol1/home/beichman/reference_genomes/homo_sapiens_ancestor_GRCh38
 # reference=homo_sapiens_ancestor_${chr}.fa
