@@ -21,7 +21,6 @@ chromosome=chr${SGE_TASK_ID}
 todaysdate=20210329
 
 
-sampleList=/net/harris/vol1/home/beichman/humans/sample_information/${pop}.sampleList.txt
 # can add as additional params
 #sep="\s"
 kmersize=7
@@ -39,8 +38,8 @@ testtraindir_withoutMask=$outdir/training_and_test_spectra_perChr_noBEDMASK_PASS
 
 mkdir -p $outdir
 mkdir -p $variantsdir
-mkdir -p $spectrumdir
-mkdir -p $testtraindir
+mkdir -p $testtraindir_withoutMask
+mkdir -p $testtraindir_withMask
 
 # refdir=/net/harris/vol1/home/beichman/reference_genomes/homo_sapiens_ancestor_GRCh38
 # reference=homo_sapiens_ancestor_${chr}.fa
@@ -78,6 +77,17 @@ pops='AFR AMR EAS EUR SAS'
 
 variantsoutfile=$variantsdir/${chromosome}.mutyper.variants.mutationTypes.noMissingData.noFixedSites.${kmersize}mers.NOSTRICT.vcf.gz
 
+# need an index to use -R/-r down below (only needs to happen once)
+bcftools index $variantsoutfile 
+
+
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in bcftools index"
+	exit 1
+else
+	echo "finished $pop"
+fi
 
 ########### mutyper variants : all pops together
 # this removes missing data and sites that are fixed: 
