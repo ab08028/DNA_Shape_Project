@@ -80,8 +80,8 @@ pops='AFR AMR EAS EUR SAS'
 variantsoutfile=$variantsdir/${chromosome}.mutyper.variants.mutationTypes.noMissingData.noFixedSites.${kmersize}mers.NOSTRICT.vcf.gz
 
 # need an index to use -R/-r down below (only needs to happen once)
-bcftools index $variantsoutfile 
-
+#bcftools index -f $variantsoutfile 
+# only once! 
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
