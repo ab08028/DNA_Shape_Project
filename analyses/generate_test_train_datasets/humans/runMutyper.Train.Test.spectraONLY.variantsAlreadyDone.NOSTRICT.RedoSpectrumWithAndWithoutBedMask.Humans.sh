@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=40:00:00,h_data=1G
+#$ -l h_rt=200:00:00,h_data=4G
 #$ -o /net/harris/vol1/home/beichman/vaquita/reports/mutyper/
 #$ -e /net/harris/vol1/home/beichman/vaquita/reports/mutyper/
 #$ -m bea
