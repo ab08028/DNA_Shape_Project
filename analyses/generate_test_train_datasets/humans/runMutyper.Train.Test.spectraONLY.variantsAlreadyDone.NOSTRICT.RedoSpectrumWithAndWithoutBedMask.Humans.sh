@@ -88,7 +88,7 @@ if [ ${exitVal} -ne 0 ]; then
 	echo "error in bcftools index"
 	exit 1
 else
-	echo "finished $pop"
+	echo "finished index"
 fi
 
 ########### mutyper variants : all pops together
@@ -124,7 +124,7 @@ if [ ${exitVal} -ne 0 ]; then
 	echo "error in mutyper spectra"
 	exit 1
 else
-	echo "finished $pop"
+	echo "finished $pop spectrum 1"
 fi
 
 bcftools view -S $sampleList -f PASS $variantsoutfile | bcftools view -c 1:minor | mutyper spectra --population - > ${spectrumoutfile_withoutMask}
@@ -134,7 +134,7 @@ if [ ${exitVal} -ne 0 ]; then
 	echo "error in mutyper spectra"
 	exit 1
 else
-	echo "finished $pop"
+	echo "finished $pop spectrum 2"
 fi
 
 
@@ -152,7 +152,7 @@ if [ ${exitVal} -ne 0 ]; then
 	echo "error in mutyper train spectra"
 	exit 1
 else
-	echo "finished $pop"
+	echo "finished $pop train 1"
 fi
 
 
@@ -166,7 +166,7 @@ if [ ${exitVal} -ne 0 ]; then
 	echo "error in mutyper test spectra"
 	exit 1
 else
-	echo "finished $pop"
+	echo "finished $pop test 1"
 fi
 
 
@@ -185,7 +185,7 @@ if [ ${exitVal} -ne 0 ]; then
 	echo "error in mutyper train spectra"
 	exit 1
 else
-	echo "finished $pop"
+	echo "finished $pop train 2s" 
 fi
 
 
@@ -199,7 +199,7 @@ if [ ${exitVal} -ne 0 ]; then
 	echo "error in mutyper test spectra"
 	exit 1
 else
-	echo "finished $pop"
+	echo "finished $pop test 2"
 fi
 
 
