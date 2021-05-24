@@ -112,7 +112,7 @@ for pop in $pops
 do
 sampleList=/net/harris/vol1/home/beichman/humans/sample_information/${pop}.sampleList.txt
 spectrumoutfile_withMask=${spectrumdir_withMask}/${chromosome}_${pop}_mutyper.spectrum.PERPOPULATION.ALLFREQS.NOSTRICT.WITHBEDMASK.PASSONLY.txt
-spectrumoutfile_withoutMask=${spectrumdir_withMask}/${chromosome}_${pop}_mutyper.spectrum.PERPOPULATION.ALLFREQS.NOSTRICT.noBEDMASK.PASSONLY.txt
+spectrumoutfile_withoutMask=${spectrumdir_withoutMask}/${chromosome}_${pop}_mutyper.spectrum.PERPOPULATION.ALLFREQS.NOSTRICT.noBEDMASK.PASSONLY.txt
 
 # restrict to just one population and sites that are variant for that population: 
 # this is positive mask 
