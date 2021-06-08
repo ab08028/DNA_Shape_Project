@@ -66,16 +66,16 @@ spectrum_onepop$central5mer.ancestral <- substr(spectrum_onepop$ancestralkmer,st
 
 ############ >>> label central mutation type by whether it is CpG or not and what nucleotides are involved (ala L&S) #########
 head(spectrum_onepop)
-spectrum_onepop$ancestral3mer <- unlist(lapply(strsplit(spectrum_onepop$ThreemerMutationType,"\\."),"[",1))
-spectrum_onepop$derived3mer <- unlist(lapply(strsplit(spectrum_onepop$ThreemerMutationType,"\\."),"[",2))
+spectrum_onepop$ancestral_central3mer <- unlist(lapply(strsplit(spectrum_onepop$ThreemerMutationType,"\\."),"[",1))
+spectrum_onepop$derived_central3mer <- unlist(lapply(strsplit(spectrum_onepop$ThreemerMutationType,"\\."),"[",2))
 
 # identify presence of CpG (CG) [not GC] in central 3mer
-spectrum_onepop$ancestral3merCpG <- "no"
-spectrum_onepop$derived3merCpG <- "no"
-spectrum_onepop[grepl("CG",spectrum_onepop$ancestral3mer),]$ancestral3merCpG <- "yes"
-spectrum_onepop[grepl("CG",spectrum_onepop$derivedkmer),]$derived3merCpG <- "yes"
+spectrum_onepop$ancestral_central3merCpG <- "no"
+spectrum_onepop$derived_central3merCpG <- "no"
+spectrum_onepop[grepl("CG",spectrum_onepop$ancestral_central3mer),]$ancestral_central3merCpG <- "yes"
+spectrum_onepop[grepl("CG",spectrum_onepop$derived_central3mer),]$derived_central3merCpG <- "yes"
 
-spectrum_onepop$mutationClassLabel <- paste0(spectrum_onepop$centralMutationType,".",spectrum_onepop$ancestral3merCpG,"_ancestralCpG") 
+spectrum_onepop$mutationClassLabel <- paste0(spectrum_onepop$centralMutationType,".",spectrum_onepop$ancestral_central3mer,"_ancestralCpG") 
 unique(spectrum_onepop$mutationClassLabel) # 9 mutation types (same as L&S)
 # "A.C.no_ancestralCpG"  "A.G.no_ancestralCpG"  "A.T.no_ancestralCpG"  "C.A.no_ancestralCpG"  "C.G.no_ancestralCpG" 
 # "C.T.no_ancestralCpG"  "C.A.yes_ancestralCpG" "C.G.yes_ancestralCpG" "C.T.yes_ancestralCpG"
@@ -156,6 +156,11 @@ for(feature in desiredFeatures){
 # so a first order feature will be: feature_1_ and a second order will be feature_2. 
 head(allFeatureVectors_labelled)
 
+
+###### WRITE THIS OUT TO USE AS FEATURE TABLE ###########
+# note this may contain multiple entries because of multiple populations (eg many mice spp)
+write.table(mutationSpectrum_featureMatrix,paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/","FEATURE.TABLE.",orderLabel,".ancestral.derived.feautres.AllShapes.ShouldBeGoodForAllSpecies.txt"),row.names=T,quote=F)
+
 ########### >>> Make a heatmap of all correlations of the features #################
 # https://briatte.github.io/ggcorr/
 correlationOfFeaturesAcrossAll7mers_plot <- ggcorr(subset(allFeatureVectors_labelled,select=-c(motif)),layout.exp = 20,hjust=1,vjust=.5,size=1.5)
@@ -173,7 +178,6 @@ intermediateMerge_ancestral <- merge(spectrum_onepop,allFeatureVectors_labelled,
 
 mutationSpectrum_featureMatrix <- merge(intermediateMerge_ancestral,allFeatureVectors_labelled,by.x="derivedkmer",by.y="motif",suffixes=c("_ancestral","_derived")) # sweet, I checked that this works and it does! 
 
-# note this may contain multiple entries because of multiple populations (eg many mice spp)
 
 ###################### >>> ACTUAL CARET STUFF STARTS HERE #######################
 
