@@ -7,6 +7,8 @@
 #$ -t 1-19
 
 ######## getting even/odd targets ##########
+module load modules modules-init modules-gs # initialize modules 
+module load samtools/1.9 # contains bgzip
 
 # chromosome lengths:
 wd=/net/harris/vol1/home/beichman/mice/analyses/ancestralReferenceFastas/separate_even_odd_bp_fromRefGenome
@@ -38,13 +40,14 @@ evenOutfile=$wd/chr${chr}.evenPositionsIfConvertedTo1Based.0basedCoords.AllSites
 > $evenOutfile
 # subtract one from len for the counter otherwise it adds an extra site at the end of each file beyond the length
 for (( COUNTER=0; COUNTER<=(("$len"-1)); COUNTER+=2 )); do
-    echo -e "$chr\t$COUNTER\t$((COUNTER+1))" >> $oddOutfile # eventually maybe need some sort of callability mask 
-    echo -e "$chr\t$((COUNTER+1))\t$((COUNTER+2))" >> $evenOutfile # eventually maybe need some sort of callability mask 
+    echo -e "chr$chr\t$COUNTER\t$((COUNTER+1))" >> $oddOutfile # eventually maybe need some sort of callability mask 
+    echo -e "chr$chr\t$((COUNTER+1))\t$((COUNTER+2))" >> $evenOutfile # eventually maybe need some sort of callability mask 
 
 done
 
 
-
+bgzip -f $oddOutfile
+bgzip -f $evenOutfile
 #done
 
 # do I want odd / even to be one based or not? tricky be careful here. 

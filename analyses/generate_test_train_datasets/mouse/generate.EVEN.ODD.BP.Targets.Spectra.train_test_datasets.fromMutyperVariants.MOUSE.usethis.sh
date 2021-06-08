@@ -17,7 +17,7 @@ module load htslib/1.9 bcftools/1.9 # for filtering out fixed sites
 
 set -o pipefail
 
-chromosome=chr${SGE_TASK_ID} # skipping xy un m for now
+chromosome=chr${SGE_TASK_ID} # skipping xy un m 
 
  
 mutyperdir=/net/harris/vol1/home/beichman/mice/analyses/mutyper/mutyperResults_20210317_NOSTRICT_7mer # prexisting path to 7mer mutyper results
@@ -30,7 +30,9 @@ poplistdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/BearAdmixtureProject
 
 
 
-outdir=$mutyperdir/training_and_test_spectra_perChr
+spectraoutdir=$mutyperdir/training_and_test_spectra_perChr
+targetsoutdir=$mutyperdir/training_and_test_targets_perChr
+
 mkdir -p $outdir
 
 vcf=$variantdir/${chromosome}.mutyper.variants.mutationTypes.noFixedSites.AncestralDerivedNotRefAlt.SomeRevComped.NOSTRICT.ALLFREQS.7mer.vcf.gz
@@ -66,6 +68,18 @@ populations='Mmd Mmc Mmm Ms' # note allNonABC contains EUR, MT and AK and PB con
 # if I want to do sub populations.
 
 # for now keeping singletons and low complexity regions in
+
+
+ancestralFastafilename=$ancestralFastaDir/FINAL.MODIFIED.ANCESTRAL.chr${SGE_TASK_ID}_mouseAncestral_extSFS_gte90-lte10Range.fasta
+oddBed=$beddir/chr${SGE_TASK_ID}.oddPositionsIfConvertedTo1Based.0basedCoords.AllSites.NoCallabilityFilter.bed
+evenBed=$beddir/chr${SGE_TASK_ID}.evenPositionsIfConvertedTo1Based.0basedCoords.AllSites.NoCallabilityFilter.bed
+
+# also want to get total 7mer targets: odd sites of genome only: ; no callability mask 
+mutyper targets --k 7 --sep $sep $ancestralFastafilename --bed $oddBed > $targetsoutdir/oddSites.mutyper.targets.7mer.chr${SGE_TASK_ID}.nostrict.txt
+
+mutyper targets --k 7 --sep $sep $ancestralFastafilename --bed $evenBed > $targetsoutdir/evenSites.mutyper.targets.7mer.chr${SGE_TASK_ID}.nostrict.txt
+
+
 for pop in $populations
 do
 echo -e "starting $pop"
@@ -84,17 +98,21 @@ popfile=$poplistdir/${pop}.txt
 # that seems not ideal but maybe can alternate even/odd when testing across species or something
 
 ######### training set (odd bp) ##########
-oddBed=$beddir/chr${SGE_TASK_ID}.oddPositionsIfConvertedTo1Based.0basedCoords.AllSites.NoCallabilityFilter.bed
 # make SURE it's !=0 here for ODD
 ### old way to do it: bcftools view -S $popfile $vcf |  bcftools view -c 1:minor  | awk '{if(/#/ || $2%2!=0)print}' |  mutyper spectra --population - > $outdir/${chromosome}_${pop}_TRAINING.mutyper.spectra.odd_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
 # want to use the bed file of regions ; note that they are 0-based and vcfs are 1-based so if the site looks even in bed fmt eg chr1 2 3 that is actually chr1 3 in vcf so is odd. 
 # doesn't really matter just be consistent between targets/spectra and use same bed files and you'll be ok
-bcftools view -S $popfile $vcf -R $oddBed |  bcftools view -c 1:minor 
+bcftools view -S $popfile $vcf -R $oddBed |  bcftools view -c 1:minor |  mutyper spectra --population - > $outdir/${chromosome}_${pop}_TRAINING.mutyper.spectra.odd_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
+
+
+######### training set (odd bp) -- split into FOLDS(?) ##########
+##### need to figure this out. maybe just use odd sites per chromosome as folds for now since naturally split anyway?
 
 ########### test set (even bp) ######################
 # make SURE it's ==0 here for EVEN
 
 ### old way to do it: bcftools view -S $popfile $vcf |  bcftools view -c 1:minor  |  awk '{if(/#/ || $2%2==0)print}' |  mutyper spectra --population - > $outdir/${chromosome}_${pop}_TESTING.mutyper.spectra.even_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
+bcftools view -S $popfile $vcf -R $evenBed |  bcftools view -c 1:minor  |  mutyper spectra --population - > $outdir/${chromosome}_${pop}_TESTING.mutyper.spectra.even_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
 
 
 
