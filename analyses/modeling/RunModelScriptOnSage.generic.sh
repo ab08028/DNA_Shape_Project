@@ -12,10 +12,22 @@
 
 module load modules modules-init modules-gs # initialize modules 
 module load pcre2/10.35 R/4.0.4
-
+# need to load newer gcc for installations! 
+module load gcc/10.2.0
 # need to set up R environment: 
-R 
-install.packages("tidymodels","tidyverse","workflows","tune","vip","ranger","ggplot2","ggrepel","ggbeeswarm","reshape2","devtools",verbose=T)
+#R 
+#install.packages("tidymodels")
+# install.packages("tidyverse")
+# install.packages("workflows")
+# install.packages("tune")
+# install.packages("vip")
+# install.packages("ranger")
+# install.packages("ggplot2")
+# install.packages("ggrepel")
+# install.packages("ggbeeswarm")
+# install.packages("reshape2")
+# install.packages("devtools")
+
 # need a data dir with shapes
 # need a data dir with species data 
 # these are just inside the R script
@@ -23,7 +35,7 @@ install.packages("tidymodels","tidyverse","workflows","tune","vip","ranger","ggp
 #shapedir=/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling
 
 gitdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/modeling
-scriptdir=$gitdir/analyses/modeling
-script=20210616.TryRunningOnHoffman.R
+scriptdir=$gitdir/
+script=20210616.TryRunningOnSage.RF.multispecies.R
 
 Rscript $scriptdir/$script

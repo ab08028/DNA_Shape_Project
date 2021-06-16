@@ -35,7 +35,7 @@ dir.create(outdir,recursive = T,showWarnings = F)
 
 ############## read in shapes ##############
 shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
-shapes <- read.table(paste0(shapedir,firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt"),header=T,sep="\t")
+shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt"),header=T,sep="\t")
 rownames(shapes) <- shapes$motif
 
 spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse"

@@ -83,8 +83,13 @@ allData_multipop_intermediate <-merge(allData_multipop,shapes,by.x="ancestral7me
 
 allData_withShapes_unprocessed <- merge(allData_multipop_intermediate,shapes,by.x="derived7mer",by.y="motif",suffixes=c(".ancestral",".derived"))
 
+########### want to rescale outcome variable rate so it's relative #######
+allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
+  group_by(population,window,label) %>%
+  mutate(mutationCount_divByTargetCount_RESCALED=mutationCount_divByTargetCount/sum(mutationCount_divByTargetCount)) %>%
+  mutate(mutationCount_divByTargetCount_RESCALED_LOG10=log10(mutationCount_divByTargetCount_RESCALED))
 
-
+# this maintains the ranking but rescales the outcome ; try it! 
 
 ####### make your splits into train/test ##########
 # not splitting by population so there will be 2x as many train and test observations, one from each species
@@ -110,13 +115,12 @@ unique(assessment(train_data_cv[[1]][[1]])$window) # the held out window:
 ####### should I sum up each non held-out fold somehow? skip for now. ##########
 rand_forest_processing_recipe_OutcomeFracSegSites_withPopAsPredictor <- 
   # which consists of the formula (outcome ~ predictors) (don't want to include the 'variable' column)
-  recipe(mutationCount_divByTargetCount ~ .,data=training(split)) %>% # 
+  recipe(mutationCount_divByTargetCount_RESCALED_LOG10 ~ .,data=training(split)) %>% # 
   update_role(mutationType, new_role="7mer mutation type label") %>%
-  step_rm(derived7mer,ancestral7mer, mutationCount,window,label,ancestral7merCount) %>%
+  step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount,mutationCount_divByTargetCount_RESCALED,window,label,ancestral7merCount) %>%
   step_dummy(all_nominal_predictors()) # KEEPING population in here as a predictor careful here that nothing else slips in! but dummy encoding it;; which RF doesn't need but xgboost and SHAP values does so just doing it 
 rand_forest_processing_recipe_OutcomeFracSegSites_withPopAsPredictor %>% summary()
 rand_forest_processing_recipe_OutcomeFracSegSites_withPopAsPredictor
-
 
 ######### MODEL SPECIFICATION #########
 rand_forest_ranger_model_specs <-
