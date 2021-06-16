@@ -38,7 +38,7 @@ shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
 shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt"),header=T,sep="\t")
 rownames(shapes) <- shapes$motif
 
-spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse"
+spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse/"
 allData_multipop <- read.table(paste0(spectrumdir,"MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.txt"),header=T) # 
 
 # and now want to split train is sp A + B spectra across odd chroms, train is sp A + B spectra across even chroms. want to have species membership as a feature! see if it's VIP or not
