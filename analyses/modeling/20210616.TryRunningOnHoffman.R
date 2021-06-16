@@ -1,6 +1,6 @@
 ############## try a new chromosome -based model to practice ###########
 
-require(tidymodels)
+require(tidymodels) # installing on hoffman 
 require(tidyverse) # instead of caret going to use tidymodels
 require(workflows)
 require(tune)
