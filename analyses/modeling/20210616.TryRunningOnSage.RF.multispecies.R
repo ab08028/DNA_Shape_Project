@@ -22,7 +22,7 @@ require(devtools)
 tidymodels_prefer() # use this 'tidymodels_prefer()' uses the 'conflicted' package to handle common conflicts with tidymodels and other packages. <-- should add this to my script
 set.seed(42) # so results are reproducible 
 todaysdate=format(Sys.Date(), "%Y%m%d")
-outcomeLabel="Log10MutationRate"
+outcomeLabel="MutationRate"
 modelLabel="RF"
 description=paste0(modelLabel,".",outcomeLabel,".Multispecies.DummyPopVar") # short description of these experiments
 description
@@ -64,15 +64,15 @@ indices <-
 split <- make_splits(indices,allData_withShapes_unprocessed)
 
 # if you want to see what's what:
-head(training(split),4)
-head(testing(split),4)
+#head(training(split),4)
+#head(testing(split),4)
 
 train_data_cv <- group_vfold_cv(training(split),group=window) # okay so I can make windows based on a grouping variable like so.
 
 # to see a fold
 # one fold: train_data_cv[[1]][[1]]
-unique(analysis(train_data_cv[[1]][[1]])$window)# the inside windows (chromosomes in this case): 
-unique(assessment(train_data_cv[[1]][[1]])$window) # the held out window: 
+#unique(analysis(train_data_cv[[1]][[1]])$window)# the inside windows (chromosomes in this case): 
+#unique(assessment(train_data_cv[[1]][[1]])$window) # the held out window: 
 # okay this works great! 
 
 ########## RECIPE #########
@@ -92,7 +92,7 @@ rand_forest_processing_recipe_OutcomeFracSegSites_withPopAsPredictor
 print('setting up model specs')
 rand_forest_ranger_model_specs <-
   rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
-  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=3) %>%
+  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=10) %>%
   set_mode('regression')
 rand_forest_ranger_model_specs
 
@@ -150,9 +150,9 @@ saveRDS(rand_forest_Fold01_fit_notlastfit, file = paste0(outdir,"modelTrainedOnO
 # R squared (OOB):                  0.9729254 
 # growing trees takes 1/2 hour; permutation importance takes another 1/2 hour.
 # then predict based on held out assessment set of fold split:
-print('starting predictions')
+print(paste(sys.time(), 'starting predictions')
 rand_forest_Fold01_predictions <- predict(object =rand_forest_Fold01_fit_notlastfit, new_data=assessment(oneFoldSetToTrainAndAssessOn))
-rand_forest_Fold01_predictions
+# rand_forest_Fold01_predictions
 
 truth_prediction_df <- cbind(assessment(oneFoldSetToTrainAndAssessOn),rand_forest_Fold01_predictions)
 View(truth_prediction_df) # VIEW doesn't show .pred column for some reason

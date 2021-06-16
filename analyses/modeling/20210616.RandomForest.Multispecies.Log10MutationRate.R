@@ -187,24 +187,23 @@ truth_prediction_df <- cbind(assessment(oneFoldSetToTrainAndAssessOn),rand_fores
 View(truth_prediction_df) # VIEW doesn't show .pred column for some reason
 
 windowOfAssessment=toString(unique(truth_prediction_df$window))
+windowOfAssessment
 #windowOfAssessment=9
 saveRDS(truth_prediction_df,file=paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onChr",windowOfAssessment,".rds")) # ah that's a problem for loading it back in -- need the window ID 
 
 # load it back in: 
 #truth_prediction_df <- readRDS(paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onChr",windowOfAssessment,".rds"))
 # get rsq
-rsq(truth_prediction_df,truth=mutationCount_divByTargetCount,estimate=.pred)
+rsq(truth_prediction_df,truth=mutationCount_divByTargetCount_RESCALED_LOG10,estimate=.pred)
 # 1 rsq     standard       0.980
-rmse(truth_prediction_df,truth=mutationCount_divByTargetCount,estimate=.pred)
+rmse(truth_prediction_df,truth=mutationCount_divByTargetCount_RESCALED_LOG10,estimate=.pred)
 
 #  rmse    standard     0.00155 ; kind of big? 
 truth_prediction_df$centralMutationType <- paste0(substr(truth_prediction_df$mutationType,4,4),".",substr(truth_prediction_df$mutationType,12,12))
 # note this doesn't have the 1-coded pops unless you juice() it but rows are still in same order 
-rand_forest_Fold01_fit_predictions_plot <-  ggplot(truth_prediction_df, aes(y=.pred,x=mutationCount_divByTargetCount,color=centralMutationType,shape=population))+
+rand_forest_Fold01_fit_predictions_plot <-  ggplot(truth_prediction_df, aes(y=.pred,x=mutationCount_divByTargetCount_RESCALED_LOG10,color=centralMutationType,shape=population))+
   geom_point()+
   geom_abline()+
-  scale_x_log10()+
-  scale_y_log10()+
   facet_wrap(~population)+
   ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$window)),")"))+
   theme_bw()
@@ -216,7 +215,7 @@ ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.AssessedOnChr",toStr
 ########### facet by central mutation type and get individual rsqs ##############
 rsqsPerSpeciesAndMutationType <- truth_prediction_df %>%
   group_by(centralMutationType,population) %>%
-  rsq(truth=mutationCount_divByTargetCount,estimate=.pred)
+  rsq(truth=mutationCount_divByTargetCount_RESCALED_LOG10,estimate=.pred)
 rsqsPerSpeciesAndMutationType
 write.table(rsqsPerSpeciesAndMutationType,paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".txt"),quote = F,row.names=F,sep="\t")
 rsqPerMutplot <- ggplot(rsqsPerSpeciesAndMutationType,aes(x=centralMutationType,y=.estimate,fill=population))+
@@ -228,12 +227,10 @@ rsqPerMutplot
 ggsave(paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),rsqPerMutplot,height=3,width=5)
 
 ####  add rsq values to plot if possible ###
-rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, aes(y=.pred,x=mutationCount_divByTargetCount,color=centralMutationType))+
+rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, aes(y=.pred,x=mutationCount_divByTargetCount_RESCALED_LOG10,color=centralMutationType))+
   geom_point()+
   geom_abline()+
-  geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=1e-4,y=0.1,label=round(.estimate,4)),color="black")+
-  scale_x_log10()+
-  scale_y_log10()+
+  geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=-6,y=-1,label=round(.estimate,4)),color="black")+
   facet_grid(~centralMutationType~population)+
   ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$window)),")"))+
   theme_bw()
@@ -253,7 +250,7 @@ vip_plot <- vip(vi_scores,include_type = T,num_features = 100)
 vip_plot
 
 ggsave(paste0(outdir,"modelTrainedOnOneFold.VIP.Plot.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),vip_plot,height=12,width=5)
-vip(ranger_obj,include_type = T,num_features = 20)
+#vip(ranger_obj,include_type = T,num_features = 20)
 
 ########## try to find interactions? ############
 #vint(ranger_obj,feature_names=c("feature_1_Shear_2.derived","feature_1_Shear_2.ancestral",progress=T),train=analysis(oneFoldSetToTrainAndAssessOn)) # CRASHED
@@ -262,11 +259,11 @@ vip(ranger_obj,include_type = T,num_features = 20)
 
 ######## want to try to find sites that are at very different rates between the mouse species and focus on those and what makes them tick #############
 head(truth_prediction_df)
-truth_prediction_df_spread <- pivot_wider(truth_prediction_df[,c("mutationType","population","mutationCount_divByTargetCount",".pred","centralMutationType")],id_cols = c(mutationType,population,centralMutationType),names_from=population,values_from=c(mutationCount_divByTargetCount,.pred)) 
+truth_prediction_df_spread <- pivot_wider(truth_prediction_df[,c("mutationType","population","mutationCount_divByTargetCount_RESCALED_LOG10",".pred","centralMutationType")],id_cols = c(mutationType,population,centralMutationType),names_from=population,values_from=c(mutationCount_divByTargetCount_RESCALED_LOG10,.pred)) 
 
 head(truth_prediction_df_spread)
 # this is really useful: plot the difference between the two species and how well the predictions do (species are off of y=x line because of diff muttion rates; model picks that up! super cool)
-speciesComparisonPlot <- ggplot(truth_prediction_df_spread,aes(x=mutationCount_divByTargetCount_Mmd,y=mutationCount_divByTargetCount_Ms))+
+speciesComparisonPlot <- ggplot(truth_prediction_df_spread,aes(x=mutationCount_divByTargetCount_RESCALED_LOG10_Mmd,y=mutationCount_divByTargetCount_RESCALED_LOG10_Ms))+
   geom_point()+
   geom_point(aes(x=.pred_Mmd,y=.pred_Ms),shape=1,color="red")+
   geom_abline()
@@ -274,25 +271,26 @@ speciesComparisonPlot
 ggsave(paste0(outdir,"modelTrainedOnOneFold.SpeciesXYComparison.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),speciesComparisonPlot,height=5,width=7)
 
 # plot both species together
-plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=mutationCount_divByTargetCount,color=population))+
+plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=mutationCount_divByTargetCount_RESCALED_LOG10,color=population))+
   theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())+
   geom_point(size=0.1)+
-  scale_x_log10()+
-  scale_y_log10()+
+  #scale_x_log10()+
+  #scale_y_log10()+
+  theme_bw()+
   geom_abline()
 plotBothSpeciesTogether
 ggsave(paste0(outdir,"modelTrainedOnOneFold.ObsExpected.SpeciesTogether.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),plotBothSpeciesTogether,height=5,width=7)
 
 
 ############# try random forest explainer -- TOO SLOW #######################
-require(randomForestExplainer)
+#require(randomForestExplainer)
 # try dist of min depth (slow)
 #min_depth_frame <- min_depth_distribution(ranger_obj)
 #head(min_depth_frame, n = 10)
 
 
 # measure importance  -- too slow! 
-importance_frame <- measure_importance(ranger_obj) # incredibly slow!!!! 
+#importance_frame <- measure_importance(ranger_obj) # incredibly slow!!!! 
 # started around 3pm on 6/14
 #saveRDS(importance_frame,file=paste0(outdir,"modelTrainedOnOneFold.IMPORATANCEFRAME.RFExplainer.Assessed.onChr",toString(unique(truth_prediction_df$window)),".rds"))
 

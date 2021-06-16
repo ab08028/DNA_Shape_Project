@@ -1,11 +1,11 @@
 #! /bin/bash
-#$ -l h_rt=20:00:00,h_data=50G
+#$ -l h_rt=20:00:00,h_data=10G
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N sandboxMouseModel
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
-
+#$ -pe serial 10
 
 ######## trying to run modeling script in hoffman #######
 
