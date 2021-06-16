@@ -149,6 +149,13 @@ xgboost_workflow_noTUNE <- workflow() %>%
   add_model(boost_tree_xgboost_spec_NOTUNING)
 xgboost_workflow_noTUNE
 
+
+xgboost_workflow_TUNE <- workflow() %>%
+  # add the recipe
+  add_recipe(xgboost_processing_recipe) %>%
+  # add the model
+  add_model(boost_tree_xgboost_spec_TUNE)
+xgboost_workflow_TUNE
 ######### set up parameter tuning grid #######
 # grid specification
 xgboost_params <- 
@@ -168,7 +175,7 @@ xgboost_grid <-
 #knitr::kable(head(xgboost_grid))
 head(xgboost_grid)
 
-xgboost_tune_results <- xgboost_workflow %>%
+xgboost_tune_results <- xgboost_workflow_TUNE %>%
   tune_grid(resamples = train_data_cv, #CV object
             grid = xgboost_grid, # grid of values to try
             metrics = metric_set(rmse, rsq) # metrics we care about: RMSE and R^2

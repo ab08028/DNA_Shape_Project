@@ -18,18 +18,19 @@ require(ggbeeswarm)
 
 # want counts divided by targets
 targetdir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_target_files"
+
+############ want to combine multispecies ############
 # per pop spectrum files:
-population="Mmd"
-spectrumdir=paste0("/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_files/",population,"/")
-outdir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/"
-dir.create(outdir,showWarnings=F)
-# merge per chromosome # 
+
+populations=c("Mmd","Ms")
 # need to separate odd and even
 chromCount=19
-#oddChr=seq(1,chromCount,by=2)
-#evenChr=seq(2,chromCount-1,by=2)
-####### only once: then read it in below instead
 allData <- data.frame()
+for(population in populations){
+  spectrumdir=paste0("/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_files/",population,"/")
+  outdir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/"
+  dir.create(outdir,showWarnings=F)
+####### only once: then read it in below instead
 for(chr in seq(1,chromCount)){
   print(chr)
   targets=read.table(paste0(targetdir,"//mutyper.targets.7mer.chr",chr,".nostrict.txt"),header=T)
@@ -38,6 +39,7 @@ for(chr in seq(1,chromCount)){
   spectrum_melt <- melt(spectrum)
   colnames(spectrum_melt) <- c("mutationType","mutationCount")
   spectrum_melt$window <- chr
+  spectrum_melt$population <- population
   if(chr %% 2==0){
     spectrum_melt$label <- "TEST"
   } else if(chr %% 2 !=0){
@@ -48,7 +50,8 @@ for(chr in seq(1,chromCount)){
   specrum_targets_merged$mutationCount_divByTargetCount <- specrum_targets_merged$mutationCount/specrum_targets_merged$ancestral7merCount
   allData <- bind_rows(allData,specrum_targets_merged)
 }
-write.table(allData,paste0(outdir,population,"_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.txt"),row.names=F,quote=F,sep="\t")
+}
+#write.table(allData,paste0(outdir,population,"_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.txt"),row.names=F,quote=F,sep="\t")
 
 
 ####### okay let's try this ###########
@@ -57,7 +60,7 @@ tidymodels_prefer() # use this 'tidymodels_prefer()' uses the 'conflicted' packa
 set.seed(42) # so results are reproducible 
 outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/sandbox/"
 ###### just one mutation type for now: #########
-#mutationType="A.T.no_ancestralCpG"
+mutationType="A.T.no_ancestralCpG"
 #CVcount=8 # total folds for k-fold cross validation 
 ######## chosen species/population: ###########
 #chosenPop="Mmd"
@@ -91,11 +94,11 @@ head(training(split),4)
 head(testing(split),4)
 
 ########### could sum up training data ###########3
-# train_data_unprocessed_allWindowsSummedUp <- training(split)  %>%
-#   group_by(mutationType,ancestral7mer) %>%
-#   summarise(mutationCount_allTrainingWindows=sum(mutationCount),ancestral7merCount_allTrainingWindows=sum(ancestral7merCount))
-# 
-# train_data_unprocessed_allWindowsSummedUp$mutationRate_allTrainingWindows <- train_data_unprocessed_allWindowsSummedUp$mutationCount_allTrainingWindows/train_data_unprocessed_allWindowsSummedUp$ancestral7merCount_allTrainingWindows
+train_data_unprocessed_allWindowsSummedUp <- training(split)  %>%
+  group_by(mutationType,ancestral7mer) %>%
+  summarise(mutationCount_allTrainingWindows=sum(mutationCount),ancestral7merCount_allTrainingWindows=sum(ancestral7merCount))
+
+train_data_unprocessed_allWindowsSummedUp$mutationRate_allTrainingWindows <- train_data_unprocessed_allWindowsSummedUp$mutationCount_allTrainingWindows/train_data_unprocessed_allWindowsSummedUp$ancestral7merCount_allTrainingWindows
 
 
 
@@ -128,11 +131,10 @@ rand_forest_processing_recipe <-
 
 # add a role for the variable (motif) label that isn't part of the model but keeps track of the label (so it was included in the "." above but now we make it not an outcome or predictor variable so it's not going to be part of the model but will be a label. you see that this works )
 rand_forest_processing_recipe
-View(summary(rand_forest_processing_recipe))
+
 ####### 
-rand_forest_ranger_model_specs_NOTUNE <-
-  #rand_forest(trees = 1000, mtry = tune(), min_n = tune()) %>% # I added in tree number = 1000
-  rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
+rand_forest_ranger_model_specs <-
+  rand_forest(trees = 1000, mtry = tune(), min_n = tune()) %>% # I added in tree number = 1000
   set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE) %>%
   set_mode('regression')
 
@@ -141,24 +143,24 @@ rand_forest_workflow <- workflow() %>%
   # add the recipe
   add_recipe(rand_forest_processing_recipe) %>%
   # add the model
-  add_model(rand_forest_ranger_model_specs_NOTUNE)
+  add_model(rand_forest_ranger_model_specs)
 rand_forest_workflow
 
-#mtrygoal=round(predictorCountdf$totalPredictors/3)
-#mtrygoal
-#mtrygrid=c(2,mtrygoal/2,mtrygoal,mtrygoal*2,mtrygoal*3) # range from 2-total features with mtrygoal (feat/3) in the middle
-#mtrygrid
-#min_ngrid = c(5,10,20) # not sure about these values but have to start somewhere. default is 5 for regression (minimum node size before gets converted to leaf)
-#rand_forest_tuning_grid <- expand.grid(mtry=mtrygrid,min_n=min_ngrid)
+mtrygoal=round(predictorCountdf$totalPredictors/3)
+mtrygoal
+mtrygrid=c(2,mtrygoal/2,mtrygoal,mtrygoal*2,mtrygoal*3) # range from 2-total features with mtrygoal (feat/3) in the middle
+mtrygrid
+min_ngrid = c(5,10,20) # not sure about these values but have to start somewhere. default is 5 for regression (minimum node size before gets converted to leaf)
+rand_forest_tuning_grid <- expand.grid(mtry=mtrygrid,min_n=min_ngrid)
 
 ####### tune: SLOW ############
 
 ####### TUNE: **VERY ** slow! 
-#rf_tune_results <- rand_forest_workflow %>%
-#  tune_grid(resamples = train_data_cv, #CV object
-#            grid = rand_forest_tuning_grid, # grid of values to try
-#            metrics = metric_set(rmse, rsq) # metrics we care about: RMSE and R^2
-#  )
+rf_tune_results <- rand_forest_workflow %>%
+  tune_grid(resamples = train_data_cv, #CV object
+            grid = rand_forest_tuning_grid, # grid of values to try
+            metrics = metric_set(rmse, rsq) # metrics we care about: RMSE and R^2
+  )
 # started at 3:15 6/4 with different CV folds ; not specifying how bootstrapping is occurring though.
 ####### could manualy set instead
 #paramdf = tibble(mtry=32,min_n=5)
@@ -166,23 +168,18 @@ rand_forest_workflow
 #  finalize_workflow(paramdf)
 #rand_forest_workflow
 ######## try training/testing on just one fold combo (all chr but one in train, tested on one chr)
-oneFoldSetToTrainAndAssessOn = train_data_cv[[1]][[1]]
 rand_forest_Fold01_fit <- rand_forest_workflow %>%
-  last_fit(oneFoldSetToTrainAndAssessOn)
+  last_fit(train_data_cv[[1]][[1]])
 rand_forest_Fold01_fit %>% collect_metrics()
-rand_forest_Fold01_fit_predictions <- rand_forest_Fold01_fit %>% 
-  collect_predictions() 
-rand_forest_Fold01_fit_predictions$mutationType <- assessment(oneFoldSetToTrainAndAssessOn)$mutationType
-rand_forest_Fold01_fit_predictions$centralMutationType <- paste0(substr(rand_forest_Fold01_fit_predictions$mutationType,4,4),".",substr(rand_forest_Fold01_fit_predictions$mutationType,12,12))
-
-ggplot(rand_forest_Fold01_fit_predictions,aes(y=.pred,x=mutationCount_divByTargetCount,color=centralMutationType))+
+rand_forest_Fold01_fit %>% 
+  collect_predictions() %>%
+  ggplot(aes(y=.pred,x=mutationCount_divByTargetCount))+
   geom_point()+
   geom_abline()+
-  #scale_x_log10()+
-  #scale_y_log10()+
+  scale_x_log10()+
+  scale_y_log10()+
   ggtitle("random forest, trained on Fold01 ( all odd chrs but one, tested on #9)")
 
-#### you are fitting a model with outcome = 
 
 rand_forest_Fold01_fit
 
