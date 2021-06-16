@@ -34,11 +34,13 @@ outdir=paste0("/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experim
 dir.create(outdir,recursive = T,showWarnings = F)
 
 ############## read in shapes ##############
+print('reading in shapes')
 shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
 shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt"),header=T,sep="\t")
 rownames(shapes) <- shapes$motif
 
-spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse"
+print('reading in spectrum')
+spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse/"
 allData_multipop <- read.table(paste0(spectrumdir,"MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.txt"),header=T) # 
 
 # and now want to split train is sp A + B spectra across odd chroms, train is sp A + B spectra across even chroms. want to have species membership as a feature! see if it's VIP or not
@@ -75,6 +77,7 @@ unique(assessment(train_data_cv[[1]][[1]])$window) # the held out window:
 
 ########## RECIPE #########
 ####### should I sum up each non held-out fold somehow? skip for now. ##########
+print('setting up recipe')
 rand_forest_processing_recipe_OutcomeFracSegSites_withPopAsPredictor <- 
   # which consists of the formula (outcome ~ predictors) (don't want to include the 'variable' column)
   recipe(mutationCount_divByTargetCount ~ .,data=training(split)) %>% # 
@@ -86,6 +89,7 @@ rand_forest_processing_recipe_OutcomeFracSegSites_withPopAsPredictor
 
 
 ######### MODEL SPECIFICATION #########
+print('setting up model specs')
 rand_forest_ranger_model_specs <-
   rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
   set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=3) %>%
@@ -94,6 +98,7 @@ rand_forest_ranger_model_specs
 
 ############ WORKFLOW #############
 ######## make a workflow with recipe and model specs ########
+print('setting up model workflow')
 rand_forest_workflow <- workflow() %>%
   # add the recipe
   add_recipe(rand_forest_processing_recipe_OutcomeFracSegSites_withPopAsPredictor) %>%
@@ -102,6 +107,7 @@ rand_forest_workflow <- workflow() %>%
 rand_forest_workflow
 
 ########### TRAIN/TEST MODEL JUST USING ONE FOLD SET #########  
+print('pulling out one fold to train/assess with for now')
 oneFoldSetToTrainAndAssessOn <- train_data_cv[[1]][[1]]
 saveRDS(oneFoldSetToTrainAndAssessOn, file = paste0(outdir,"oneFoldSetToTrainAndAssessOn.rds"))
 # load back in:
@@ -133,6 +139,7 @@ saveRDS(oneFoldSetToTrainAndAssessOn, file = paste0(outdir,"oneFoldSetToTrainAnd
 
 
 ######## hmm need to use fit() not last_fit() that's irritating ##########
+print('starting to fit model')
 rand_forest_Fold01_fit_notlastfit <- fit(rand_forest_workflow,data = analysis(oneFoldSetToTrainAndAssessOn))
 rand_forest_Fold01_fit_notlastfit
 
@@ -143,6 +150,7 @@ saveRDS(rand_forest_Fold01_fit_notlastfit, file = paste0(outdir,"modelTrainedOnO
 # R squared (OOB):                  0.9729254 
 # growing trees takes 1/2 hour; permutation importance takes another 1/2 hour.
 # then predict based on held out assessment set of fold split:
+print('starting predictions')
 rand_forest_Fold01_predictions <- predict(object =rand_forest_Fold01_fit_notlastfit, new_data=assessment(oneFoldSetToTrainAndAssessOn))
 rand_forest_Fold01_predictions
 
