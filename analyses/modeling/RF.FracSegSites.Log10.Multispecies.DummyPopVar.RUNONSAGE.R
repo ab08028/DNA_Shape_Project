@@ -62,18 +62,6 @@ allData_multipop_intermediate <-merge(allData_multipop,shapes,by.x="ancestral7me
 allData_withShapes_unprocessed <- merge(allData_multipop_intermediate,shapes,by.x="derived7mer",by.y="motif",suffixes=c(".ancestral",".derived"))
 
 
-allData_multipop <- read.table(paste0(spectrumoutdir,"MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.txt"),header=T) # 
-
-# and now want to split train is sp A + B spectra across odd chroms, train is sp A + B spectra across even chroms. want to have species membership as a feature! see if it's VIP or not
-
-# merge with shapes
-
-allData_multipop$derived7mer <- substr(allData_multipop$mutationType,9,15)
-allData_multipop_intermediate <-merge(allData_multipop,shapes,by.x="ancestral7mer",by.y="motif")
-
-allData_withShapes_unprocessed <- merge(allData_multipop_intermediate,shapes,by.x="derived7mer",by.y="motif",suffixes=c(".ancestral",".derived"))
-
-
 ####### make your splits into train/test ##########
 # not splitting by population so there will be 2x as many train and test observations, one from each species
 indices <-
