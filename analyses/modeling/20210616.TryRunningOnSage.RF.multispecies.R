@@ -1,5 +1,4 @@
 ############## try a new chromosome -based model to practice ###########
-
 require(tidymodels) # installing on hoffman 
 require(tidyverse) # instead of caret going to use tidymodels
 require(workflows)
@@ -21,17 +20,32 @@ require(devtools)
 #install_shap()
 tidymodels_prefer() # use this 'tidymodels_prefer()' uses the 'conflicted' package to handle common conflicts with tidymodels and other packages. <-- should add this to my script
 set.seed(42) # so results are reproducible 
-todaysdate=format(Sys.Date(), "%Y%m%d")
-outcomeLabel="MutationRate"
-modelLabel="RF"
-description=paste0(modelLabel,".",outcomeLabel,".Multispecies.DummyPopVar") # short description of these experiments
-description
+# doing this in the wrapper script instead:
+
+
+args <- commandArgs(trailingOnly = TRUE)
+description <- args[1]
+outdir <- args[2]
+# trying to use sink() to catch all output: (errors will go to a different file)
+sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
+# do your work here
+a <- 1
+a
+stop("huh?")
+sink(NULL, type = "message")
+sink(NULL, type = "output")
+
+#todaysdate=format(Sys.Date(), "%Y%m%d")
+#outcomeLabel="MutationRate"
+#modelLabel="RF"
+#description=paste0(modelLabel,".",outcomeLabel,".Multispecies.DummyPopVar") # short description of these experiments
+#description
 chromCount=19
 # per pop spectrum files:
 populations=c("Mmd","Ms")
 # modeling outdir:
-outdir=paste0("/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/",todaysdate,"_",description,"/") #  date specific 
-dir.create(outdir,recursive = T,showWarnings = F)
+#outdir=paste0("/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/",todaysdate,"_",description,"/") #  date specific 
+#dir.create(outdir,recursive = T,showWarnings = F)
 
 ############## read in shapes ##############
 print('reading in shapes')
@@ -151,7 +165,7 @@ saveRDS(rand_forest_Fold01_fit_notlastfit, file = paste0(outdir,"modelTrainedOnO
 # R squared (OOB):                  0.9729254 
 # growing trees takes 1/2 hour; permutation importance takes another 1/2 hour.
 # then predict based on held out assessment set of fold split:
-print(paste(sys.time(), 'starting predictions')
+print(paste(Sys.time(), 'starting predictions')
 rand_forest_Fold01_predictions <- predict(object =rand_forest_Fold01_fit_notlastfit, new_data=assessment(oneFoldSetToTrainAndAssessOn))
 # rand_forest_Fold01_predictions
 
@@ -336,3 +350,4 @@ shapplot1
 ggsave(paste0(outdir,"modelTrainedOnOneFold.SHAPVALUES.AssessedOnChr",windowOfAssessment,".png"),shapplot1,height=12,width=6)
 
 
+sink() # end sink

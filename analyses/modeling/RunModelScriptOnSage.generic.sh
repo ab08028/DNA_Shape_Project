@@ -36,6 +36,23 @@ module load gcc/10.2.0
 
 gitdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/modeling
 scriptdir=$gitdir/
-script=20210616.TryRunningOnSage.RF.multispecies.R
+script=20210616.TryRunningOnSage.RF.multispecies.R # don't have dates on these
+# but date this running script each time
 
-Rscript $scriptdir/$script
+todaysdate=`date +%Y%m%d`
+##### CHANGE THESE APPROPRIATELY TO BE ABOUT SCRIPT YOU"RE RUNNING #########
+outcomeLabel="MutationRate"
+modelLabel="RF"
+otherInfo="Multispecies.DummyPopVar"
+
+description=${modelLabel}.${outcomeLabel}.${otherInfo}
+
+outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/".${todaysdate}"_"${description}"/" #  date specific 
+
+mkdir -p $outdir
+cp $scriptdir/$script $outdir/$script.COPYRUNON${todaysdate} # copy it to the outdir 
+
+Rscript $scriptdir/$script $description $outdir
+
+# would like output files and the script to be copied to the same outdir as a record. 
+
