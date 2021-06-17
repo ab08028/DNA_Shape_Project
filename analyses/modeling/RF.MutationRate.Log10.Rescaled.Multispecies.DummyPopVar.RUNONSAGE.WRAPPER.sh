@@ -4,7 +4,7 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N runRModel
+#$ -N RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
 #$ -pe serial 10
 ######## trying to run modeling script in hoffman #######
 
@@ -40,11 +40,12 @@ scriptdir=$gitdir/
 
 todaysdate=`date +%Y%m%d`
 ##### CHANGE THESE APPROPRIATELY TO BE ABOUT SCRIPT YOU"RE RUNNING #########
-outcomeLabel="MutationRate.Log10.Rescaled"
-modelLabel="RF"
-otherInfo="Multispecies.DummyPopVar"
+#outcomeLabel="MutationRate.Log10.Rescaled"
+#modelLabel="RF"
+#otherInfo="Multispecies.DummyPopVar"
 
-description=${modelLabel}.${outcomeLabel}.${otherInfo}
+#description=${modelLabel}.${outcomeLabel}.${otherInfo}
+description=RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
 script=${description}.RUNONSAGE.R # this may not be the best way to do this
 outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 
