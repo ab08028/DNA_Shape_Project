@@ -1,4 +1,4 @@
-#!/net/gs/vol3/software/modules-sw/R/4.0.4/Linux/CentOS7/x86_64/bin/Rscript
+#! /net/gs/vol3/software/modules-sw/R/4.0.4/Linux/CentOS7/x86_64/bin/Rscript
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 
