@@ -1,11 +1,11 @@
 #! /bin/bash
-#$ -l h_rt=20:00:00,h_data=20G
+#$ -l h_rt=2:00:00,mfree=25G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
-#$ -pe serial 10
+#$ -pe serial 5
 ######## trying to run modeling script in hoffman #######
 
 ###### SAVE NEW WRAPPER SCRIPT EACH TIME ######
