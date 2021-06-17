@@ -31,7 +31,7 @@ args <- commandArgs(trailingOnly = TRUE)
 description <- args[1]
 outdir <- args[2]
 # trying to use sink() to catch all output: (errors will go to a different file)
-sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
+#sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
 #todaysdate=format(Sys.Date(), "%Y%m%d")
 #outcomeLabel="MutationRate"
@@ -348,4 +348,4 @@ shapplot1
 ggsave(paste0(outdir,"modelTrainedOnOneFold.SHAPVALUES.AssessedOnChr",windowOfAssessment,".png"),shapplot1,height=12,width=6)
 
 
-sink() # end sink
+#sink() # end sink
