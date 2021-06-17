@@ -38,7 +38,7 @@ otherInfo="Multispecies.DummyPopVar"
 
 description=${modelLabel}.${outcomeLabel}.${otherInfo}
 
-outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/".${todaysdate}"_"${description}"/" #  date specific 
+outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 
 mkdir -p $outdir
 cp $scriptdir/$script $outdir/$script.COPYRUNON${todaysdate} # copy it to the outdir 
