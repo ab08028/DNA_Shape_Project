@@ -193,6 +193,7 @@ saveRDS(truth_prediction_df,file=paste0(outdir,"modelTrainedOnOneFold.PREDICTION
 
 # load it back in: 
 #truth_prediction_df <- readRDS(paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onChr",windowOfAssessment,".rds"))
+
 # get rsq
 rsq(truth_prediction_df,truth=mutationCount_divByTargetCount_RESCALED_LOG10,estimate=.pred)
 # 1 rsq     standard       0.980
@@ -253,7 +254,15 @@ ggsave(paste0(outdir,"modelTrainedOnOneFold.VIP.Plot.AssessedOnChr",toString(uni
 #vip(ranger_obj,include_type = T,num_features = 20)
 
 ########## try to find interactions? ############
-#vint(ranger_obj,feature_names=c("feature_1_Shear_2.derived","feature_1_Shear_2.ancestral",progress=T),train=analysis(oneFoldSetToTrainAndAssessOn)) # CRASHED
+##### juice the training data:
+analysisdf_processed <- prep(rand_forest_processing_recipe_OutcomeFracSegSites_withPopAsPredictor, analysis(oneFoldSetToTrainAndAssessOn)) %>% 
+  juice() %>% 
+  select(-c(mutationType)) 
+head(analysisdf_processed)
+# maybe save this as an rds object? save the recipe as an object? what do I need?
+
+# try to speed this up and do all pairs
+interact <- vint(ranger_obj,feature_names=c("feature_1_Shear_2.derived","feature_1_Shear_2.ancestral",progress=T),train=analysisdf_processed,progress = "text",parallel=T) # CRASHED
 
 # can't get it to work with categorical variables 
 
