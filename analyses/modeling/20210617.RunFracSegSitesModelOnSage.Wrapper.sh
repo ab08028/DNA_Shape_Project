@@ -8,7 +8,7 @@
 #$ -pe serial 10
 ######## trying to run modeling script in hoffman #######
 
-
+###### SAVE NEW WRAPPER SCRIPT EACH TIME ######
 module load modules modules-init modules-gs # initialize modules 
 module load pcre2/10.35 R/4.0.4
 # need to load newer gcc for installations! 
@@ -35,17 +35,17 @@ module load gcc/10.2.0
 
 gitdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/modeling
 scriptdir=$gitdir/
-script="" # don't have dates on these
+
 # but date this running script each time
 
 todaysdate=`date +%Y%m%d`
 ##### CHANGE THESE APPROPRIATELY TO BE ABOUT SCRIPT YOU"RE RUNNING #########
-outcomeLabel=""
-modelLabel=""
-otherInfo=""
+outcomeLabel="FracSegSites.Log10"
+modelLabel="RF"
+otherInfo="Multispecies.DummyPopVar"
 
 description=${modelLabel}.${outcomeLabel}.${otherInfo}
-
+script=${description}.RUNONSAGE.R # this may not be the best way to do this
 outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 
 mkdir -p $outdir
