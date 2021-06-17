@@ -1,3 +1,11 @@
+#! /bin/bash
+#$ -l h_rt=20:00:00,h_data=20G
+#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
+#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
+#$ -m bea
+#$ -M annabel.beichman@gmail.com
+#$ -N runRModel
+#$ -pe serial 10
 ######## trying to run modeling script in hoffman #######
 
 
@@ -44,9 +52,7 @@ mkdir -p $outdir
 cp $scriptdir/$script $outdir/$script.COPYRUNON${todaysdate} # copy it to the outdir 
 # this Rscript has !#/usr/bin/env Rscript as setting
 
-qsub -V -o $outdir -e $outdir -N $description \
--l h_rt=20:00:00,mfree=20G -pe serial 10 \
-$scriptdir/$script $description $outdir
+Rscript $scriptdir/$script $description $outdir
 
 # would like output files and the script to be copied to the same outdir as a record. 
 
