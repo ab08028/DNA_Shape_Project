@@ -54,8 +54,12 @@ allData_multipop <- read.table(paste0(spectrumdir,"MULTIPOPULATION_spectrumCount
 
 # and now want to split train is sp A + B spectra across odd chroms, train is sp A + B spectra across even chroms. want to have species membership as a feature! see if it's VIP or not
 
+# calc frac of seg sites:
+allData_multipop <- allData_multipop %>%
+  group_by(label,window,population) %>%
+  mutate(fractionOfSegSites_perWindow = mutationCount/sum(mutationCount)) %>%
+  mutate(fractionOfSegSites_perWindow_LOG10=log10(fractionOfSegSites_perWindow))
 # merge with shapes
-
 allData_multipop$derived7mer <- substr(allData_multipop$mutationType,9,15)
 allData_multipop_intermediate <-merge(allData_multipop,shapes,by.x="ancestral7mer",by.y="motif")
 
