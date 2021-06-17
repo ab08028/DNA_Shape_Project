@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=20:00:00,h_data=10G
+#$ -l h_rt=20:00:00,mfree=20G
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N sandboxMouseModel
