@@ -344,4 +344,8 @@ shapplot1
 ggsave(paste0(outdir,"modelTrainedOnOneFold.SHAPVALUES.AssessedOnChr",windowOfAssessment,".png"),shapplot1,height=12,width=6)
 
 
+<<<<<<< HEAD
+#sink() # end sink
+=======
 sink() # end sink
+>>>>>>> 57ec320b184fd54c695f1cb0172b8c1ed038b71a
