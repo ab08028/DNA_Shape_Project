@@ -1,3 +1,7 @@
+#!/usr/bin/env Rscript
+#$ -m bea
+#$ -M annabel.beichman@gmail.com
+
 ############## try a new chromosome -based model to practice ###########
 require(tidymodels) # installing on hoffman 
 require(tidyverse) # instead of caret going to use tidymodels
