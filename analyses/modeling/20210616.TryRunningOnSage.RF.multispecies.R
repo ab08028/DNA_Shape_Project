@@ -1,7 +1,3 @@
-#! /net/gs/vol3/software/modules-sw/R/4.0.4/Linux/CentOS7/x86_64/bin/Rscript
-#$ -m bea
-#$ -M annabel.beichman@gmail.com
-
 ############## try a new chromosome -based model to practice ###########
 require(tidymodels) # installing on hoffman 
 require(tidyverse) # instead of caret going to use tidymodels
@@ -31,7 +27,7 @@ args <- commandArgs(trailingOnly = TRUE)
 description <- args[1]
 outdir <- args[2]
 # trying to use sink() to catch all output: (errors will go to a different file)
-#sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
+sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
 #todaysdate=format(Sys.Date(), "%Y%m%d")
 #outcomeLabel="MutationRate"
@@ -348,4 +344,8 @@ shapplot1
 ggsave(paste0(outdir,"modelTrainedOnOneFold.SHAPVALUES.AssessedOnChr",windowOfAssessment,".png"),shapplot1,height=12,width=6)
 
 
+<<<<<<< HEAD
 #sink() # end sink
+=======
+sink() # end sink
+>>>>>>> 57ec320b184fd54c695f1cb0172b8c1ed038b71a
