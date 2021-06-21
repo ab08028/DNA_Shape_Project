@@ -74,7 +74,7 @@ epsilon=1e-11 # a tiny amount to add to the mutation rate so that it's not 0 eve
 # call whatever you want your final outcome to be 'outcome' so that it's the same in all plots
 # picked this because it's smaller than 1/genome size 
 allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
-  group_by(population,window,label) %>%
+  group_by(population,newGroup,label) %>%
   # add in epislon 
   mutate(mutationCount_divByTargetCount_plusEpsilon=mutationCount_divByTargetCount+epsilon) %>%
   mutate(mutationCount_divByTargetCount_plusEpsilon_RESCALED=mutationCount_divByTargetCount_plusEpsilon/sum(mutationCount_divByTargetCount_plusEpsilon)) %>%
@@ -96,12 +96,12 @@ saveRDS(split, file = paste0(outdir,"split.rds"))
 head(training(split),4)
 head(testing(split),4)
 
-train_data_cv <- group_vfold_cv(training(split),group=window) # okay so I can make windows based on a grouping variable like so.
+train_data_cv <- group_vfold_cv(training(split),group=newGroup) # okay so I can make newGroups based on a grouping variable like so.
 
 # to see a fold
 # one fold: train_data_cv[[1]][[1]]
-unique(analysis(train_data_cv[[1]][[1]])$window)# the inside windows (chromosomes in this case): 
-unique(assessment(train_data_cv[[1]][[1]])$window) # the held out window: 
+unique(analysis(train_data_cv[[1]][[1]])$newGroup)# the inside newGroups (chromosomes in this case): 
+unique(assessment(train_data_cv[[1]][[1]])$newGroup) # the held out newGroup: 
 # okay this works great! 
 
 ########## RECIPE #########
@@ -111,7 +111,7 @@ rand_forest_processing_recipe <-
   
   recipe(outcome ~ .,data=training(split)) %>% # 
   update_role(mutationType, new_role="7mer mutation type label") %>%
-  step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount_plusEpsilon,mutationCount_divByTargetCount_plusEpsilon_RESCALED,window,label,ancestral7merCount) %>%
+  step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount_plusEpsilon,mutationCount_divByTargetCount_plusEpsilon_RESCALED,newGroup,label,ancestral7merCount) %>%
   step_dummy(all_nominal_predictors()) # KEEPING population in here as a predictor careful here that nothing else slips in! but dummy encoding it;; which RF doesn't need but xgboost and SHAP values does so just doing it 
 rand_forest_processing_recipe %>% summary()
 rand_forest_processing_recipe
@@ -180,7 +180,7 @@ rand_forest_Fold01_predictions
 truth_prediction_df <- cbind(assessment(oneFoldSetToTrainAndAssessOn),rand_forest_Fold01_predictions)
 View(truth_prediction_df) # VIEW doesn't show .pred column for some reason
 
-windowOfAssessment=toString(unique(truth_prediction_df$window))
+windowOfAssessment=toString(unique(truth_prediction_df$newGroup))
 windowOfAssessment
 #windowOfAssessment=9
 saveRDS(truth_prediction_df,file=paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onChr",windowOfAssessment,".rds")) # ah that's a problem for loading it back in -- need the window ID 
@@ -199,11 +199,11 @@ rand_forest_Fold01_fit_predictions_plot <-  ggplot(truth_prediction_df, aes(y=.p
   geom_point()+
   geom_abline()+
   facet_wrap(~population)+
-  ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$window)),")"))+
+  ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
   theme_bw()
 rand_forest_Fold01_fit_predictions_plot
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),rand_forest_Fold01_fit_predictions_plot,height=6,width=9)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),rand_forest_Fold01_fit_predictions_plot,height=6,width=9)
 
 
 ########### facet by central mutation type and get individual rsqs ##############
@@ -211,14 +211,14 @@ rsqsPerSpeciesAndMutationType <- truth_prediction_df %>%
   group_by(centralMutationType,population) %>%
   rsq(truth=outcome,estimate=.pred)
 rsqsPerSpeciesAndMutationType
-write.table(rsqsPerSpeciesAndMutationType,paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".txt"),quote = F,row.names=F,sep="\t")
+write.table(rsqsPerSpeciesAndMutationType,paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".txt"),quote = F,row.names=F,sep="\t")
 rsqPerMutplot <- ggplot(rsqsPerSpeciesAndMutationType,aes(x=centralMutationType,y=.estimate,fill=population))+
   geom_col(position="dodge")+
   theme_bw()+
   ylab("r-squared")
 rsqPerMutplot
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),rsqPerMutplot,height=3,width=5)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutationType.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),rsqPerMutplot,height=3,width=5)
 
 ####  add rsq values to plot if possible ###
 rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, aes(y=.pred,x=outcome,color=centralMutationType))+
@@ -226,11 +226,11 @@ rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, 
   geom_abline()+
   geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=-6,y=-1,label=round(.estimate,4)),color="black")+
   facet_grid(~centralMutationType~population)+
-  ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$window)),")"))+
+  ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
   theme_bw()
 rand_forest_Fold01_fit_predictions_plot_faceted
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.FacetedPerMutationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),rand_forest_Fold01_fit_predictions_plot_faceted,height=12,width=9)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.FacetedPerMutationType.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),rand_forest_Fold01_fit_predictions_plot_faceted,height=12,width=9)
 
 ############ VIP: variable importance ###########
 ranger_obj <- pull_workflow_fit(rand_forest_Fold01_fit_notlastfit)$fit
@@ -238,12 +238,12 @@ ranger_obj
 #OOB prediction error (MSE):       3.130142e-06 
 # R squared (OOB):                  0.9729254
 vi_scores <- vip::vi(ranger_obj)
-write.table(vi_scores,paste0(outdir,"modelTrainedOnOneFold.VIPScores.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".txt"),quote = F,row.names=F,sep="\t")
+write.table(vi_scores,paste0(outdir,"modelTrainedOnOneFold.VIPScores.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".txt"),quote = F,row.names=F,sep="\t")
 
 vip_plot <- vip(vi_scores,include_type = T,num_features = 100)
 vip_plot
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.VIP.Plot.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),vip_plot,height=12,width=5)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.VIP.Plot.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),vip_plot,height=12,width=5)
 #vip(ranger_obj,include_type = T,num_features = 20)
 
 ########## try to find interactions? ############
@@ -262,7 +262,7 @@ speciesComparisonPlot <- ggplot(truth_prediction_df_spread,aes(x=outcome_Mmd,y=o
   geom_point(aes(x=.pred_Mmd,y=.pred_Ms),shape=1,color="red")+
   geom_abline()
 speciesComparisonPlot
-ggsave(paste0(outdir,"modelTrainedOnOneFold.SpeciesXYComparison.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),speciesComparisonPlot,height=5,width=7)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.SpeciesXYComparison.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),speciesComparisonPlot,height=5,width=7)
 
 # plot both species together
 plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=outcome,color=population))+
@@ -273,6 +273,6 @@ plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=outcome,colo
   theme_bw()+
   geom_abline()
 plotBothSpeciesTogether
-ggsave(paste0(outdir,"modelTrainedOnOneFold.ObsExpected.SpeciesTogether.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),plotBothSpeciesTogether,height=5,width=7)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.ObsExpected.SpeciesTogether.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),plotBothSpeciesTogether,height=5,width=7)
 
 sink()
