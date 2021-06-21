@@ -55,7 +55,7 @@ allInteractionResults <- NULL
 for (i in seq(1,dim(pairsOfTopScores)[2])){
   #print(pairsOfTopScores[,i])
   interact <- vint(ranger_obj,feature_names=pairsOfTopScores[,i],train=analysisdf_processed,progress = "text",parallel=T) 
-  #saveRDS(interact,paste0(outdir,"vint.rds"))
+  saveRDS(interact,paste0(outdir,"vint.intermediate.",i,".rds"))
   allInteractionResults <- rbind(allInteractionResults,interact)
   }
 saveRDS(allInteractionResults,paste0(outdir,"vint.rds"))
