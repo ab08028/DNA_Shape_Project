@@ -111,7 +111,7 @@ rand_forest_processing_recipe <-
   
   recipe(outcome ~ .,data=training(split)) %>% # 
   update_role(mutationType, new_role="7mer mutation type label") %>%
-  step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount_plusEpsilon,mutationCount_divByTargetCount_plusEpsilon_RESCALED,window,label,ancestral7merCount) %>%
+  step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount,mutationCount_divByTargetCount_plusEpsilon,mutationCount_divByTargetCount_plusEpsilon_RESCALED,window,label,ancestral7merCount) %>%
   step_dummy(all_nominal_predictors()) # KEEPING population in here as a predictor careful here that nothing else slips in! but dummy encoding it;; which RF doesn't need but xgboost and SHAP values does so just doing it 
 rand_forest_processing_recipe %>% summary()
 rand_forest_processing_recipe
