@@ -76,7 +76,7 @@ epsilon=1e-11 # a tiny amount to add to the mutation rate so that it's not 0 eve
 allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
   group_by(population,window,label) %>%
   # add in epislon 
-  mutate(mutationCount_divByTargetCount_plusEpsilon=mutationCount_divByTargetCount+epislon) %>%
+  mutate(mutationCount_divByTargetCount_plusEpsilon=mutationCount_divByTargetCount+epsilon) %>%
   mutate(mutationCount_divByTargetCount_plusEpsilon_RESCALED=mutationCount_divByTargetCount_plusEpsilon/sum(mutationCount_divByTargetCount_plusEpsilon)) %>%
   # final outcome variable is log10 scaled: 
   mutate(outcome=log10(mutationCount_divByTargetCount_plusEpsilon_RESCALED))
