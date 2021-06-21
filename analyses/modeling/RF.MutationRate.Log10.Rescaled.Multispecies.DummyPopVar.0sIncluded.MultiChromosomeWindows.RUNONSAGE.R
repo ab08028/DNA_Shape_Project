@@ -119,7 +119,7 @@ rand_forest_processing_recipe
 ######### MODEL SPECIFICATION #########
 rand_forest_ranger_model_specs <-
   rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
-  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=10) %>%
+  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=5) %>%
   set_mode('regression')
 rand_forest_ranger_model_specs
 
@@ -178,7 +178,7 @@ rand_forest_Fold01_predictions <- predict(object =rand_forest_Fold01_fit_notlast
 rand_forest_Fold01_predictions
 
 truth_prediction_df <- cbind(assessment(oneFoldSetToTrainAndAssessOn),rand_forest_Fold01_predictions)
-View(truth_prediction_df) # VIEW doesn't show .pred column for some reason
+#View(truth_prediction_df) # VIEW doesn't show .pred column for some reason
 
 windowOfAssessment=toString(unique(truth_prediction_df$newGroup))
 windowOfAssessment
