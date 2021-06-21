@@ -1,10 +1,10 @@
 #! /bin/bash
-#$ -l h_rt=20:00:00,mfree=25G
+#$ -l h_rt=10:00:00,mfree=30G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N RF.FracSegSites.Log10.Multispecies.DummyPopVar
+#$ -N RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
 #$ -pe serial 5
 ######## trying to run modeling script in hoffman #######
 
@@ -40,15 +40,13 @@ scriptdir=$gitdir/
 
 todaysdate=`date +%Y%m%d`
 ##### CHANGE THESE APPROPRIATELY TO BE ABOUT SCRIPT YOU"RE RUNNING #########
-#outcomeLabel="FracSegSites.Log10"
+#outcomeLabel="MutationRate.Log10.Rescaled"
 #modelLabel="RF"
 #otherInfo="Multispecies.DummyPopVar"
 
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
-
-description=RF.FracSegSites.Log10.Multispecies.DummyPopVar
-
-script=${description}.RUNONSAGE.R # this may not be the best way to do this
+description=RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
+script=${description}.RUNONSAGE.REDO.R # this may not be the best way to do this
 outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 
 mkdir -p $outdir

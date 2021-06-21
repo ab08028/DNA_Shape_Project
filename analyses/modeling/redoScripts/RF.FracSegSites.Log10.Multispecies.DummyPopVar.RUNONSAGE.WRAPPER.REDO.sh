@@ -48,7 +48,7 @@ todaysdate=`date +%Y%m%d`
 
 description=RF.FracSegSites.Log10.Multispecies.DummyPopVar
 
-script=${description}.RUNONSAGE.R # this may not be the best way to do this
+script=${description}.RUNONSAGE.REDO.R # this may not be the best way to do this
 outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 
 mkdir -p $outdir

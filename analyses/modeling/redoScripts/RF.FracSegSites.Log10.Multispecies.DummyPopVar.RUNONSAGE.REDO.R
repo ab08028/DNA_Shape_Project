@@ -92,8 +92,11 @@ rand_forest_processing_recipe <-
   # which consists of the formula (outcome ~ predictors) (don't want to include the 'variable' column)
   recipe(fractionOfSegSites_perWindow_LOG10 ~ .,data=training(split)) %>% # 
   update_role(mutationType, new_role="7mer mutation type label") %>%
-  step_rm(fractionOfSegSites_perWindow,mutationCount_divByTargetCount,derived7mer,ancestral7mer, mutationCount,window,label,ancestral7merCount) %>% # KEEPING population in here as a predictor careful here that nothing else slips in!
-  step_dummy(all_nominal_predictors()) 
+  step_rm(fractionOfSegSites_perWindow,mutationCount_divByTargetCount,derived7mer,ancestral7mer, mutationCount,window,label,ancestral7merCount) %>%
+  step_dummy(all_nominal_predictors())
+
+
+ # KEEPING population in here as a predictor careful here that nothing else slips in!
 rand_forest_processing_recipe %>% summary()
 saveRDS(rand_forest_processing_recipe,paste0(outdir,"recipe.rds"))
 
@@ -145,12 +148,12 @@ saveRDS(oneFoldSetToTrainAndAssessOn, file = paste0(outdir,"oneFoldSetToTrainAnd
 
 
 ######## hmm need to use fit() not last_fit() that's irritating ##########
-rand_forest_Fold01_fit_notlastfit <- fit(rand_forest_workflow,data = analysis(oneFoldSetToTrainAndAssessOn))
-rand_forest_Fold01_fit_notlastfit
+#rand_forest_Fold01_fit_notlastfit <- fit(rand_forest_workflow,data = analysis(oneFoldSetToTrainAndAssessOn))
+#rand_forest_Fold01_fit_notlastfit
 
-saveRDS(rand_forest_Fold01_fit_notlastfit, file = paste0(outdir,"modelTrainedOnOneFold.rds"))
+#saveRDS(rand_forest_Fold01_fit_notlastfit, file = paste0(outdir,"modelTrainedOnOneFold.rds"))
 # want to load it back in
-#rand_forest_Fold01_fit_notlastfit <- readRDS(paste0(outdir,"modelTrainedOnOneFold.rds"))
+rand_forest_Fold01_fit_notlastfit <- readRDS(paste0(outdir,"modelTrainedOnOneFold.rds"))
 # OOB prediction error (MSE):       3.130142e-06
 # R squared (OOB):                  0.9729254 
 # growing trees takes 1/2 hour; permutation importance takes another 1/2 hour.
