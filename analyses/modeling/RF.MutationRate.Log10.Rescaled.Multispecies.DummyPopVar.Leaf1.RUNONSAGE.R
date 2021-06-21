@@ -25,7 +25,7 @@ set.seed(42) # so results are reproducible
 
 args <- commandArgs(trailingOnly = TRUE)
 description <- args[1]
-outdir <- args[2]
+outdir <- paste0(args[2],"/")
 # trying to use sink() to catch all output: (errors will go to a different file)
 sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
@@ -101,12 +101,12 @@ rand_forest_processing_recipe <-
   step_dummy(all_nominal_predictors()) # KEEPING population in here as a predictor careful here that nothing else slips in! but dummy encoding it;; which RF doesn't need but xgboost and SHAP values does so just doing it 
 rand_forest_processing_recipe %>% summary()
 rand_forest_processing_recipe
-
+saveRDS(rand_forest_processing_recipe,paste0(outdir,"recipe.rds"))
 ######### MODEL SPECIFICATION #########
 # trying with leaf size  = 1 
 rand_forest_ranger_model_specs <-
   rand_forest(trees = 1000, mtry = 32, min_n = 1) %>% # I added in tree number = 1000
-  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=10) %>%
+  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=5) %>%
   set_mode('regression')
 rand_forest_ranger_model_specs
 
@@ -165,7 +165,7 @@ rand_forest_Fold01_predictions <- predict(object =rand_forest_Fold01_fit_notlast
 rand_forest_Fold01_predictions
 
 truth_prediction_df <- cbind(assessment(oneFoldSetToTrainAndAssessOn),rand_forest_Fold01_predictions)
-View(truth_prediction_df) # VIEW doesn't show .pred column for some reason
+#View(truth_prediction_df) # VIEW doesn't show .pred column for some reason
 
 windowOfAssessment=toString(unique(truth_prediction_df$window))
 windowOfAssessment
@@ -186,7 +186,7 @@ rand_forest_Fold01_fit_predictions_plot <-  ggplot(truth_prediction_df, aes(y=.p
   geom_point()+
   geom_abline()+
   facet_wrap(~population)+
-  ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$window)),")"))+
+  ggtitle(paste0(description,"\n trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$window)),")"))+
   theme_bw()
 rand_forest_Fold01_fit_predictions_plot
 
@@ -213,7 +213,7 @@ rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, 
   geom_abline()+
   geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=-6,y=-1,label=round(.estimate,4)),color="black")+
   facet_grid(~centralMutationType~population)+
-  ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$window)),")"))+
+  ggtitle(paste0(description,"\n trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$window)),")"))+
   theme_bw()
 rand_forest_Fold01_fit_predictions_plot_faceted
 

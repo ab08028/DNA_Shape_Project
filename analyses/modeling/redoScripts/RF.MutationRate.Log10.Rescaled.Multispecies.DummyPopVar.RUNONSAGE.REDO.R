@@ -54,17 +54,21 @@ allData_multipop <- read.table(paste0(spectrumdir,"MULTIPOPULATION_spectrumCount
 
 # and now want to split train is sp A + B spectra across odd chroms, train is sp A + B spectra across even chroms. want to have species membership as a feature! see if it's VIP or not
 
-# calc frac of seg sites:
-allData_multipop <- allData_multipop %>%
-  group_by(label,window,population) %>%
-  mutate(fractionOfSegSites_perWindow = mutationCount/sum(mutationCount)) %>%
-  mutate(fractionOfSegSites_perWindow_LOG10=log10(fractionOfSegSites_perWindow))
 # merge with shapes
+
 allData_multipop$derived7mer <- substr(allData_multipop$mutationType,9,15)
 allData_multipop_intermediate <-merge(allData_multipop,shapes,by.x="ancestral7mer",by.y="motif")
 
 allData_withShapes_unprocessed <- merge(allData_multipop_intermediate,shapes,by.x="derived7mer",by.y="motif",suffixes=c(".ancestral",".derived"))
 
+
+########### want to rescale outcome variable rate so it's relative #######
+allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
+  group_by(population,window,label) %>%
+  mutate(mutationCount_divByTargetCount_RESCALED=mutationCount_divByTargetCount/sum(mutationCount_divByTargetCount)) %>%
+  mutate(mutationCount_divByTargetCount_RESCALED_LOG10=log10(mutationCount_divByTargetCount_RESCALED))
+
+# this maintains the ranking but rescales the outcome ; try it! 
 
 ####### make your splits into train/test ##########
 # not splitting by population so there will be 2x as many train and test observations, one from each species
@@ -73,6 +77,7 @@ indices <-
        assessment = which(allData_withShapes_unprocessed$label=="TEST"))
 
 split <- make_splits(indices,allData_withShapes_unprocessed)
+saveRDS(split, file = paste0(outdir,"split.rds"))
 
 # if you want to see what's what:
 head(training(split),4)
@@ -90,13 +95,13 @@ unique(assessment(train_data_cv[[1]][[1]])$window) # the held out window:
 ####### should I sum up each non held-out fold somehow? skip for now. ##########
 rand_forest_processing_recipe <- 
   # which consists of the formula (outcome ~ predictors) (don't want to include the 'variable' column)
-  recipe(fractionOfSegSites_perWindow_LOG10 ~ .,data=training(split)) %>% # 
+  recipe(mutationCount_divByTargetCount_RESCALED_LOG10 ~ .,data=training(split)) %>% # 
   update_role(mutationType, new_role="7mer mutation type label") %>%
-  step_rm(fractionOfSegSites_perWindow,mutationCount_divByTargetCount,derived7mer,ancestral7mer, mutationCount,window,label,ancestral7merCount) %>% # KEEPING population in here as a predictor careful here that nothing else slips in!
-  step_dummy(all_nominal_predictors()) 
+  step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount,mutationCount_divByTargetCount_RESCALED,window,label,ancestral7merCount) %>%
+  step_dummy(all_nominal_predictors()) # KEEPING population in here as a predictor careful here that nothing else slips in! but dummy encoding it;; which RF doesn't need but xgboost and SHAP values does so just doing it 
 rand_forest_processing_recipe %>% summary()
+rand_forest_processing_recipe
 saveRDS(rand_forest_processing_recipe,paste0(outdir,"recipe.rds"))
-
 ######### MODEL SPECIFICATION #########
 rand_forest_ranger_model_specs <-
   rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
@@ -145,12 +150,12 @@ saveRDS(oneFoldSetToTrainAndAssessOn, file = paste0(outdir,"oneFoldSetToTrainAnd
 
 
 ######## hmm need to use fit() not last_fit() that's irritating ##########
-rand_forest_Fold01_fit_notlastfit <- fit(rand_forest_workflow,data = analysis(oneFoldSetToTrainAndAssessOn))
-rand_forest_Fold01_fit_notlastfit
+#rand_forest_Fold01_fit_notlastfit <- fit(rand_forest_workflow,data = analysis(oneFoldSetToTrainAndAssessOn))
+#rand_forest_Fold01_fit_notlastfit
 
-saveRDS(rand_forest_Fold01_fit_notlastfit, file = paste0(outdir,"modelTrainedOnOneFold.rds"))
+#saveRDS(rand_forest_Fold01_fit_notlastfit, file = paste0(outdir,"modelTrainedOnOneFold.rds"))
 # want to load it back in
-#rand_forest_Fold01_fit_notlastfit <- readRDS(paste0(outdir,"modelTrainedOnOneFold.rds"))
+rand_forest_Fold01_fit_notlastfit <- readRDS(paste0(outdir,"modelTrainedOnOneFold.rds"))
 # OOB prediction error (MSE):       3.130142e-06
 # R squared (OOB):                  0.9729254 
 # growing trees takes 1/2 hour; permutation importance takes another 1/2 hour.
@@ -169,14 +174,14 @@ saveRDS(truth_prediction_df,file=paste0(outdir,"modelTrainedOnOneFold.PREDICTION
 # load it back in: 
 #truth_prediction_df <- readRDS(paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onChr",windowOfAssessment,".rds"))
 # get rsq
-rsq(truth_prediction_df,truth=fractionOfSegSites_perWindow_LOG10,estimate=.pred)
+rsq(truth_prediction_df,truth=mutationCount_divByTargetCount_RESCALED_LOG10,estimate=.pred)
 # 1 rsq     standard       0.980
-rmse(truth_prediction_df,truth=fractionOfSegSites_perWindow_LOG10,estimate=.pred)
+rmse(truth_prediction_df,truth=mutationCount_divByTargetCount_RESCALED_LOG10,estimate=.pred)
 
 #  rmse    standard     0.00155 ; kind of big? 
 truth_prediction_df$centralMutationType <- paste0(substr(truth_prediction_df$mutationType,4,4),".",substr(truth_prediction_df$mutationType,12,12))
 # note this doesn't have the 1-coded pops unless you juice() it but rows are still in same order 
-rand_forest_Fold01_fit_predictions_plot <-  ggplot(truth_prediction_df, aes(y=.pred,x=fractionOfSegSites_perWindow_LOG10,color=centralMutationType,shape=population))+
+rand_forest_Fold01_fit_predictions_plot <-  ggplot(truth_prediction_df, aes(y=.pred,x=mutationCount_divByTargetCount_RESCALED_LOG10,color=centralMutationType,shape=population))+
   geom_point()+
   geom_abline()+
   facet_wrap(~population)+
@@ -190,7 +195,7 @@ ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.AssessedOnChr",toStr
 ########### facet by central mutation type and get individual rsqs ##############
 rsqsPerSpeciesAndMutationType <- truth_prediction_df %>%
   group_by(centralMutationType,population) %>%
-  rsq(truth=fractionOfSegSites_perWindow_LOG10,estimate=.pred)
+  rsq(truth=mutationCount_divByTargetCount_RESCALED_LOG10,estimate=.pred)
 rsqsPerSpeciesAndMutationType
 write.table(rsqsPerSpeciesAndMutationType,paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".txt"),quote = F,row.names=F,sep="\t")
 rsqPerMutplot <- ggplot(rsqsPerSpeciesAndMutationType,aes(x=centralMutationType,y=.estimate,fill=population))+
@@ -202,7 +207,7 @@ rsqPerMutplot
 ggsave(paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),rsqPerMutplot,height=3,width=5)
 
 ####  add rsq values to plot if possible ###
-rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, aes(y=.pred,x=fractionOfSegSites_perWindow_LOG10,color=centralMutationType))+
+rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, aes(y=.pred,x=mutationCount_divByTargetCount_RESCALED_LOG10,color=centralMutationType))+
   geom_point()+
   geom_abline()+
   geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=-6,y=-1,label=round(.estimate,4)),color="black")+
@@ -228,17 +233,17 @@ ggsave(paste0(outdir,"modelTrainedOnOneFold.VIP.Plot.AssessedOnChr",toString(uni
 #vip(ranger_obj,include_type = T,num_features = 20)
 
 ########## try to find interactions? ############
-#vint(ranger_obj,feature_names=c("feature_1_Shear_2.derived","feature_1_Shear_2.ancestral",progress=T),train=analysis(oneFoldSetToTrainAndAssessOn)) # CRASHED
+#vint(ranger_obj,feature_names=c("feature_1_Shear_2.derived","feature_1_Shear_2.ancestral"),progress=T),train=analysis(oneFoldSetToTrainAndAssessOn)) # CRASHED
 
 # can't get it to work with categorical variables 
 
 ######## want to try to find sites that are at very different rates between the mouse species and focus on those and what makes them tick #############
 head(truth_prediction_df)
-truth_prediction_df_spread <- pivot_wider(truth_prediction_df[,c("mutationType","population","fractionOfSegSites_perWindow_LOG10",".pred","centralMutationType")],id_cols = c(mutationType,population,centralMutationType),names_from=population,values_from=c(fractionOfSegSites_perWindow_LOG10,.pred)) 
+truth_prediction_df_spread <- pivot_wider(truth_prediction_df[,c("mutationType","population","mutationCount_divByTargetCount_RESCALED_LOG10",".pred","centralMutationType")],id_cols = c(mutationType,population,centralMutationType),names_from=population,values_from=c(mutationCount_divByTargetCount_RESCALED_LOG10,.pred)) 
 
 head(truth_prediction_df_spread)
 # this is really useful: plot the difference between the two species and how well the predictions do (species are off of y=x line because of diff muttion rates; model picks that up! super cool)
-speciesComparisonPlot <- ggplot(truth_prediction_df_spread,aes(x=fractionOfSegSites_perWindow_LOG10_Mmd,y=fractionOfSegSites_perWindow_LOG10_Ms))+
+speciesComparisonPlot <- ggplot(truth_prediction_df_spread,aes(x=mutationCount_divByTargetCount_RESCALED_LOG10_Mmd,y=mutationCount_divByTargetCount_RESCALED_LOG10_Ms))+
   geom_point()+
   geom_point(aes(x=.pred_Mmd,y=.pred_Ms),shape=1,color="red")+
   geom_abline()
@@ -246,7 +251,7 @@ speciesComparisonPlot
 ggsave(paste0(outdir,"modelTrainedOnOneFold.SpeciesXYComparison.AssessedOnChr",toString(unique(truth_prediction_df$window)),".png"),speciesComparisonPlot,height=5,width=7)
 
 # plot both species together
-plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=fractionOfSegSites_perWindow_LOG10,color=population))+
+plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=mutationCount_divByTargetCount_RESCALED_LOG10,color=population))+
   theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())+
   geom_point(size=0.1)+
   #scale_x_log10()+

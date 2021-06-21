@@ -1,11 +1,11 @@
 #! /bin/bash
-#$ -l h_rt=20:00:00,mfree=25G
+#$ -l h_rt=200:00:00,mfree=2G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N RF.FracSegSites.Log10.Multispecies.DummyPopVar
-#$ -pe serial 5
+#$ -N vint
+#$ -pe serial 25
 ######## trying to run modeling script in hoffman #######
 
 ###### SAVE NEW WRAPPER SCRIPT EACH TIME ######
@@ -46,16 +46,19 @@ todaysdate=`date +%Y%m%d`
 
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
 
-description=RF.FracSegSites.Log10.Multispecies.DummyPopVar
 
-script=${description}.RUNONSAGE.R # this may not be the best way to do this
-outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
+description=RF.MutationRate.Log10.Multispecies.DummyPopVar
+indir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210618"_${description}"/" # must end in "/"
+#script=${description}.RUNONSAGE.R # this may not be the best way to do this
+#script=RF.FracSegSites.Log10.Multispecies.DummyPopVar.2.VINT.RUNONSAGE.R
+script=VINT.RUNONSAGE.R
+#outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 
-mkdir -p $outdir
-cp $scriptdir/$script $outdir/$script.COPYRUNON${todaysdate} # copy it to the outdir 
+#mkdir -p $outdir
+#cp $scriptdir/$script $outdir/$script.COPYRUNON${todaysdate} # copy it to the outdir 
 # this Rscript has !#/usr/bin/env Rscript as setting
 
-Rscript $scriptdir/$script $description $outdir
+Rscript $scriptdir/$script $indir
 
 # would like output files and the script to be copied to the same outdir as a record. 
 
