@@ -199,7 +199,7 @@ rand_forest_Fold01_fit_predictions_plot <-  ggplot(truth_prediction_df, aes(y=.p
   geom_point()+
   geom_abline()+
   facet_wrap(~population)+
-  ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
+  ggtitle(paste0(description,"\ntrained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
   theme_bw()
 rand_forest_Fold01_fit_predictions_plot
 
@@ -226,7 +226,7 @@ rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, 
   geom_abline()+
   geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=-6,y=-1,label=round(.estimate,4)),color="black")+
   facet_grid(~centralMutationType~population)+
-  ggtitle(paste0("OUTCOME: ",outcomeLabel,"\nALL 7mer mutation types;\n",modelLabel," trained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
+  ggtitle(paste0(description,"\ntrained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
   theme_bw()
 rand_forest_Fold01_fit_predictions_plot_faceted
 
