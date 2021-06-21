@@ -4,7 +4,7 @@
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
-#$ -pe serial 10
+#$ -pe serial 5
 ######## trying to run modeling script in hoffman #######
 
 ###### SAVE NEW WRAPPER SCRIPT EACH TIME ######
