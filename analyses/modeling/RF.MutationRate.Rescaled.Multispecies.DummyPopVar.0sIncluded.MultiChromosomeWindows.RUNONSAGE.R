@@ -75,7 +75,6 @@ allData_withShapes_unprocessed <- merge(allData_multipop_intermediate,shapes,by.
 # picked this because it's smaller than 1/genome size 
 allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
   group_by(population,newGroup,label) %>%
-  # add in epsilon 
   mutate(outcome=mutationCount_divByTargetCount/sum(mutationCount_divByTargetCount)) 
 
 # this maintains the ranking but rescales the outcome ; try it! 
