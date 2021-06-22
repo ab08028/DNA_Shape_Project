@@ -70,7 +70,8 @@ allData_withShapes_unprocessed <- merge(allData_multipop_intermediate,shapes,by.
 
 
 ########### want to rescale outcome variable rate so it's relative #######
-epsilon=1e-8 # a tiny amount to add to the mutation rate so that it's not 0 ever
+epsilon=1e-6 # a tiny amount to add to the mutation rate so that it's not 0 ever
+print(paste0("epsilon: ",epsilon))
 # call whatever you want your final outcome to be 'outcome' so that it's the same in all plots
 # picked this because it's smaller than 1/genome size 
 allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
