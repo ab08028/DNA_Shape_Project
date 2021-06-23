@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=100:00:00,h_data=10G
+#$ -l h_rt=20:00:00,h_data=6G
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N mouseMutyper7merSpectrum
@@ -25,8 +25,7 @@ mutyperdir=/net/harris/vol1/home/beichman/mice/analyses/mutyper/mutyperResults_2
 
 variantdir=$mutyperdir/mutyper_variant_files # variant files (assumes you've already run mutyper variants)
 
-variantdir2=$mutyperdir/mutyper_variant_files_separatedIntoEvenOddBp
-mkdir -p $variantdir2
+
 poplistdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/BearAdmixtureProject/samples/mouseSamples/populationFilesForMutyper
 
 
@@ -37,12 +36,10 @@ targetsoutdir=$mutyperdir/training_and_test_targets_perChr
 mkdir -p $spectraoutdir
 mkdir -p $targetsoutdir
 
+vcf=$variantdir/${chromosome}.mutyper.variants.mutationTypes.noFixedSites.AncestralDerivedNotRefAlt.SomeRevComped.NOSTRICT.ALLFREQS.7mer.vcf.gz
 
-vcf=${chromosome}.mutyper.variants.mutationTypes.noFixedSites.AncestralDerivedNotRefAlt.SomeRevComped.NOSTRICT.ALLFREQS.7mer.vcf.gz
-# located in $variantdir
 # need to index the vcf ^
-# only once: 
-bcftools index $variantdir/$vcf 
+bcftools index $vcf 
 
 beddir=/net/harris/vol1/home/beichman/mice/analyses/ancestralReferenceFastas/separate_even_odd_bp_fromRefGenome
 # testing even/odd separation method:
@@ -90,12 +87,6 @@ mutyper targets --k 7 --bed $oddBed $ancestralFastafilename  > $targetsoutdir/od
 
 mutyper targets --k 7 --bed $evenBed  $ancestralFastafilename > $targetsoutdir/evenSites.mutyper.targets.7mer.chr${SGE_TASK_ID}.nostrict.txt
 
-evenvcf=$variantdir2/${vcf%.gz}.EVENONLY.gz
-oddvcf=$variantdir2/${vcf%.gz}.ODDONLY.gz
-echo "starting to create odd variants file"
-bcftools view -R $oddBed $variantdir/$vcf -Oz $evenvcf
-echo "starting to create even variants file"
-bcftools view -R $evenBed $variantdir/$vcf -Oz $oddvcf
 
 for pop in $populations
 do
@@ -119,7 +110,7 @@ popfile=$poplistdir/${pop}.txt
 ### old way to do it: bcftools view -S $popfile $vcf |  bcftools view -c 1:minor  | awk '{if(/#/ || $2%2!=0)print}' |  mutyper spectra --population - > $outdir/${chromosome}_${pop}_TRAINING.mutyper.spectra.odd_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
 # want to use the bed file of regions ; note that they are 0-based and vcfs are 1-based so if the site looks even in bed fmt eg chr1 2 3 that is actually chr1 3 in vcf so is odd. 
 # doesn't really matter just be consistent between targets/spectra and use same bed files and you'll be ok
-bcftools view -S $popfile $oddvcf | bcftools view -c 1:minor |  mutyper spectra --population - > $spectraoutdir/${chromosome}_${pop}_TRAINING.mutyper.spectra.odd_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
+bcftools view -S $popfile $vcf -R $oddBed |  bcftools view -c 1:minor |  mutyper spectra --population - > $spectraoutdir/${chromosome}_${pop}_TRAINING.mutyper.spectra.odd_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
 
 
 ######### training set (odd bp) -- split into FOLDS(?) ##########
@@ -129,7 +120,7 @@ bcftools view -S $popfile $oddvcf | bcftools view -c 1:minor |  mutyper spectra 
 # make SURE it's ==0 here for EVEN
 
 ### old way to do it: bcftools view -S $popfile $vcf |  bcftools view -c 1:minor  |  awk '{if(/#/ || $2%2==0)print}' |  mutyper spectra --population - > $outdir/${chromosome}_${pop}_TESTING.mutyper.spectra.even_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
-bcftools view -S $popfile $evenvcf | bcftools -c 1:minor  |  mutyper spectra --population - > $spectraoutdir/${chromosome}_${pop}_TESTING.mutyper.spectra.even_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
+bcftools view -S $popfile $vcf -R $evenBed |  bcftools view -c 1:minor  |  mutyper spectra --population - > $spectraoutdir/${chromosome}_${pop}_TESTING.mutyper.spectra.even_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
 
 
 
