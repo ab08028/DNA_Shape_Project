@@ -92,9 +92,9 @@ evenBed=$beddir/chr${SGE_TASK_ID}.evenPositionsIfConvertedTo1Based.0basedCoords.
 evenvcf=$variantdir2/${vcf%.gz}.EVENONLY.gz
 oddvcf=$variantdir2/${vcf%.gz}.ODDONLY.gz
 echo "starting to create odd variants file"
-bcftools view -R $oddBed $variantdir/$vcf -Oz -o $evenvcf
+bcftools view -R $oddBed $variantdir/$vcf -Oz -o $oddvcf
 echo "starting to create even variants file"
-bcftools view -R $evenBed $variantdir/$vcf -Oz -o $oddvcf
+bcftools view -R $evenBed $variantdir/$vcf -Oz -o $evenvcf
 
 for pop in $populations
 do
