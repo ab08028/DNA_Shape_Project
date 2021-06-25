@@ -1,11 +1,11 @@
 #! /bin/bash
-#$ -l h_rt=10:00:00,mfree=30G
+#$ -l h_rt=100:00:00,mfree=2G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
-#$ -pe serial 5
+#$ -N vint
+#$ -pe serial 30
 ######## trying to run modeling script in hoffman #######
 
 ###### SAVE NEW WRAPPER SCRIPT EACH TIME ######
@@ -40,20 +40,26 @@ scriptdir=$gitdir/
 
 todaysdate=`date +%Y%m%d`
 ##### CHANGE THESE APPROPRIATELY TO BE ABOUT SCRIPT YOU"RE RUNNING #########
-#outcomeLabel="MutationRate.Log10.Rescaled"
+#outcomeLabel="FracSegSites.Log10"
 #modelLabel="RF"
 #otherInfo="Multispecies.DummyPopVar"
 
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
-description=RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
-script=${description}.RUNONSAGE.R # this may not be the best way to do this
-outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 
-mkdir -p $outdir
-cp $scriptdir/$script $outdir/$script.COPYRUNON${todaysdate} # copy it to the outdir 
+
+description=model_006_RF.MutationRate.Rescaled.Multispecies.DummyPopVar.0sIncluded.MultiChromosomeWindows
+#20210622_RF.MutationRate.Rescaled.Multispecies.DummyPopVar.0sIncluded.MultiChromosomeWindows
+indir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210622"_${description}"/" # must end in "/"
+#script=${description}.RUNONSAGE.R # this may not be the best way to do this
+#script=RF.FracSegSites.Log10.Multispecies.DummyPopVar.2.VINT.RUNONSAGE.R
+script=VINT.RUNONSAGE.R
+#outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
+
+#mkdir -p $outdir
+#cp $scriptdir/$script $outdir/$script.COPYRUNON${todaysdate} # copy it to the outdir 
 # this Rscript has !#/usr/bin/env Rscript as setting
 
-Rscript $scriptdir/$script $description $outdir
+Rscript $scriptdir/$script $indir
 
 # would like output files and the script to be copied to the same outdir as a record. 
 

@@ -48,7 +48,7 @@ todaysdate=`date +%Y%m%d`
 #otherInfo="Multispecies.DummyPopVar"
 
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
-description=RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar.0sIncluded
+description=model_003_RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar.0sIncluded
 script=${description}.RUNONSAGE.R # this may not be the best way to do this
 outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 

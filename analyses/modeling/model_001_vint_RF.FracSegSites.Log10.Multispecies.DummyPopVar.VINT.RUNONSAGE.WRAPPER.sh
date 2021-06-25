@@ -47,12 +47,13 @@ todaysdate=`date +%Y%m%d`
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
 
 
-description=RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
+description=model_001_RF.MutationRate.Log10.Multispecies.DummyPopVar
 indir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210618"_${description}"/" # must end in "/"
 #script=${description}.RUNONSAGE.R # this may not be the best way to do this
 #script=RF.FracSegSites.Log10.Multispecies.DummyPopVar.2.VINT.RUNONSAGE.R
-#outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 script=VINT.RUNONSAGE.R
+#outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
+
 #mkdir -p $outdir
 #cp $scriptdir/$script $outdir/$script.COPYRUNON${todaysdate} # copy it to the outdir 
 # this Rscript has !#/usr/bin/env Rscript as setting
