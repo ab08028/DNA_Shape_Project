@@ -111,7 +111,7 @@ rand_forest_processing_recipe <-
   step_dummy(all_nominal_predictors()) # KEEPING population in here as a predictor careful here that nothing else slips in! but dummy encoding it;; which RF doesn't need but xgboost and SHAP values does so just doing it 
 rand_forest_processing_recipe %>% summary()
 rand_forest_processing_recipe
-
+saveRDS(rand_forest_processing_recipe,paste0(outdir,"recipe.rds"))
 ######### MODEL SPECIFICATION #########
 rand_forest_ranger_model_specs <-
   rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
