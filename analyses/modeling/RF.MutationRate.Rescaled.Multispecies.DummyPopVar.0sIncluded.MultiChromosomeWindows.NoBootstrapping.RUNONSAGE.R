@@ -26,6 +26,10 @@ set.seed(42) # so results are reproducible
 args <- commandArgs(trailingOnly = TRUE)
 description <- args[1]
 outdir <- args[2]
+# for testing:
+#description="RF.MutationRate.Rescaled.Multispecies.DummyPopVar.0sIncluded.MultiChromosomeWindows.NoBootstrapping"
+#outdir=paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/experiments/20210623_",description,"/")
+#dir.create(outdir)
 # trying to use sink() to catch all output: (errors will go to a different file)
 sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
@@ -46,24 +50,32 @@ print('reading in shapes')
 shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
 shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt"),header=T,sep="\t")
 rownames(shapes) <- shapes$motif
-# for testing on home computer:
+# for testing on home computer: 
 #shapes <- read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt",header=T,sep="\t")
-
 print('reading in spectrum')
 spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse/"
-
-
 ######## DIFFERENT IN THIS SCRIPT: NOW USING DATA THAT INCLUDES 0 ENTRIES (USE FROM NOW ON)######
-# (IF YOU WANT TO LOG SCALE THIS YOU HAVE TO ADD A TINY EPISLON TO MUTATION RATES TO LOG-SCALE THEM) but I'm not log-scaling or adding epsilon for now 
+# IF YOU WANT TO LOG SCALE THIS YOU HAVE TO ADD A TINY EPISLON TO MUTATION RATES TO LOG-SCALE THEM
 # AND ALSO HAS BIGGER WINDOWS (chr 1+3 2+4 etc.)
 allData_multipop <- read.table(paste0(spectrumdir,"TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt"),header=T) # 
-# for testing on home computer:
+
+# for testing on home computer: 
 #allData_multipop <- read.table("/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt",header=T)
+
 dim(allData_multipop)
 # need to get rid of NA entries
 print("getting rid of NA mutation rates due to no ancestral targets observed")
 allData_multipop <- na.omit(allData_multipop) 
 dim(allData_multipop)
+
+######## DIFFERENT IN THIS SCRIPT: summing up over test/train chromosomes ###########
+
+
+allData_multipop <- allData_multipop %>%
+  group_by(population,label,ancestral7mer, mutationType) %>%
+  summarise(totalMutationCount = sum(mutationCount),totaltargetCount=sum(ancestral7merCount)) # it's ok to sum up targets because you've grouped by ancestral7er type and mutation type so you aren't summing over multiple mutaiton types you are just summing over multiple chromosomes 
+
+allData_multipop$mutationCount_divByTargetCount <- allData_multipop$totalMutationCount / allData_multipop$totaltargetCount
 # and now want to split train is sp A + B spectra across odd chroms, train is sp A + B spectra across even chroms. want to have species membership as a feature! see if it's VIP or not
 
 # merge with shapes
@@ -71,47 +83,15 @@ dim(allData_multipop)
 allData_multipop$derived7mer <- substr(allData_multipop$mutationType,9,15)
 allData_multipop_intermediate <-merge(allData_multipop,shapes,by.x="ancestral7mer",by.y="motif")
 
-
-#### okay so for derived features I don't want to have all the sequence features repeated (?) only the ones that change (Pos_4_*)
 allData_withShapes_unprocessed <- merge(allData_multipop_intermediate,shapes,by.x="derived7mer",by.y="motif",suffixes=c(".ancestral",".derived"))
 
-######## DIFFERENT IN THIS SCRIPT: prior to rescaling, remove outlier 7mers that have very high mutation rate and try to fit without them #####################
-# remove outliers: 
-allData_withShapes_unprocessed$centralMutationType <- paste0(substr(allData_withShapes_unprocessed$mutationType,4,4),".",substr(allData_withShapes_unprocessed$mutationType,12,12))
 
-# note window is now called 'new group' -- at least for now. 
-# summarise mean and sd of mutaiton rate per group / per window 
-allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
-  group_by(centralMutationType,population,newGroup,label) %>%
-  mutate(mean=mean(mutationCount_divByTargetCount),sd=sd(mutationCount_divByTargetCount),twosd=2*sd)
-allData_withShapes_unprocessed
-# this just adds the same mean/sd to every mutation type within a window/population 
-# identify 7mers that are >2sd away from the corresponding mean 
-# View(meanSDPerwindowPerMutationType[,c("mean","sd","mutationType","centralMutationType","population","label","newGroup")]) <-- 
-allData_withShapes_unprocessed$flagOutlier <- "ok"
-#View(meanSDPerwindowPerMutationType[meanSDPerwindowPerMutationType$mutationCount_divByTargetCount>=meanSDPerwindowPerMutationType$mean+meanSDPerwindowPerMutationType$twosd,])
-allData_withShapes_unprocessed[allData_withShapes_unprocessed$mutationCount_divByTargetCount>=allData_withShapes_unprocessed$mean+10*(allData_withShapes_unprocessed$sd),]$flagOutlier <- ">= 10sd from mean of group"
-sum(allData_withShapes_unprocessed$flagOutlier!="ok")
-#View(meanSDPerwindowPerMutationType[meanSDPerwindowPerMutationType$flagOutlier!="ok",])
-outlierplot <- ggplot(allData_withShapes_unprocessed,aes(x=newGroup,y=mutationCount_divByTargetCount,color=flagOutlier))+
-  facet_wrap(~centralMutationType~population,scales="free")+
-  geom_point()
-ggsave(paste0(outdir,"outlierplot.maskingOutliers.png"),outlierplot,height=6,width=9)
-
-############### get rid of the outliers #################
-dim(allData_withShapes_unprocessed)
-allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
-  ungroup() %>% # have to ungroup because previously grouped (otherwise it puts central mutation type back in) 
-  subset(flagOutlier=="ok") %>%
-  select(-c(centralMutationType,mean,sd,twosd,flagOutlier))
-print('got rid of outliers')
-dim(allData_withShapes_unprocessed)
 ########### want to rescale outcome variable rate so it's relative #######
 # not adding epsilon because 
 # not log scaling # call whatever you want your final outcome to be 'outcome' so that it's the same in all plots
 # picked this because it's smaller than 1/genome size 
 allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
-  group_by(population,newGroup,label) %>%
+  group_by(population,label) %>%
   mutate(outcome=mutationCount_divByTargetCount/sum(mutationCount_divByTargetCount)) 
 
 # this maintains the ranking but rescales the outcome ; try it! 
@@ -129,12 +109,12 @@ saveRDS(split, file = paste0(outdir,"split.rds"))
 head(training(split),4)
 head(testing(split),4)
 
-train_data_cv <- group_vfold_cv(training(split),group=newGroup) # okay so I can make newGroups based on a grouping variable like so.
+#train_data_cv <- group_vfold_cv(training(split),group=newGroup) # okay so I can make newGroups based on a grouping variable like so.
 
 # to see a fold
 # one fold: train_data_cv[[1]][[1]]
-unique(analysis(train_data_cv[[1]][[1]])$newGroup)# the inside newGroups (chromosomes in this case): 
-unique(assessment(train_data_cv[[1]][[1]])$newGroup) # the held out newGroup: 
+#unique(analysis(train_data_cv[[1]][[1]])$newGroup)# the inside newGroups (chromosomes in this case): 
+#unique(assessment(train_data_cv[[1]][[1]])$newGroup) # the held out newGroup: 
 # okay this works great! 
 
 ########## RECIPE #########
@@ -144,15 +124,18 @@ rand_forest_processing_recipe <-
   
   recipe(outcome ~ .,data=training(split)) %>% # 
   update_role(mutationType, new_role="7mer mutation type label") %>%
-  step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount,newGroup,label,ancestral7merCount) %>%
+  step_rm(derived7mer,ancestral7mer, totaltargetCount, totalMutationCount,mutationCount_divByTargetCount,label) %>%
   step_dummy(all_nominal_predictors()) # KEEPING population in here as a predictor careful here that nothing else slips in! but dummy encoding it;; which RF doesn't need but xgboost and SHAP values does so just doing it 
 rand_forest_processing_recipe %>% summary()
 rand_forest_processing_recipe
 
 ######### MODEL SPECIFICATION #########
+######## DIFFERENT IN THIS SCRIPT: trying to use all the data in every tree (so the randomness only comes from the features being selected differently in each tree)
+# and going to reduce the data down to 1 spectrum?
 rand_forest_ranger_model_specs <-
   rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
-  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=5) %>%
+  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=5,oob.error=F,replace=F,sample.fraction=1) %>%
+  # setting oob.error = F to not calc oob error, setting with replacement to false, and setting frac to 1 -- let's see if that works 
   set_mode('regression')
 rand_forest_ranger_model_specs
 
@@ -166,7 +149,7 @@ rand_forest_workflow <- workflow() %>%
 rand_forest_workflow
 
 ########### TRAIN/TEST MODEL JUST USING ONE FOLD SET #########  
-oneFoldSetToTrainAndAssessOn <- train_data_cv[[1]][[1]]
+oneFoldSetToTrainAndAssessOn <- split # using train/test split instead of _cv # DONT DO THIS IN OTHER SCRIPTS!!!
 saveRDS(oneFoldSetToTrainAndAssessOn, file = paste0(outdir,"oneFoldSetToTrainAndAssessOn.rds"))
 # load back in:
 #oneFoldSetToTrainAndAssessOn <- readRDS(paste0(outdir,"oneFoldSetToTrainAndAssessOn.rds"))
@@ -213,10 +196,10 @@ rand_forest_Fold01_predictions
 truth_prediction_df <- cbind(assessment(oneFoldSetToTrainAndAssessOn),rand_forest_Fold01_predictions)
 #View(truth_prediction_df) # VIEW doesn't show .pred column for some reason
 
-windowOfAssessment=toString(unique(truth_prediction_df$newGroup))
-windowOfAssessment
+#windowOfAssessment=toString(unique(truth_prediction_df$newGroup))
+#windowOfAssessment
 #windowOfAssessment=9
-saveRDS(truth_prediction_df,file=paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onChr",windowOfAssessment,".rds")) # ah that's a problem for loading it back in -- need the window ID 
+saveRDS(truth_prediction_df,file=paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.TEST.rds")) # ah that's a problem for loading it back in -- need the window ID 
 
 # load it back in: 
 #truth_prediction_df <- readRDS(paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onChr",windowOfAssessment,".rds"))
@@ -232,11 +215,11 @@ rand_forest_Fold01_fit_predictions_plot <-  ggplot(truth_prediction_df, aes(y=.p
   geom_point()+
   geom_abline()+
   facet_wrap(~population)+
-  ggtitle(paste0(description,"\ntrained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
+  #ggtitle(paste0(description,"\ntrained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
   theme_bw()
 rand_forest_Fold01_fit_predictions_plot
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),rand_forest_Fold01_fit_predictions_plot,height=6,width=9)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.AssessedOnTEST.png"),rand_forest_Fold01_fit_predictions_plot,height=6,width=9)
 
 
 ########### facet by central mutation type and get individual rsqs ##############
@@ -244,39 +227,61 @@ rsqsPerSpeciesAndMutationType <- truth_prediction_df %>%
   group_by(centralMutationType,population) %>%
   rsq(truth=outcome,estimate=.pred)
 rsqsPerSpeciesAndMutationType
-write.table(rsqsPerSpeciesAndMutationType,paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".txt"),quote = F,row.names=F,sep="\t")
+write.table(rsqsPerSpeciesAndMutationType,paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutatationType.AssessedOnTEST.txt"),quote = F,row.names=F,sep="\t")
 rsqPerMutplot <- ggplot(rsqsPerSpeciesAndMutationType,aes(x=centralMutationType,y=.estimate,fill=population))+
   geom_col(position="dodge")+
   theme_bw()+
   ylab("r-squared")
 rsqPerMutplot
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutationType.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),rsqPerMutplot,height=3,width=5)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutationType.AssessedOnTEST.png"),rsqPerMutplot,height=3,width=5)
 
 ####  add rsq values to plot if possible ###
 rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, aes(y=.pred,x=outcome,color=centralMutationType))+
   geom_point()+
   geom_abline()+
   geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=1e-6,y=1e-4,label=round(.estimate,4)),color="black")+
-  facet_grid(~centralMutationType~population)+
-  ggtitle(paste0(description,"\ntrained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
-  theme_bw()
+  facet_grid(~centralMutationType~population,scales="free")+
+  #ggtitle(paste0(description,"\ntrained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
+  theme_bw() #+
+  #scale_x_log10()+
+  #scale_y_log10()
 rand_forest_Fold01_fit_predictions_plot_faceted
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.FacetedPerMutationType.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),rand_forest_Fold01_fit_predictions_plot_faceted,height=12,width=9)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.FacetedPerMutationType.AssessedOnTEST.png"),rand_forest_Fold01_fit_predictions_plot_faceted,height=12,width=9)
+
+
+
+####  tiny epsilon *after the modeling fact * so that you can plot 0 entries###
+epsilon=1e-6
+truth_prediction_df$.pred_PLUSEPSILON <- truth_prediction_df$.pred+epsilon
+truth_prediction_df$outcome_PLUSEPSILON <- truth_prediction_df$outcome+epsilon
+
+rand_forest_Fold01_fit_predictions_plot_faceted_log10_epsilon <-  ggplot(truth_prediction_df, aes(y=.pred_PLUSEPSILON,x=outcome_PLUSEPSILON,color=centralMutationType))+
+  geom_point()+
+  geom_abline()+
+  geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=1e-6,y=1e-4,label=round(.estimate,4)),color="black")+
+  facet_grid(~centralMutationType~population,scales="free")+
+  ggtitle(paste0("added epsilon = ",epsilon," to all points AFTER THE FACT\nto plot on log10 scale"))+
+  scale_y_log10()+
+  scale_x_log10()+
+  #ggtitle(paste0(description,"\ntrained on Fold01\n(all odd chrs but one, tested on just chr",toString(unique(truth_prediction_df$newGroup)),")"))+
+  theme_bw() 
+rand_forest_Fold01_fit_predictions_plot_faceted_log10_epsilon
+
+ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.FacetedPerMutationType.AssessedOnTEST.log10.PLUSEPSILONAFTERTHEFACT.png"),rand_forest_Fold01_fit_predictions_plot_faceted_log10_epsilon,height=12,width=9)
 
 ############ VIP: variable importance ###########
 ranger_obj <- pull_workflow_fit(rand_forest_Fold01_fit_notlastfit)$fit
 ranger_obj
-#OOB prediction error (MSE):       3.130142e-06 
-# R squared (OOB):                  0.9729254
-vi_scores <- vip::vi(ranger_obj)
-write.table(vi_scores,paste0(outdir,"modelTrainedOnOneFold.VIPScores.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".txt"),quote = F,row.names=F,sep="\t")
+# OOB error Nan
+vi_scores <- vip::vi(ranger_obj) # not able to do permutation improtance 
+#write.table(vi_scores,paste0(outdir,"modelTrainedOnOneFold.VIPScores.PerMutatationType.AssessedOnTEST.txt"),quote = F,row.names=F,sep="\t")
 
 vip_plot <- vip(vi_scores,include_type = T,num_features = 100)
-vip_plot
+vip_plot # not able to do permutation importance 
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.VIP.Plot.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),vip_plot,height=12,width=5)
+#ggsave(paste0(outdir,"modelTrainedOnOneFold.VIP.Plot.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),vip_plot,height=12,width=5)
 #vip(ranger_obj,include_type = T,num_features = 20)
 
 ########## try to find interactions? ############
@@ -295,7 +300,7 @@ speciesComparisonPlot <- ggplot(truth_prediction_df_spread,aes(x=outcome_Mmd,y=o
   geom_point(aes(x=.pred_Mmd,y=.pred_Ms),shape=1,color="red")+
   geom_abline()
 speciesComparisonPlot
-ggsave(paste0(outdir,"modelTrainedOnOneFold.SpeciesXYComparison.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),speciesComparisonPlot,height=5,width=7)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.SpeciesXYComparison.AssessedOnTEST.png"),speciesComparisonPlot,height=5,width=7)
 
 # plot both species together
 plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=outcome,color=population))+
@@ -306,6 +311,11 @@ plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=outcome,colo
   theme_bw()+
   geom_abline()
 plotBothSpeciesTogether
-ggsave(paste0(outdir,"modelTrainedOnOneFold.ObsExpected.SpeciesTogether.AssessedOnChr",toString(unique(truth_prediction_df$newGroup)),".png"),plotBothSpeciesTogether,height=5,width=7)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.ObsExpected.SpeciesTogether.AssessedOnTEST.png"),plotBothSpeciesTogether,height=5,width=7)
 
 sink()
+
+### make sure juiced data is what I want
+#juiceddf <- prep(rand_forest_processing_recipe,training = training(split)) %>%
+#  juice()
+#names(juiceddf) # cool this worked the way I wanted it to

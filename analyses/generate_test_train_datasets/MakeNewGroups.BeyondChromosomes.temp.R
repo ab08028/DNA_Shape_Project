@@ -5,7 +5,7 @@
 
 spectrumdir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/" # eventually save in resutls dir of dnashape project 
 
-datadf <- read.table(paste0(spectrumoutdir,"MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.USETHIS.txt"),header=T,sep="\t")
+datadf <- read.table(paste0(spectrumdir,"MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.USETHIS.txt"),header=T,sep="\t")
 dim(datadf) # 933774 good
 
 # okay I want to sum things up across multiple chroms
@@ -22,15 +22,17 @@ datadf[datadf$window %in% c(14,16,18),]$newGroup <- 8
 
 df2 <- datadf %>%
   group_by(newGroup,population,ancestral7mer, mutationType) %>%
-  summarise(ancestral7merCount=sum(ancestral7merCount),mutationCount=sum(mutationCount))
-
+  summarise(ancestral7merCount=sum(ancestral7merCount),mutationCount=sum(mutationCount)) ### actually think it may be ok maybe ? this isn't right! shouldn't sum up 7mer count per group -- that'll lead to a big over estimation I think ! uhoh! fix this!
+# oh! maybe I actually did this ok???? seems to add up correctly actually.... let's chill out and find out later.
+head(df2)
 View(df2)
+
 
 df2$mutationCount_divByTargetCount <- df2$mutationCount / df2$ancestral7merCount
 head(df2)
-df2 %>%
-  group_by(newGroup) %>%
-  summarise(totalMutations=sum(mutationCount))
+# df2 %>%
+#   group_by(newGroup) %>%
+#   summarise(totalMutations=sum(mutationCount))
 
 # need to label as train/test
 df2$label <- ""
