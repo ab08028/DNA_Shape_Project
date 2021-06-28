@@ -129,7 +129,7 @@ bcftools view -S $popfile $oddvcf | bcftools view -c 1:minor |  mutyper spectra 
 # make SURE it's ==0 here for EVEN
 
 ### old way to do it: bcftools view -S $popfile $vcf |  bcftools view -c 1:minor  |  awk '{if(/#/ || $2%2==0)print}' |  mutyper spectra --population - > $outdir/${chromosome}_${pop}_TESTING.mutyper.spectra.even_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
-bcftools view -S $popfile $evenvcf | bcftools -c 1:minor  |  mutyper spectra --population - > $spectraoutdir/${chromosome}_${pop}_TESTING.mutyper.spectra.even_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
+bcftools view -S $popfile $evenvcf | bcftools view -c 1:minor  |  mutyper spectra --population - > $spectraoutdir/${chromosome}_${pop}_TESTING.mutyper.spectra.even_bpOnly.PERPOPULATION.ALLFREQS.NOSTRICT.txt
 
 
 
