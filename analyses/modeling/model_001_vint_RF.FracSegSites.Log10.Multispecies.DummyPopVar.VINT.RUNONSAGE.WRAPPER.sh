@@ -4,7 +4,7 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N vint
+#$ -N model_001_vint
 #$ -pe serial 25
 ######## trying to run modeling script in hoffman #######
 
