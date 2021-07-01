@@ -157,6 +157,7 @@ xgb_grid <- grid_latin_hypercube(
   learn_rate(),
   size = 30
 )
+# ranges have model specific defaults - what are they?
 print('grid of tuning parameters (latin hypercube)')
 xgb_grid
 dim(xgb_grid)
