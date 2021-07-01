@@ -1,12 +1,12 @@
 #! /bin/bash
 #$ -l h_rt 40:00:00,mfree=2G
-#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
-#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
+#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling/vint
+#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling/vint
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N model_001_vint_parallel
 #$ -pe serial 5
-#$ -t 1-10 
+#$ -t 1-10
 #### NEED TO CHANGE THIS BASED ON HOW MANY TOP PARAMETERS YOU'RE USING
 # THIS ISN'T WELL AUTOMATED --- JUST GET IT WORKING WELL ENOUGH FOR NOW.
 # NEED TO MANUALLY CALCULATE 5 CHOOSE 2 = 10 TO GET THE SIZE OF THE ARRAY
@@ -51,7 +51,8 @@ todaysdate=`date +%Y%m%d`
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
 
 
-description=model_001_RF.MutationRate.Log10.Multispecies.DummyPopVar
+description=model_002_RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
+
 indir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210618"_${description}"/" # must end in "/"
 #script=${description}.RUNONSAGE.R # this may not be the best way to do this
 #script=RF.FracSegSites.Log10.Multispecies.DummyPopVar.2.VINT.RUNONSAGE.R
@@ -60,7 +61,7 @@ script=VINT.RUNONSAGE.parallelPairsOfParams.R
 # need to specify top number of parameters (5) to compare interactions of and also the index will be SGE_TASK_ID
 
 
-topXParams=5
+topXParams=5 ####### IF YOU CHANGE THIS YOU MUST ALSO CHANGE THE -t setting up above to topXparams choose 2 to get all pairs as an array ######### 
 Rscript $scriptdir/$script $indir $topXParams $SGE_TASK_ID
 
 # would like output files and the script to be copied to the same outdir as a record. 
