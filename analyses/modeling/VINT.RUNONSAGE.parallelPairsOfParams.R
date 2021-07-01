@@ -23,7 +23,7 @@ parameter_pair_index <- as.numeric(args[3]) # give the index when you submit the
 
 oneFoldSetToTrainAndAssessOn <- readRDS(paste0(indir,"oneFoldSetToTrainAndAssessOn.rds"))
 
-windowOfAssessment=toString(unique(assessment(oneFoldSetToTrainAndAssessOn)$newGroup))
+windowOfAssessment=toString(unique(assessment(oneFoldSetToTrainAndAssessOn)$window))
 
 model <- readRDS(paste0(indir,"modelTrainedOnOneFold.rds"))
 
@@ -36,6 +36,7 @@ recipe <- readRDS(paste0(indir,"recipe.rds"))
 analysisdf_processed <- prep(recipe, analysis(oneFoldSetToTrainAndAssessOn)) %>% 
   juice() %>% 
   select(-c(mutationType)) 
+
 head(analysisdf_processed)
 
 #interact <- vint(ranger_obj,feature_names=c("feature_1_Shear_2.derived","feature_1_Shear_2.ancestral",progress=T),train=analysisdf_processed,progress = "text",parallel=T) # CRASHED
