@@ -4,7 +4,7 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N model_001_vint_parallel
+#$ -N model_002_vint_parallel
 #$ -pe serial 5
 #$ -t 1:10
 
@@ -52,7 +52,7 @@ todaysdate=`date +%Y%m%d`
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
 
 
-description=model_001_RF.MutationRate.Log10.Multispecies.DummyPopVar
+description=model_002_RF.MutationRate.Log10.Multispecies.DummyPopVar
 indir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210618"_${description}"/" # must end in "/"
 #script=${description}.RUNONSAGE.R # this may not be the best way to do this
 #script=RF.FracSegSites.Log10.Multispecies.DummyPopVar.2.VINT.RUNONSAGE.R
