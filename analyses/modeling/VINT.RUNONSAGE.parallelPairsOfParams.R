@@ -44,7 +44,7 @@ head(analysisdf_processed)
 #vi_scores <- vip::vi(ranger_obj) ### I'm being dumb here -- this may not order parameters in same way across runs. Need to be more thoughtful
 #write.table(vi_scores,paste0(outdir,"modelTrainedOnOneFold.VIPScores.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".txt"),quote = F,row.names=F,sep="\t")
 # just doing top 5 scores *for now* for interactions
-vi_scores <- read.table(paste0(outdir,"modelTrainedOnOneFold.VIPScores.PerMutatationType.AssessedOnChr",toString(windowOfAssessment),".txt"),sep="\t",header=T)
+vi_scores <- read.table(paste0(indir,"modelTrainedOnOneFold.VIPScores.PerMutatationType.AssessedOnChr",toString(windowOfAssessment),".txt"),sep="\t",header=T)
 
 top_vi_scores <- 
   vi_scores %>%
