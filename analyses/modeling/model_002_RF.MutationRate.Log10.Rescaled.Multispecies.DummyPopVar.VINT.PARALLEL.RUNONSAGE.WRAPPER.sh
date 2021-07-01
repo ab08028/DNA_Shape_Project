@@ -52,12 +52,10 @@ todaysdate=`date +%Y%m%d`
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
 
 
-<<<<<<< HEAD
+
 description=model_002_RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
 
-=======
-description=model_002_RF.MutationRate.Log10.Multispecies.DummyPopVar
->>>>>>> 8229e587436328649d6d3668774ae4552c1c841a
+
 indir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210618"_${description}"/" # must end in "/"
 #script=${description}.RUNONSAGE.R # this may not be the best way to do this
 #script=RF.FracSegSites.Log10.Multispecies.DummyPopVar.2.VINT.RUNONSAGE.R
