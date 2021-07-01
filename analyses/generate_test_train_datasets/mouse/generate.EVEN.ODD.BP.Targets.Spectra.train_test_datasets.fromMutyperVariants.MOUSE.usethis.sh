@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=100:00:00,h_data=10G
+#$ -l h_rt=300:00:00,h_data=10G
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N mouseMutyper7merSpectrum
