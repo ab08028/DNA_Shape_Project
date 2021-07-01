@@ -1,12 +1,13 @@
 #! /bin/bash
-#$ -l h_rt 40:00:00,mfree=2G
+#$ -l h_rt=40:00:00,mfree=2G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N model_001_vint_parallel
 #$ -pe serial 5
-#$ -t 1-10 
+#$ -t 1:10
+
 #### NEED TO CHANGE THIS BASED ON HOW MANY TOP PARAMETERS YOU'RE USING
 # THIS ISN'T WELL AUTOMATED --- JUST GET IT WORKING WELL ENOUGH FOR NOW.
 # NEED TO MANUALLY CALCULATE 5 CHOOSE 2 = 10 TO GET THE SIZE OF THE ARRAY
