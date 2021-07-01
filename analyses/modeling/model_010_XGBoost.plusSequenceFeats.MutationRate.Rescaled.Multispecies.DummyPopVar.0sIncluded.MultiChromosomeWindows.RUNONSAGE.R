@@ -127,15 +127,16 @@ saveRDS(recipe, file = paste0(outdir,"recipe.rds"))
 
 ############ MODEL SPECS ##############
 # tuning based on: https://juliasilge.com/blog/xgboost-tune-volleyball/
+# more info: https://towardsdatascience.com/xgboost-fine-tune-and-optimize-your-model-23d996fab663
 boost_tree_xgboost_spec_TUNE <-
   boost_tree(
     trees = 1000, 
     tree_depth = tune(),  # model complexity
     min_n = tune(), # model complexity (number of obs per leaf)
-    loss_reduction = tune(), # model complxity
-    sample_size = tune(),  ## randomness 
+    loss_reduction = tune(), # model compelxity
+    sample_size = tune(),  ## randomness (fraction of data to sample for each tree)
     mtry = tune(),         ## randomness
-    learn_rate = tune(),                         ## step size
+    learn_rate = tune(),  ## step size (how much it learns from previous tree)
   ) %>% 
   #boost_tree() %>% # trying with defaults
   set_engine('xgboost',verbose=T,nthread=25) %>%
@@ -171,7 +172,7 @@ xgboost_workflow_TUNE
 
 ########### TUNE -- SLOW (do on sage) #############
 doParallel::registerDoParallel()
-
+print(paste0(Sys.time(),' starting tuning'))
 xgb_tuning_results <- tune_grid(
   xgboost_workflow_TUNE,
   resamples = train_data_cv,
@@ -182,9 +183,13 @@ xgb_tuning_results <- tune_grid(
 xgb_tuning_results
 saveRDS(xgb_tuning_results, file = paste0(outdir,"xgb_tuning_results.rds"))
 
+print(paste0(Sys.time(),' finished tuning'))
 
 metrics <- collect_metrics(xgb_tuning_results)
 write.table(metrics,paste0(outdir,"tuningMetrics.txt"),sep="\t",rownames=F,quote=F)
 
 best_parameters <- show_best(xgb_tuning_results, "rmse") # try for rmse 
 write.table(best_parameters,paste0(outdir,"bestParameters.fromtuning.txt"),sep="\t",rownames=F,quote=F)
+
+
+sink()

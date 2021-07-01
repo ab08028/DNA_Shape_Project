@@ -3,8 +3,9 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
-#$ -pe serial 5
+#$ -N model_010
+#$ -pe serial 10
+
 ######## trying to run modeling script in hoffman #######
 
 ###### SAVE NEW WRAPPER SCRIPT EACH TIME ######
@@ -25,7 +26,9 @@ module load gcc/10.2.0
 # install.packages("ggbeeswarm")
 # install.packages("reshape2")
 # install.packages("devtools")
-#install.packages(c("doParallel", "foreach", "plyr"))
+#install.packages(c("doParallel",  "foreach", "plyr"))
+# install.packages('xgboost') # note for installing xgboost you need a LOT of memory (1G won't cut it so do qrsh -l mfree=25G) # still is slow but doesn't hang forever!
+# https://github.com/dmlc/xgboost/issues/6424
 #require(doParallel)
 #require(foreach)
 #require(plyr)

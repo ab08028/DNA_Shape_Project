@@ -4,7 +4,7 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N RF.FracSegSites.Log10.Multispecies.DummyPopVar
+#$ -N model_001
 #$ -pe serial 5
 ######## trying to run modeling script in hoffman #######
 
