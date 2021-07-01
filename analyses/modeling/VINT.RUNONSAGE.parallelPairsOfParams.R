@@ -22,6 +22,9 @@ topXParamsToCompare <- args[2] # number of top params to compare (will affect si
 parameter_pair_index <- as.numeric(args[3]) # give the index when you submit the script so you can do parameter pairs in parallel!  
 
 oneFoldSetToTrainAndAssessOn <- readRDS(paste0(indir,"oneFoldSetToTrainAndAssessOn.rds"))
+
+windowOfAssessment=toString(unique(assessment(oneFoldSetToTrainAndAssessOn)$newGroup))
+
 model <- readRDS(paste0(indir,"modelTrainedOnOneFold.rds"))
 
 ranger_obj <- pull_workflow_fit(model)$fit
@@ -37,9 +40,11 @@ head(analysisdf_processed)
 
 #interact <- vint(ranger_obj,feature_names=c("feature_1_Shear_2.derived","feature_1_Shear_2.ancestral",progress=T),train=analysisdf_processed,progress = "text",parallel=T) # CRASHED
 
-vi_scores <- vip::vi(ranger_obj)
+#vi_scores <- vip::vi(ranger_obj) ### I'm being dumb here -- this may not order parameters in same way across runs. Need to be more thoughtful
 #write.table(vi_scores,paste0(outdir,"modelTrainedOnOneFold.VIPScores.PerMutatationType.AssessedOnChr",toString(unique(truth_prediction_df$window)),".txt"),quote = F,row.names=F,sep="\t")
 # just doing top 5 scores *for now* for interactions
+vi_scores <- read.table(paste0(outdir,"modelTrainedOnOneFold.VIPScores.PerMutatationType.AssessedOnChr",toString(windowOfAssessment),".txt"),sep="\t",header=T)
+
 top_vi_scores <- 
   vi_scores %>%
   filter(rank(desc(Importance))<=topXParamsToCompare)
