@@ -11,7 +11,10 @@ require(ggrepel)
 require(ggbeeswarm)
 require(reshape2)
 require(devtools)
-
+# try adding this:
+library(foreach)
+library(doParallel)
+#registerDoParallel()
 # for doing this on hoffman you could set 
 args <- commandArgs(trailingOnly = TRUE)
 indir <- paste0(args[1],"/") # doing this to make sure slash comes after
@@ -55,7 +58,7 @@ allInteractionResults <- NULL
 for (i in seq(1,dim(pairsOfTopScores)[2])){
   #print(pairsOfTopScores[,i])
   interact <- vint(ranger_obj,feature_names=pairsOfTopScores[,i],train=analysisdf_processed,progress = "text",parallel=T) 
-  saveRDS(interact,paste0(outdir,"vint.intermediate.",i,".rds"))
+  saveRDS(interact,paste0(indir,"vint.intermediate.",i,".rds"))
   allInteractionResults <- rbind(allInteractionResults,interact)
   }
 saveRDS(allInteractionResults,paste0(outdir,"vint.rds"))
