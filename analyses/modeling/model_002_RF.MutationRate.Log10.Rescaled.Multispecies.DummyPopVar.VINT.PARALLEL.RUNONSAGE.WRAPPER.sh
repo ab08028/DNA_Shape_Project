@@ -1,12 +1,13 @@
 #! /bin/bash
-#$ -l h_rt 40:00:00,mfree=2G
+#$ -l h_rt=40:00:00,mfree=2G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling/vint
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling/vint
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N model_001_vint_parallel
+#$ -N model_002_vint_parallel
 #$ -pe serial 5
 #$ -t 1-10
+
 #### NEED TO CHANGE THIS BASED ON HOW MANY TOP PARAMETERS YOU'RE USING
 # THIS ISN'T WELL AUTOMATED --- JUST GET IT WORKING WELL ENOUGH FOR NOW.
 # NEED TO MANUALLY CALCULATE 5 CHOOSE 2 = 10 TO GET THE SIZE OF THE ARRAY
@@ -51,8 +52,12 @@ todaysdate=`date +%Y%m%d`
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
 
 
+<<<<<<< HEAD
 description=model_002_RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar
 
+=======
+description=model_002_RF.MutationRate.Log10.Multispecies.DummyPopVar
+>>>>>>> 8229e587436328649d6d3668774ae4552c1c841a
 indir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210618"_${description}"/" # must end in "/"
 #script=${description}.RUNONSAGE.R # this may not be the best way to do this
 #script=RF.FracSegSites.Log10.Multispecies.DummyPopVar.2.VINT.RUNONSAGE.R
