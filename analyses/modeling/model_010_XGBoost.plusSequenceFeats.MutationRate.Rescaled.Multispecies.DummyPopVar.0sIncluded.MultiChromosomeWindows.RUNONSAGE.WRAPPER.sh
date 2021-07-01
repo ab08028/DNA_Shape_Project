@@ -1,10 +1,11 @@
-#$ -l h_rt=20:00:00,mfree=25G
+#$ -l h_rt=20:00:00,mfree=10G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N model_010
 #$ -pe serial 10
+
 ######## trying to run modeling script in hoffman #######
 
 ###### SAVE NEW WRAPPER SCRIPT EACH TIME ######
