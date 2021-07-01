@@ -19,7 +19,7 @@ library(doParallel)
 args <- commandArgs(trailingOnly = TRUE)
 indir <- paste0(args[1],"/") # doing this to make sure slash comes after
 topXParamsToCompare <- args[2] # number of top params to compare (will affect size of array) == start with 5.
-parameter_pair_index <- args[3] # give the index when you submit the script so you can do parameter pairs in parallel!  
+parameter_pair_index <- as.numeric(args[3]) # give the index when you submit the script so you can do parameter pairs in parallel!  
 
 oneFoldSetToTrainAndAssessOn <- readRDS(paste0(indir,"oneFoldSetToTrainAndAssessOn.rds"))
 model <- readRDS(paste0(indir,"modelTrainedOnOneFold.rds"))

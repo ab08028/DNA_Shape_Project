@@ -6,7 +6,7 @@
 #$ -M annabel.beichman@gmail.com
 #$ -N model_002_vint_parallel
 #$ -pe serial 5
-#$ -t 1-10
+#$ -t 1-1
 
 #### NEED TO CHANGE THIS BASED ON HOW MANY TOP PARAMETERS YOU'RE USING
 # THIS ISN'T WELL AUTOMATED --- JUST GET IT WORKING WELL ENOUGH FOR NOW.
@@ -69,3 +69,4 @@ Rscript $scriptdir/$script $indir $topXParams $SGE_TASK_ID
 
 # would like output files and the script to be copied to the same outdir as a record. 
 
+sleep 5m 
