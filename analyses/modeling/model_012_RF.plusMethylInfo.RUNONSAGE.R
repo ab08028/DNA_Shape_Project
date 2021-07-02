@@ -220,32 +220,40 @@ rand_forest_Fold01_fit_predictions_plot
 
 ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),rand_forest_Fold01_fit_predictions_plot,height=6,width=9)
 
+############ label central CpGs groups ala L&S  ###################
+truth_prediction_df$ancestral_central3mer <- substr(truth_prediction_df$mutationType,start=3,stop=5)
+truth_prediction_df$centralCpGLabel <- "NoCentralCpG"
+truth_prediction_df[grep('CG',truth_prediction_df$ancestral_central3mer),]$centralCpGLabel <- "YesCentralCpG"
 
-########### facet by central mutation type and get individual rsqs ##############
+truth_prediction_df$centralMutationType <- paste0(substr(truth_prediction_df$mutationType,4,4),".",substr(truth_prediction_df$mutationType,12,12))
+
+# make labels: 
+truth_prediction_df$mutationLabel <- paste0(truth_prediction_df$centralMutationType,"_",truth_prediction_df$centralCpGLabel)
+########### facet by central mutation label and get individual rsqs ##############
 rsqsPerSpeciesAndMutationType <- truth_prediction_df %>%
-  group_by(centralMutationType,population) %>%
+  group_by(mutationLabel,population) %>%
   rsq(truth=outcome,estimate=.pred)
 rsqsPerSpeciesAndMutationType
 write.table(rsqsPerSpeciesAndMutationType,paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutatationType.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".txt"),quote = F,row.names=F,sep="\t")
-rsqPerMutplot <- ggplot(rsqsPerSpeciesAndMutationType,aes(x=centralMutationType,y=.estimate,fill=population))+
+rsqPerMutplot <- ggplot(rsqsPerSpeciesAndMutationType,aes(x=mutationLabel,y=.estimate,fill=population))+
   geom_col(position="dodge")+
   theme_bw()+
   ylab("r-squared")
 rsqPerMutplot
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutationType.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),rsqPerMutplot,height=3,width=5)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutationType.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),rsqPerMutplot,height=3,width=8)
 
 ####  add rsq values to plot if possible ###
-rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, aes(y=.pred,x=outcome,color=centralMutationType))+
+rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, aes(y=.pred,x=outcome,color=mutationLabel))+
   geom_point()+
   geom_abline()+
   geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=1e-6,y=1e-4,label=round(.estimate,4)),color="black")+
-  facet_grid(~centralMutationType~population,scales="free")+
+  facet_wrap(~mutationLabel~population,scales="free")+
   #ggtitle(paste0(description,"\ntrained on Fold01\n(all odd Windows but one, tested on just Window",toString(unique(truth_prediction_df$newGroup)),")"))+
   theme_bw()
 rand_forest_Fold01_fit_predictions_plot_faceted
 
-ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.FacetedPerMutationType.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),rand_forest_Fold01_fit_predictions_plot_faceted,height=12,width=9)
+ggsave(paste0(outdir,"modelTrainedOnOneFold.PredictionsPlot.FacetedPerMutationType.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),rand_forest_Fold01_fit_predictions_plot_faceted,height=12,width=15)
 
 ############ VIP: variable importance ###########
 ranger_obj <- pull_workflow_fit(rand_forest_Fold01_fit_notlastfit)$fit
@@ -277,7 +285,18 @@ speciesComparisonPlot <- ggplot(truth_prediction_df_spread,aes(x=outcome_Mmd,y=o
   geom_point(aes(x=.pred_Mmd,y=.pred_Ms),shape=1,color="red")+
   geom_abline()
 speciesComparisonPlot
+
 ggsave(paste0(outdir,"modelTrainedOnOneFold.SpeciesXYComparison.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),speciesComparisonPlot,height=5,width=7)
+# facet by mutation type:
+
+speciesComparisonPlot2 <- ggplot(truth_prediction_df_spread,aes(x=outcome_Mmd,y=outcome_Ms))+
+  geom_point()+
+  geom_point(aes(x=.pred_Mmd,y=.pred_Ms),shape=1,color="red")+
+  geom_abline()+
+  facet_wrap(~centralMutationType,scales="free")
+speciesComparisonPlot2
+ggsave(paste0(outdir,"modelTrainedOnOneFold.SpeciesXYComparison.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),speciesComparisonPlot,height=5,width=7)
+
 
 # plot both species together
 plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=outcome,color=population))+
@@ -289,5 +308,27 @@ plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=outcome,colo
   geom_abline()
 plotBothSpeciesTogether
 ggsave(paste0(outdir,"modelTrainedOnOneFold.ObsExpected.SpeciesTogether.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),plotBothSpeciesTogether,height=5,width=7)
+
+
+################# GET CpG count in whole ancestral 7mer #######
+# get
+truth_prediction_df$ancestral_CpG_Count <- str_count(truth_prediction_df$ancestral7mer,"CG")
+
+### plot based on number of CpGs
+#### just one model and pop for now: 
+for(pop in unique(truth_prediction_df$population) ){
+predictionsPlot_labelCpGCount <-  ggplot(truth_prediction_df[truth_prediction_df$population==pop,], aes(y=.pred,x=outcome,color=as.factor(ancestral_CpG_Count)))+
+  geom_point(size=1.2,alpha=1)+
+  geom_abline()+
+  facet_wrap(~mutationLabel,scales="free")+
+  theme_bw()+
+  ggtitle(paste0(pop," only"))+
+  scale_color_viridis_d(option = "inferno")
+
+predictionsPlot_labelCpGCount
+
+ggsave(paste0(outdir,pop,".FitOfModel.ColoredBy.CpGCount.png"),combo_predictionsPlot_labelCpGCount,width=14,height=12)
+
+}
 
 sink()
