@@ -11,8 +11,6 @@ require(ggrepel)
 require(ggbeeswarm)
 require(reshape2)
 require(devtools)
-require(doParallel)
-
 #devtools::install_github("MI2DataLab/randomForestExplainer")
 #require(randomForestExplainer) # too slow
 #devtools::install_github('ModelOriented/treeshap')
@@ -36,9 +34,9 @@ sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink outp
 #modelLabel="RF"
 #description=paste0(modelLabel,".",outcomeLabel,".Multispecies.DummyPopVar") # short description of these experiments
 #description
-#chromCount=19
+chromCount=19
 # per pop spectrum files:
-#populations=c("Mmd","Ms")
+populations=c("Mmd","Ms")
 # modeling outdir:
 #outdir=paste0("/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/",todaysdate,"_",description,"/") #  date specific 
 #dir.create(outdir,recursive = T,showWarnings = F)
@@ -47,9 +45,10 @@ sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink outp
 print('reading in shapes')
 shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
 shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt"),header=T,sep="\t")
+rownames(shapes) <- shapes$motif
 # for testing on home computer: 
 #shapes <- read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt",header=T,sep="\t")
-rownames(shapes) <- shapes$motif
+
 print('reading in spectrum')
 spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse/"
 
@@ -105,7 +104,6 @@ head(training(split),4)
 head(testing(split),4)
 
 train_data_cv <- group_vfold_cv(training(split),group=newGroup) # okay so I can make newGroups based on a grouping variable like so.
-saveRDS(train_data_cv, file = paste0(outdir,"train_data_cv.rds"))
 
 # to see a fold
 # one fold: train_data_cv[[1]][[1]]
@@ -113,122 +111,80 @@ unique(analysis(train_data_cv[[1]][[1]])$newGroup)# the inside newGroups (chromo
 unique(assessment(train_data_cv[[1]][[1]])$newGroup) # the held out newGroup: 
 # okay this works great! 
 
-###################### RECIPE ###############
-# note this recipe is the same as my random forest recipe (just need ot make sure nominal predictors are dummy-fied which I was already doing)
-recipe <- 
+########## RECIPE #########
+####### should I sum up each non held-out fold somehow? skip for now. ##########
+rand_forest_processing_recipe <- 
   # which consists of the formula (outcome ~ predictors) (don't want to include the 'variable' column)
   
   recipe(outcome ~ .,data=training(split)) %>% # 
- # update_role(mutationType, new_role="7mer mutation type label") %>% # trying to remove this, even though shouldn't be present in training as a predictor but going to try without it just in case (removing it below)
-  step_rm(mutationType,derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount,newGroup,label,ancestral7merCount) %>%
+  update_role(mutationType, new_role="7mer mutation type label") %>%
+  step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount,newGroup,label,ancestral7merCount) %>%
   step_dummy(all_nominal_predictors()) # KEEPING population in here as a predictor careful here that nothing else slips in! but dummy encoding it;; which RF doesn't need but xgboost and SHAP values does so just doing it ; this also dummy encodes the sequence with A as 0 0 0 , 1 0 0 = c etc. 
-recipe
-saveRDS(recipe, file = paste0(outdir,"recipe.rds"))
+#Encoding each ancestral bp as a feature Pos_1, Pos_2, Pos_3 etc.
+#Pos_4.ancestral and Pos_4.derived
+#Then convert to one-hot binary variables where A is 0 0 0 , C is 1 0 0 , G is 0 1 0, T is 0 0 1 (ala L&S)
+#But unlike L&S I’m also keeping in the derived position of the central bp
 
-############ MODEL SPECS ##############
-# tuning based on: https://juliasilge.com/blog/xgboost-tune-volleyball/
-# more info: https://towardsdatascience.com/xgboost-fine-tune-and-optimize-your-model-23d996fab663
-boost_tree_xgboost_spec_TUNE <-
-  boost_tree(
-    trees = 1000, 
-    tree_depth = tune(),  # model complexity
-    min_n = tune(), # model complexity (number of obs per leaf)
-    loss_reduction = tune(), # model complexity
-    #sample_size = tune(),  ## randomness (fraction of data to sample for each tree)
-    sample_size = 1,  ## (use all data but it isn't summed up) randomness (fraction of data to sample for each tree)
-    mtry = tune(),         ## randomness
-    learn_rate = tune(),  ## step size (how much it learns from previous tree)
-  ) %>% 
-  #boost_tree() %>% # trying with defaults
-  set_engine('xgboost',verbose=T,nthread=25) %>%
+rand_forest_processing_recipe %>% summary()
+rand_forest_processing_recipe
+# can extract data like this try it :
+#prepped <- prep(rand_forest_processing_recipe,training(split)) %>%
+#  juice()
+
+######### MODEL SPECIFICATION #########
+rand_forest_ranger_model_specs <-
+  #rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
+  rand_forest(trees = 1000, mtry = tune(), min_n = tune()) %>% # I added in tree number = 1000
+  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=5) %>%
   set_mode('regression')
-boost_tree_xgboost_spec_TUNE
-translate(boost_tree_xgboost_spec_TUNE)
-# not yet setting lambda = 1 -- wait on that!
-############### TUNE GRID ###############
+rand_forest_ranger_model_specs
 
-
-#"Notice that we had to treat mtry() differently because it depends on the actual number of predictors in the data."
-xgb_grid <- grid_latin_hypercube(
-  tree_depth(),
-  min_n(),
-  loss_reduction(),
-  #sample_size = sample_prop(),
-  finalize(mtry(),training(split)), # this sets range of 1,total predictors for mtry
-  learn_rate(),
-  size = 30
-)
-# trying to use the full sample size each time 
-# ranges have model specific defaults - what are they?
-print('grid of tuning parameters (latin hypercube)')
-xgb_grid
-dim(xgb_grid)
-saveRDS(xgb_grid, file = paste0(outdir,"tuningParameterGrid.rds"))
-
-########### WORKFLOW ##############
-xgboost_workflow_TUNE <- workflow() %>%
+############ WORKFLOW #############
+######## make a workflow with recipe and model specs ########
+rand_forest_workflow <- workflow() %>%
   # add the recipe
-  add_recipe(recipe) %>%
+  add_recipe(rand_forest_processing_recipe) %>%
   # add the model
-  add_model(boost_tree_xgboost_spec_TUNE)
-xgboost_workflow_TUNE
+  add_model(rand_forest_ranger_model_specs)
+rand_forest_workflow
 
-########### TUNE -- SLOW (do on sage) (takes a couple hours on sage) #############
+########### TUNE ##########
 doParallel::registerDoParallel()
-print(paste0(Sys.time(),' starting tuning'))
-xgb_tuning_results <- tune_grid(
-  xgboost_workflow_TUNE,
+
+tune_results <- tune_grid(
+  rand_forest_workflow,
   resamples = train_data_cv,
-  grid = xgb_grid,
-  control = control_grid(save_pred = TRUE) # saving predictions
+  grid = 20
 )
 
-xgb_tuning_results
-saveRDS(xgb_tuning_results, file = paste0(outdir,"xgb_tuning_results.rds"))
-print(paste0(Sys.time(),' finished tuning'))
-
-tuningplot <- xgb_tuning_results %>%
+tunePlot <- tune_results %>%
   collect_metrics() %>%
   filter(.metric == "rmse") %>%
-  select(mean, mtry:sample_size) %>% # get mean out and all cols from mtry-sample_size
-  pivot_longer(mtry:sample_size,
+  select(mean, min_n, mtry) %>%
+  pivot_longer(min_n:mtry,
                values_to = "value",
                names_to = "parameter"
   ) %>%
   ggplot(aes(value, mean, color = parameter)) +
-  geom_point(alpha = 0.8, show.legend = FALSE) +
+  geom_point(show.legend = FALSE) +
   facet_wrap(~parameter, scales = "free_x") +
   labs(x = NULL, y = "rmse")
-tuningplot
-
-ggsave(paste0(outdir,"tuningResults.png"),tuningplot,height=6,width=9)
-
-metrics <- collect_metrics(xgb_tuning_results)
-write.table(metrics,paste0(outdir,"tuningMetrics.txt"),sep="\t",row.names=F,quote=F)
-
-top_parameters <- show_best(xgb_tuning_results, "rmse") # try for rmse 
-print("top 5 best tuning parameter combos (rmse)")
-top_parameters
-
-# choose one out as the best
-best_parameter_combo <- select_best(xgb_tuning_results, "rmse")
-best_parameter_combo
+tunePlot
+ggsave(paste0(outdir,"tuningPlot.png"),tunePlot,height=6, width=9)
 
 
-write.table(best_parameter_combo,paste0(outdir,"bestParameters.fromtuning.rmse.txt"),sep="\t",row.names=F,quote=F)
-# still has good rsq as well 
-# plot:
+tune_metrics <- collect_metrics(tune_results)
+write.table(tune_metrics,paste0(outdir,"tuningMetrics.txt"),sep="\t",row.names=F,quote=F)
 
-preds <- collect_predictions(xgb_tuning_results)
-head(preds)
-dim(preds)
-best_preds <- preds[preds$.config==unique(best_parameter_combo$.config),]
-dim(best_preds)
 
-predplot <- ggplot(best_preds,aes(x=outcome,y=.pred))+
-  geom_point()+
-  ggtitle("predictions on fold data during tuning")
-predplot
-ggsave(paste0(outdir,"tuningResults.png"),predplot,height=6,width=9)
+best_tuning_params_rmse <- select_best(tune_results,"rmse")
+write.table(best_tuning_params_rmse,paste0(outdir,"best_tuning_params_rmse.txt"),sep="\t",row.names=F,quote=F)
+
+
+best_tuning_params_rsq <- select_best(tune_results,"rsq")
+write.table(best_tuning_params_rsq,paste0(outdir,"best_tuning_params_rsq.txt"),sep="\t",row.names=F,quote=F)
+####### take a look at results and possibly narrow them down:
+# https://juliasilge.com/blog/sf-trees-random-tuning/
+
 
 sink()

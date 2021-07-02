@@ -3,7 +3,7 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N model_009
+#$ -N model_011a_tune
 #$ -pe serial 10
 ######## trying to run modeling script in hoffman #######
 
@@ -47,7 +47,7 @@ todaysdate=`date +%Y%m%d`
 #otherInfo="Multispecies.DummyPopVar"
 
 #description=${modelLabel}.${outcomeLabel}.${otherInfo}
-description=model_009_RF.MutationRate.Log10.Rescaled.Multispecies.DummyPopVar.0sIncluded.MultiChromosomeWindows
+description=model_011a_tune_RF # this is just to tune the parameteres
 script=${description}.RUNONSAGE.R # this may not be the best way to do this
 outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/"${todaysdate}"_"${description}"/" #  date specific 
 
