@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=40:00:00,mfree=2G
+#$ -l h_rt=40:00:00,mfree=25G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling/vint
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling/vint
 #$ -m bea
