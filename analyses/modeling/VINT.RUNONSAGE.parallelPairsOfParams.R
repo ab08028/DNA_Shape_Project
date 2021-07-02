@@ -65,8 +65,8 @@ pairsOfTopScores <- combn(top_vi_scores$Variable,m=2,simplify = T) # get all pai
 #allInteractionResults <- NULL
 #for (i in seq(1,dim(pairsOfTopScores)[2])){
   #print(pairsOfTopScores[,i])
-
-print('starting parameter pair:', toString(pairsOfTopScores[,parameter_pair_index]))
+print("starting paramters")
+pairsOfTopScores[,parameter_pair_index] 
 interact <- vint(ranger_obj,feature_names=pairsOfTopScores[,parameter_pair_index],train=analysisdf_processed,progress = "text",parallel=T) 
 
 write.table(data.frame(interact),paste0(indir,"vint.parallel.",parameter_pair_index,".txt"),rownames=F,quote=F,sep="\t")
