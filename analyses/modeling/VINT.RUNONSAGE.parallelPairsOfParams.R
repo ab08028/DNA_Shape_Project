@@ -67,9 +67,12 @@ pairsOfTopScores <- combn(top_vi_scores$Variable,m=2,simplify = T) # get all pai
   #print(pairsOfTopScores[,i])
 print("starting paramters")
 pairsOfTopScores[,parameter_pair_index] 
+
+doParallel::registerDoParallel() # need to do this run in parallel?
+
 interact <- vint(ranger_obj,feature_names=pairsOfTopScores[,parameter_pair_index],train=analysisdf_processed,progress = "text",parallel=T) 
 
-write.table(data.frame(interact),paste0(indir,"vint.parallel.",parameter_pair_index,".txt"),rownames=F,quote=F,sep="\t")
+write.table(data.frame(interact),paste0(indir,"vint.parallel.",parameter_pair_index,".txt"),row.names=F,quote=F,sep="\t")
 #allInteractionResults <- rbind(allInteractionResults,interact)
 #  }
 #saveRDS(allInteractionResults,paste0(outdir,"vint.rds"))

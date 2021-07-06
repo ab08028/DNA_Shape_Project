@@ -1,11 +1,11 @@
 #! /bin/bash
-#$ -l h_rt=40:00:00,mfree=25G
+#$ -l h_rt=100:00:00,mfree=5G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling/vint
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling/vint
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N model_002_vint_parallel
-#$ -pe serial 5
+#$ -pe serial 15
 #$ -t 1-10
 
 #### NEED TO CHANGE THIS BASED ON HOW MANY TOP PARAMETERS YOU'RE USING
