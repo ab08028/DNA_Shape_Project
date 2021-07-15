@@ -135,7 +135,7 @@ rand_forest_processing_recipe
 rand_forest_ranger_model_specs <-
   #rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
   rand_forest(trees = 1000, mtry = tune(), min_n = tune()) %>% # I added in tree number = 1000
-  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=5) %>%
+  set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=15) %>%
   set_mode('regression')
 rand_forest_ranger_model_specs
 
