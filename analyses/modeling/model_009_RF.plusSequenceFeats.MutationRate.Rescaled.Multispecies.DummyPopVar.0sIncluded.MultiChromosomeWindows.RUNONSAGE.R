@@ -24,7 +24,8 @@ set.seed(42) # so results are reproducible
 
 
 args <- commandArgs(trailingOnly = TRUE)
-outdir <- args[1]
+description <- args[1]
+outdir <- args[2]
 # trying to use sink() to catch all output: (errors will go to a different file)
 sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
