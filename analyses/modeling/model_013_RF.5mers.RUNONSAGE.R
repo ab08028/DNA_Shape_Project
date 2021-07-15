@@ -24,7 +24,8 @@ set.seed(42) # so results are reproducible
 
 
 args <- commandArgs(trailingOnly = TRUE)
-outdir <- args[1]
+description <- args[1]
+outdir <- args[2]
 # trying to use sink() to catch all output: (errors will go to a different file)
 sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
@@ -43,10 +44,11 @@ sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink outp
 ############## read in shapes ##############
 print('reading in shapes')
 shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
-shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt"),header=T,sep="\t")
+shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt"),header=T,sep="\t")
 rownames(shapes) <- shapes$motif
+
 # for testing on home computer: 
-#shapes <- read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/firstOrder_featureTypes_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt",header=T,sep="\t")
+#shapes <- read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt",header=T,sep="\t")
 
 print('reading in spectrum')
 spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse/"
@@ -54,7 +56,7 @@ spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mou
 # note: don't need to read in sequence encoded data -- am doing it below with tidymodels
 ####### Now including data that has 0 entries and for now has large multi-chromosome windows ############
 ## eventually make better windows 
-allData_multipop <- read.table(paste0(spectrumdir,"TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt"),header=T) # 
+allData_multipop <- read.table(paste0(spectrumdir,"TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt"),header=T) # this is the 7mer spectrum but down below you are going to sum up over 5mers 
 # for testing on home computer:
 #allData_multipop <- read.table("/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt",header=T)
 
@@ -65,7 +67,32 @@ allData_multipop <- na.omit(allData_multipop)
 dim(allData_multipop)
 # and now want to split train is sp A + B spectra across odd chroms, train is sp A + B spectra across even chroms. want to have species membership as a feature! see if it's VIP or not
 
+########## !!!!!! condense 7mer spectrum down to 5mer spectrum  !!!!!!! #########
+allData_multipop$mutationType_5mer <- paste0(substr(allData_multipop$mutationType,2,6),".",substr(allData_multipop$mutationType,10,14))
+
+
+head(allData_multipop)
+tail(allData_multipop)
+allData_multipop_5mer <- allData_multipop %>%
+  group_by(population,newGroup,label,mutationType_5mer) %>%
+  summarise(mutationCount_5mer = sum(mutationCount),ancestral5merCount=sum(ancestral7merCount),mutationCount_divByTargetCount_5mer = mutationCount_5mer/ancestral5merCount) ##### is this double counting 5mer targets?
+
+
+dim(allData_multipop_5mer)
+dim(allData_multipop_5mer[allData_multipop_5mer$population=="Mmd" & allData_multipop_5mer$newGroup==1,]) # there are 1536 types of central 5mer so this checks out.
+
+sum(allData_multipop_5mer[allData_multipop_5mer$population=="Mmd" & allData_multipop_5mer$newGroup==1,]$mutationCount_5mer)
+sum(allData_multipop[allData_multipop$population=="Mmd" & allData_multipop$newGroup==1,]$mutationCount)
+# these match ^ ; good. 
+
+
+# note sum of all ancestral targest across mutations is larger than the available space because each mutation type has some of the same ancestral targets, so that's why it's important to group by a particular mutation type 
+# make sure these sums work 
+  # newGroup here not window; eventually go back to window?
+
 ########## merge with shapes ##########
+############# YOU ARE HERE #######################
+# need to get ancestral and derived 5mers
 
 allData_multipop$derived7mer <- substr(allData_multipop$mutationType,9,15)
 allData_multipop_intermediate <-merge(allData_multipop,shapes,by.x="ancestral7mer",by.y="motif")

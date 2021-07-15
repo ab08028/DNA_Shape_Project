@@ -1,16 +1,16 @@
-###### Get features of all possible 7mers  (not rev-comped; will be once I merge with a spectrum ###########
+###### Get features of all possible 5mers  (not rev-comped; will be once I merge with a spectrum ###########
 require(tidyr)
 require(DNAshapeR)
 require(phylotools) # to get names of sequences from fasta
 
-fastadir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/fastasOf7mers/"
+fastadir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/fastasOf5mers/"
 plotdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/plots/"
 dir.create(fastadir,recursive = T,showWarnings = F)
-#### >>> get  all possible 7mers (not rev comped because don't need to at this stage) #####
+#### >>> get  all possible 5mers (not rev comped because don't need to at this stage) #####
 bases=c("A","C","G","T")
-kmerlength=7
+kmerlength=5
 allkmers <- expand.grid((rep(list(bases),kmerlength)))
-dim(allkmers)
+dim(allkmers) # 1024 -- way fewer than 7mers, nice
 
 # paste all columns together:
 allkmers_united <- allkmers %>%
@@ -18,7 +18,7 @@ allkmers_united <- allkmers %>%
 # should all be unique
 
 #### >>> write to fasta ####
-fastaContainingAllKmers=paste0(fastadir,"allPossible7mers.NotRevCompedCollapsedBecauseNotNeeded.notSpeciesSpecific.WillWorkForAnySpecies.usethis.fasta")
+fastaContainingAllKmers=paste0(fastadir,"allPossible5mers.NotRevCompedCollapsedBecauseNotNeeded.notSpeciesSpecific.WillWorkForAnySpecies.usethis.fasta")
 
 sink(fastaContainingAllKmers)
 # using unique to not do repeats (there are repeats because of X>Y and X>Z mutations. just want to get shape features of each one once)
@@ -36,7 +36,7 @@ sink()
 # this works!
 #test="CGCGCGCCTT"
 #unlist(gregexpr(pattern ='CG',test)) # gives CpG positions - yes! 
-CpGPositionFile=paste0(fastadir,"allPossible7mers.CpGPositions.fasta")
+CpGPositionFile=paste0(fastadir,"allPossible5mers.CpGPositions.fasta")
 
 sink(CpGPositionFile)
 for(kmer in allkmers_united$allkmers){
@@ -66,8 +66,8 @@ all14ShapeTypes=c("HelT", "Rise", "Roll", "Shift", "Slide", "Tilt", "Buckle", "O
 
 DNAShapeR_Prediction <- getShape(fastaContainingAllKmers,parse=T,shapeType = all14ShapeTypes) # runs fast (a minute or two)
 
-
-# this yields a massive list of dataframes that has all entries for every 7mer in each fasta. Note that it is done in sliding 5mers so you only get values for the center 3bp and their flanking steps which are at the center of each 5mer. but those data are informed by the whole sequence. Some measurements are per bp and some are per bp 'step' between bps depending on whether its an intra or inter-bp measurement. 
+# way faster with 5mers 
+# this yields a massive list of dataframes that has all entries for every 5mer in each fasta. Note that it is done in sliding 5mers so you only get values for the center 3bp and their flanking steps which are at the center of each 5mer. but those data are informed by the whole sequence. Some measurements are per bp and some are per bp 'step' between bps depending on whether its an intra or inter-bp measurement. 
 
 ########## GET METHYLATED VERSION (Only works for basic shape features, not extended list) ###################
 # #from manual:
@@ -112,7 +112,7 @@ for(feature in desiredFeatures){
   featVec <- data.frame(encodeSeqShape(fastaContainingAllKmers,DNAShapeR_Prediction,feature, normalize=T))
   # label columns based on how many columsn there are for each feature: (adding _1 _2 _3 to the feature name)
   featVecNum=as.numeric(unlist(dim(featVec)[2]))
-  # note that for sequence vectors they encode each bp as four columns (1000 0100 etc). So this numbering system doesn't work great for that. so each 7mer gets 28 columns for the 1mer column. Want to rename them somehow feature_1_mer_1 _2 etc is okay I guess. 
+  # note that for sequence vectors they encode each bp as four columns (1000 0100 etc). So this numbering system doesn't work great for that. 
   colnames(featVec) <- unlist(paste0("feature_",feature_noDash,"_",as.character(seq(1,featVecNum))))
   
   # then want to bind columns:
@@ -123,7 +123,7 @@ head(allFeatureVectors_labelled)
 dim(allFeatureVectors_labelled)
 
 # write out the table:
-write.table(allFeatureVectors_labelled,paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/",orderLabel,"_allPossible7mers.FeatureValues.min-maxNormalized.WillWorkForAnySpecies.goodForPCAOrAnythingWhereDontWantUnits.txt"),row.names = F,quote=F,sep = "\t")
+write.table(allFeatureVectors_labelled,paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/",orderLabel,"_allPossible5mers.FeatureValues.min-maxNormalized.WillWorkForAnySpecies.goodForPCAOrAnythingWhereDontWantUnits.txt"),row.names = F,quote=F,sep = "\t")
 
 # note when you read it in you need to set rownames
 ######## >>> also write out a version that isn't normalized ##########
@@ -145,7 +145,7 @@ head(allFeatureVectors_labelled_NOTnormalized)
 dim(allFeatureVectors_labelled_NOTnormalized)
 
 # write out the table:
-write.table(allFeatureVectors_labelled_NOTnormalized,paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/",orderLabel,"_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt"),row.names = F,quote=F,sep = "\t")
+write.table(allFeatureVectors_labelled_NOTnormalized,paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/",orderLabel,"_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.txt"),row.names = F,quote=F,sep = "\t")
 
 
 ######### write a version with METHYLATED features that is NOT normalized ###########
@@ -176,27 +176,23 @@ for(feature in desiredFeatures){
   # then want to bind columns:
   allFeatureVectors_labelled_NOTnormalized_METHYLATED <- cbind(allFeatureVectors_labelled_NOTnormalized_METHYLATED,featVec)
 }
-# so a first order feature will be: feature_1_ and a second order will be feature_2. 
-head(allFeatureVectors_labelled_NOTnormalized_METHYLATED)
-dim(allFeatureVectors_labelled_NOTnormalized_METHYLATED)
-# check on test case: these should be different in the methylated and non-methylated dataframes
-allFeatureVectors_labelled_NOTnormalized_METHYLATED[794,c("feature_1_Roll_1")] #-3.63
-allFeatureVectors_labelled_NOTnormalized[794,c("feature_1_Roll_1")] #-0.76 # the not methylated version
-# make sure these are different 
+# so a first order feature will be: feature_1_ and a second order will be feature_2. ED)
+
 
 # write out the table:
-write.table(allFeatureVectors_labelled_NOTnormalized_METHYLATED,paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/","METHYLATED",orderLabel,"_allPossible7mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.METHYLATED.txt"),row.names = F,quote=F,sep = "\t")
+write.table(allFeatureVectors_labelled_NOTnormalized_METHYLATED,paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/","METHYLATED",orderLabel,"_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.METHYLATED.txt"),row.names = F,quote=F,sep = "\t")
 # writing methylated at beg and end of filename so I can't miss it 
 
 ########## >>> make a few summary plots #############
 ########### >>> plot correlations of the features #################
 # https://briatte.github.io/ggcorr/
-correlationOfFeaturesAcrossAll7mers_plot <- ggcorr(subset(allFeatureVectors_labelled,select=-c(motif)),layout.exp = 20,hjust=1,vjust=.5,size=1.5)
-correlationOfFeaturesAcrossAll7mers_plot
-ggsave(paste0(plotdir,"correlationOfFeaturesAcrossAll7mers.",orderLabel,".png"),correlationOfFeaturesAcrossAll7mers_plot,height=8,width=9)
+require(GGally)
+correlationOfFeaturesAcrossAll5mers_plot <- ggcorr(subset(allFeatureVectors_labelled,select=-c(motif)),layout.exp = 20,hjust=1,vjust=.5,size=1.5)
+correlationOfFeaturesAcrossAll5mers_plot
+ggsave(paste0(plotdir,"correlationOfFeaturesAcrossAll5mers.",orderLabel,".png"),correlationOfFeaturesAcrossAll5mers_plot,height=8,width=9)
 
 ####### >>> plot heatmap of mutation types by their shape features ###########
 rownames(allFeatureVectors_labelled) <- allFeatureVectors_labelled$motif
-png(paste0(plotdir,"heatmap.shapefeatures.allPossibleShapeFeatures.7mers.png"),height=20,width = 20,units="in",res=300)
+png(paste0(plotdir,"heatmap.shapefeatures.allPossibleShapeFeatures.5mers.png"),height=20,width = 20,units="in",res=300)
 heatmap(as.matrix(select(allFeatureVectors_labelled,-c("motif"))))
 dev.off()

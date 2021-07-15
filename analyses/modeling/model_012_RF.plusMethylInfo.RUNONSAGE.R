@@ -316,8 +316,9 @@ truth_prediction_df$ancestral_CpG_Count <- str_count(truth_prediction_df$ancestr
 
 ### plot based on number of CpGs
 #### just one model and pop for now: 
-truth_prediction_df <- readRDS("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/experiments/20210704_model_012_RF.plusMethylInfo/modelTrainedOnOneFold.PREDICTIONS.onWindow7.rds")
-outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/experiments/20210704_model_012_RF.plusMethylInfo/"
+# needed to redo this last part:
+#truth_prediction_df <- readRDS("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/experiments/20210704_model_012_RF.plusMethylInfo/modelTrainedOnOneFold.PREDICTIONS.onWindow7.rds")
+#outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/experiments/20210704_model_012_RF.plusMethylInfo/"
 for(pop in unique(truth_prediction_df$population) ){
 predictionsPlot_labelCpGCount <-  ggplot(truth_prediction_df[truth_prediction_df$population==pop,], aes(y=.pred,x=outcome,color=as.factor(ancestral_CpG_Count)))+
   geom_point(size=1.2,alpha=1)+
