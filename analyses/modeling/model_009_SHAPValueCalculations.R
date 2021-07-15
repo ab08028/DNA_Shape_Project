@@ -22,21 +22,20 @@ outdir <- args[1]
 sink(paste0(outdir,"SHAP.logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
 #outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210625_model_009_RF.plusSequenceFeats.MutationRate.Rescaled.Multispecies.DummyPopVar.0sIncluded.MultiChromosomeWindows/"
-split <- readRDS(paste0(outdir,"split.rds"))
+#split <- readRDS(paste0(outdir,"split.rds")) ## NO don't use split! fixing this bug on 20210715 -- should use the fold hte model was trained on
+oneFoldTrainedOn <- readRDS(paste0(outdir,"oneFoldSetToTrainAndAssessOn.rds"))
 ########## RECIPE #########
 ####### should I sum up each non held-out fold somehow? skip for now. ##########
 rand_forest_processing_recipe <- 
   # which consists of the formula (outcome ~ predictors) (don't want to include the 'variable' column)
   
-  recipe(outcome ~ .,data=training(split)) %>% # 
+  recipe(outcome ~ .,data=training(oneFoldTrainedOn)) %>% # 
   update_role(mutationType, new_role="7mer mutation type label") %>%
   step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount,newGroup,label,ancestral7merCount) %>%
   step_dummy(all_nominal_predictors())
 rand_forest_processing_recipe %>% summary()
 rand_forest_processing_recipe
-# can extract data like this try it :
-#prepped <- prep(rand_forest_processing_recipe,training(split)) %>%
-#  juice()
+
 
 ######### Need ranger object ####### 
 
@@ -48,14 +47,14 @@ ranger_obj <- pull_workflow_fit(model)$fit
 ######### Need to juice the training and assessment data and exclude anything that isn't features ###### 
 
 # juice and get rid of outcome variables and anything that isn't predictions (like mutaiton type)
-Xtrain <- prep(rand_forest_processing_recipe, training(split)) %>% 
+Xtrain <- prep(rand_forest_processing_recipe, training(oneFoldTrainedOn)) %>% 
   juice() %>% 
   select(-c(mutationType,outcome)) %>% 
   as.matrix()
 head(Xtrain)
 
 
-Xtest <- prep(rand_forest_processing_recipe, testing(split)) %>% 
+Xtest <- prep(rand_forest_processing_recipe, testing(oneFoldTrainedOn)) %>% 
   juice() %>% 
   select(-c(mutationType,outcome)) %>% 
   as.matrix()
@@ -98,13 +97,13 @@ ggsave(paste0(outdir,"random_forest.shapImportance.png"),shapplot1,height=10,wid
 ######## shapley dependence plot ########
 # need dataframe of training data:
 # note X above was a matrix but this has to be a df
-Xdftrain <- prep(rand_forest_processing_recipe, training(split)) %>% 
+Xdftrain <- prep(rand_forest_processing_recipe, training(oneFoldTrainedOn)) %>% 
   juice()  #%>%
 
 head(Xdftrain)
 
 # note X above was a matrix but this has to be a df
-Xdftest <- prep(rand_forest_processing_recipe, testing(split)) %>% 
+Xdftest <- prep(rand_forest_processing_recipe, testing(oneFoldTrainedOn)) %>% 
   juice()  #%>%
 
 head(Xdftest)
@@ -125,19 +124,19 @@ for(feature in featuresToPlot){
     theme_bw()+
     labs(color="outcome")
   shapdependenceplot1
-  ggsave(paste0(outdir,"/perFeatureDependencePlots/",mutationType,".random_forest.shapDependence.",feature,".png"),shapdependenceplot1,height=4,width=6)
+  ggsave(paste0(outdir,"/perFeatureDependencePlots/random_forest.shapDependence.",feature,".png"),shapdependenceplot1,height=4,width=6)
 }
 # can use these to try and detect interactions by coloring by other variables -- is there a systematic way to detect though?
 # color_by = "fractionOfAllSegSites"
 # for a single motif of interest
 motifOfInterest="TTTAAAA.TTTTAAA"
-rowNumberForForce=which(Xdftest$variable==motifOfInterest)
+rowNumberForForce=which(Xdftest$mutationType==motifOfInterest)
 rowNumberForForce
 
 shapplot2 <- autoplot(shap, type = "contribution", row_num = rowNumberForForce) +
   ggtitle(motifOfInterest)
 shapplot2
-ggsave(paste0(outdir,mutationType,".random_forest.shapImportance.",motifOfInterest,".png"),shapplot2,height=10,width=6)
+ggsave(paste0(outdir,"random_forest.shapImportance.",motifOfInterest,".png"),shapplot2,height=10,width=6)
 
 
 
@@ -158,7 +157,7 @@ ggsave(paste0(outdir,mutationType,".random_forest.shapImportance.",motifOfIntere
 
 ####### SHAP summary plot (really useful) ######
 shap_labeled <- shap
-shap_labeled$mutationtype <- Xdftest$variable
+shap_labeled$mutationtype <- Xdftest$mutationType
 head(shap_labeled)
 shap_melt <- melt(shap_labeled)
 head(shap_melt)
@@ -189,7 +188,7 @@ shapSummaryPlot <- ggplot(shap_plusFeatures,aes(y=feature,x=SHAP.value,color=min
   ggtitle(paste0(mutationType ,"SHAP summary plot"))+
   scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")
 shapSummaryPlot
-ggsave(paste0(outdir,mutationType,".random_forest.shapSummaryPlot.USEFUL.png"),shapSummaryPlot,height=12,width=10)
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot.USEFUL.png"),shapSummaryPlot,height=12,width=10)
 
 # just do top 10 most important:
 top10 <- head(featuresInOrderOfImportance$Variable,10)
@@ -201,7 +200,7 @@ shapSummaryPlot_top10 <- ggplot(shap_plusFeatures[shap_plusFeatures$feature %in%
   ggtitle(paste0(mutationType ,"SHAP summary plot"))+
   scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")
 shapSummaryPlot_top10
-ggsave(paste0(outdir,mutationType,".random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
 
 ### just do all the population ones: 
 shapSummaryPlot_populationOnly <- ggplot(shap_plusFeatures[grepl("population",shap_plusFeatures$feature),],aes(y=feature,x=SHAP.value,color=minmaxnormalized.feature.value))+
@@ -212,5 +211,5 @@ shapSummaryPlot_populationOnly <- ggplot(shap_plusFeatures[grepl("population",sh
   ggtitle(paste0(mutationType ,"SHAP summary plot"))+
   scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")
 shapSummaryPlot_top10
-ggsave(paste0(outdir,mutationType,".random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
 
