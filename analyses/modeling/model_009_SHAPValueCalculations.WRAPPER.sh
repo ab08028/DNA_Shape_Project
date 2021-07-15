@@ -37,7 +37,7 @@ module load gcc/10.2.0
 
 scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/modeling
 
-script=$scriptdir/model_009_SHAPValueCalculations.R
+script=model_009_SHAPValueCalculations.R
 
 outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210625_model_009_RF.plusSequenceFeats.MutationRate.Rescaled.Multispecies.DummyPopVar.0sIncluded.MultiChromosomeWindows/" 
 # must have end "/" ^^
