@@ -35,8 +35,7 @@ module load gcc/10.2.0
 #spectrumdir=/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse
 #shapedir=/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling
 
-gitdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/modeling
-scriptdir=$gitdir/
+scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/modeling
 
 script=$scriptdir/model_009_SHAPValueCalculations.R
 

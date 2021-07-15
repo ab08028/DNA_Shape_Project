@@ -17,9 +17,12 @@ registerDoParallel()
 #dir on home laptop:
 #outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/experiments/20210625_model_009_RF.plusSequenceFeats.MutationRate.Rescaled.Multispecies.DummyPopVar.0sIncluded.MultiChromosomeWindows/"
 # outdir on sage:
+args <- commandArgs(trailingOnly = TRUE)
+description <- args[1]
+outdir <- args[2]
+sink(paste0(outdir,"SHAP.logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
-
-outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210625_model_009_RF.plusSequenceFeats.MutationRate.Rescaled.Multispecies.DummyPopVar.0sIncluded.MultiChromosomeWindows/"
+#outdir="/net/harris/vol1/home/beichman/DNAShape/analyses/modeling/experiments/20210625_model_009_RF.plusSequenceFeats.MutationRate.Rescaled.Multispecies.DummyPopVar.0sIncluded.MultiChromosomeWindows/"
 split <- readRDS(paste0(outdir,"split.rds"))
 ########## RECIPE #########
 ####### should I sum up each non held-out fold somehow? skip for now. ##########
