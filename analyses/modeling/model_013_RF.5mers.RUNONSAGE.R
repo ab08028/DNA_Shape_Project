@@ -22,12 +22,14 @@ tidymodels_prefer() # use this 'tidymodels_prefer()' uses the 'conflicted' packa
 set.seed(42) # so results are reproducible 
 # doing this in the wrapper script instead:
 
-
-args <- commandArgs(trailingOnly = TRUE)
-description <- args[1]
-outdir <- args[2]
+# running on laptop for now
+#args <- commandArgs(trailingOnly = TRUE)
+#description <- args[1]
+#outdir <- args[2]
+outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/experiments/20210714_model_013_RF.5mers_runOnLaptop/"
+dir.create(outdir,showWarnings = F)
 # trying to use sink() to catch all output: (errors will go to a different file)
-sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
+#sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
 #todaysdate=format(Sys.Date(), "%Y%m%d")
 #outcomeLabel="MutationRate"
@@ -43,22 +45,22 @@ sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink outp
 
 ############## read in shapes ##############
 print('reading in shapes')
-shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
-shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt"),header=T,sep="\t")
-rownames(shapes) <- shapes$motif
+#shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
+#shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt"),header=T,sep="\t")
 
 # for testing on home computer: 
-#shapes <- read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt",header=T,sep="\t")
+shapes <- read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt",header=T,sep="\t")
+rownames(shapes) <- shapes$motif
 
 print('reading in spectrum')
-spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse/"
+#spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse/"
 
 # note: don't need to read in sequence encoded data -- am doing it below with tidymodels
 ####### Now including data that has 0 entries and for now has large multi-chromosome windows ############
-## eventually make better windows 
-allData_multipop <- read.table(paste0(spectrumdir,"TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt"),header=T) # this is the 7mer spectrum but down below you are going to sum up over 5mers 
+## eventually make better windows : this is the 7mer spectrum but am going to sum up over 5mers below so don't worry :) 
+#allData_multipop <- read.table(paste0(spectrumdir,"TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt"),header=T) # this is the 7mer spectrum but down below you are going to sum up over 5mers 
 # for testing on home computer:
-#allData_multipop <- read.table("/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt",header=T)
+allData_multipop <- read.table("/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt",header=T)
 
 dim(allData_multipop)
 # need to get rid of NA entries
@@ -73,49 +75,52 @@ allData_multipop$mutationType_5mer <- paste0(substr(allData_multipop$mutationTyp
 
 head(allData_multipop)
 tail(allData_multipop)
-allData_multipop_5mer <- allData_multipop %>%
+allData_multipop <- allData_multipop %>%
   group_by(population,newGroup,label,mutationType_5mer) %>%
   summarise(mutationCount_5mer = sum(mutationCount),ancestral5merCount=sum(ancestral7merCount),mutationCount_divByTargetCount_5mer = mutationCount_5mer/ancestral5merCount) ##### is this double counting 5mer targets?
 
 
-dim(allData_multipop_5mer)
-dim(allData_multipop_5mer[allData_multipop_5mer$population=="Mmd" & allData_multipop_5mer$newGroup==1,]) # there are 1536 types of central 5mer so this checks out.
-
-sum(allData_multipop_5mer[allData_multipop_5mer$population=="Mmd" & allData_multipop_5mer$newGroup==1,]$mutationCount_5mer)
-sum(allData_multipop[allData_multipop$population=="Mmd" & allData_multipop$newGroup==1,]$mutationCount)
-# these match ^ ; good. 
-
+dim(allData_multipop)
+dim(allData_multipop[allData_multipop$population=="Mmd" & allData_multipop$newGroup==1,]) # there are 1536 types of central 5mer so this checks out.
 
 # note sum of all ancestral targest across mutations is larger than the available space because each mutation type has some of the same ancestral targets, so that's why it's important to group by a particular mutation type 
 # make sure these sums work 
   # newGroup here not window; eventually go back to window?
 
 ########## merge with shapes ##########
-############# YOU ARE HERE #######################
 # need to get ancestral and derived 5mers
+# be careful here to do derived/ancestral properly
+allData_multipop$ancestral5mer <- substr(allData_multipop$mutationType_5mer,1,5)
+allData_multipop$derived5mer <- substr(allData_multipop$mutationType_5mer,7,11)
+head(allData_multipop[,c("mutationType_5mer","ancestral5mer","derived5mer")])
 
-allData_multipop$derived7mer <- substr(allData_multipop$mutationType,9,15)
-allData_multipop_intermediate <-merge(allData_multipop,shapes,by.x="ancestral7mer",by.y="motif")
 
-allData_withShapes_unprocessed <- merge(allData_multipop_intermediate,shapes,by.x="derived7mer",by.y="motif",suffixes=c(".ancestral",".derived"))
+allData_multipop_intermediate <-merge(allData_multipop,shapes,by.x="ancestral5mer",by.y="motif")
 
+allData_withShapes_unprocessed <- merge(allData_multipop_intermediate,shapes,by.x="derived5mer",by.y="motif",suffixes=c(".ancestral",".derived"))
+
+head(allData_withShapes_unprocessed)
 
 ######## add seq info (not yet 1-hot encoded, will encode with tidy models )##########
-# just want ancestral 7mer 
-allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>% separate(ancestral7mer,into=c("Pos_1","Pos_2","Pos_3","Pos_4.ancestral","Pos_5","Pos_6","Pos_7"),remove=F,sep=c(1,2,3,4,5,6))
-# also get derived bp:
-allData_withShapes_unprocessed$Pos_4.derived <- substr(allData_withShapes_unprocessed$derived7mer,4,4)
+# just want ancestral 5mer : so now it's Pos3 that is central position (not pos 4 the way it was for 7mers)
+allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>% separate(ancestral5mer,into=c("Pos_1","Pos_2","Pos_3.ancestral","Pos_4","Pos_5"),remove=F,sep=c(1,2,3,4))
+head(allData_withShapes_unprocessed)
 
+# also get derived bp:
+allData_withShapes_unprocessed$Pos_3.derived <- substr(allData_withShapes_unprocessed$derived5mer,3,3) # it's position 3 not 4 now
+
+head(allData_withShapes_unprocessed)
+# check random rows; allData_withShapes_unprocessed[c(45,600,30),]
 ########### want to rescale outcome variable rate so it's relative #######
 # not adding epsilon because 
 # not log scaling # call whatever you want your final outcome to be 'outcome' so that it's the same in all plots
 # picked this because it's smaller than 1/genome size 
 allData_withShapes_unprocessed <- allData_withShapes_unprocessed %>%
   group_by(population,newGroup,label) %>%
-  mutate(outcome=mutationCount_divByTargetCount/sum(mutationCount_divByTargetCount)) 
+  mutate(outcome=mutationCount_divByTargetCount_5mer/sum(mutationCount_divByTargetCount_5mer)) # didn't change the name of this to reflect 5mers so this code is good to go 
 
 # this maintains the ranking but rescales the outcome ; try it! 
-
+sum(allData_withShapes_unprocessed[allData_withShapes_unprocessed$population=="Mmd" & allData_withShapes_unprocessed$newGroup==1,]$outcome) # should be 1
 ####### make your splits into train/test ##########
 # not splitting by population so there will be 2x as many train and test observations, one from each species
 indices <-
@@ -137,14 +142,25 @@ unique(analysis(train_data_cv[[1]][[1]])$newGroup)# the inside newGroups (chromo
 unique(assessment(train_data_cv[[1]][[1]])$newGroup) # the held out newGroup: 
 # okay this works great! 
 
+########### TRAIN/TEST MODEL JUST USING ONE FOLD SET #########  
+oneFoldSetToTrainAndAssessOn <- train_data_cv[[1]][[1]]
+saveRDS(oneFoldSetToTrainAndAssessOn, file = paste0(outdir,"oneFoldSetToTrainAndAssessOn.rds"))
+# load back in:
+#oneFoldSetToTrainAndAssessOn <- readRDS(paste0(outdir,"oneFoldSetToTrainAndAssessOn.rds"))
+# rand_forest_Fold01_fit <- rand_forest_workflow %>%
+#   last_fit(oneFoldSetToTrainAndAssessOn) # is very slow (a couple hours because it's based on all 7mer types)
+
 ########## RECIPE #########
 ####### should I sum up each non held-out fold somehow? skip for now. ##########
+# Note about recipes: You initialize the recipe with some data so that it gets the column names, but then when I do fit, I specify which data to use for fitting the model and it's not data that is in the recipe (so the recipe was initialized with the full trainign split, but then model is fit with the fold I am using, I got worried that somehow there could be some data leakage with that, but I don't think there is because the model used to initialize the recipe isn't used for fitting if I don't say to. But just to be safe in future models maybe initialize the recipe with the fold you're using # So for this model on 
+# see variables:
+names(analysis(oneFoldSetToTrainAndAssessOn))
 rand_forest_processing_recipe <- 
   # which consists of the formula (outcome ~ predictors) (don't want to include the 'variable' column)
   
-  recipe(outcome ~ .,data=training(split)) %>% # 
-  update_role(mutationType, new_role="7mer mutation type label") %>%
-  step_rm(derived7mer,ancestral7mer, mutationCount,mutationCount_divByTargetCount,newGroup,label,ancestral7merCount) %>%
+  recipe(outcome ~ .,data=analysis(oneFoldSetToTrainAndAssessOn)) %>% # 
+  update_role(mutationType_5mer, new_role="5mer mutation type label") %>%
+  step_rm(derived5mer,ancestral5mer,mutationCount_5mer,mutationCount_divByTargetCount_5mer,newGroup,label,ancestral5merCount) %>%
   step_dummy(all_nominal_predictors()) # KEEPING population in here as a predictor careful here that nothing else slips in! but dummy encoding it;; which RF doesn't need but xgboost and SHAP values does so just doing it ; this also dummy encodes the sequence with A as 0 0 0 , 1 0 0 = c etc. 
 #Encoding each ancestral bp as a feature Pos_1, Pos_2, Pos_3 etc.
 #Pos_4.ancestral and Pos_4.derived
@@ -153,13 +169,20 @@ rand_forest_processing_recipe <-
 
 rand_forest_processing_recipe %>% summary()
 rand_forest_processing_recipe
+
+# extract it just to see:
+print('processing training data to make sure variables I want are there')
+juicedData <- prep(rand_forest_processing_recipe,training(oneFoldSetToTrainAndAssessOn)) %>%
+  juice()
+dim(juicedData)   # so there are ~57 features now so should adjust mtry
+names(juicedData)
 # can extract data like this try it :
 #prepped <- prep(rand_forest_processing_recipe,training(split)) %>%
 #  juice()
 
 ######### MODEL SPECIFICATION #########
 rand_forest_ranger_model_specs <-
-  rand_forest(trees = 1000, mtry = 32, min_n = 5) %>% # I added in tree number = 1000
+  rand_forest(trees = 1000, mtry = 19, min_n = 1) %>% # I added in tree number = 1000
   set_engine('ranger',importance="permutation",respect.unordered.factors="order",verbose=TRUE,num.threads=5) %>%
   set_mode('regression')
 rand_forest_ranger_model_specs
@@ -173,13 +196,7 @@ rand_forest_workflow <- workflow() %>%
   add_model(rand_forest_ranger_model_specs)
 rand_forest_workflow
 
-########### TRAIN/TEST MODEL JUST USING ONE FOLD SET #########  
-oneFoldSetToTrainAndAssessOn <- train_data_cv[[1]][[1]]
-saveRDS(oneFoldSetToTrainAndAssessOn, file = paste0(outdir,"oneFoldSetToTrainAndAssessOn.rds"))
-# load back in:
-#oneFoldSetToTrainAndAssessOn <- readRDS(paste0(outdir,"oneFoldSetToTrainAndAssessOn.rds"))
-# rand_forest_Fold01_fit <- rand_forest_workflow %>%
-#   last_fit(oneFoldSetToTrainAndAssessOn) # is very slow (a couple hours because it's based on all 7mer types)
+
 # 
 # ########### assess fit to held-out fold #########
 # rand_forest_Fold01_fit %>% collect_metrics()
@@ -234,7 +251,11 @@ rsq(truth_prediction_df,truth=outcome,estimate=.pred)
 rmse(truth_prediction_df,truth=outcome,estimate=.pred)
 
 #  rmse    standard     0.00155 ; kind of big? 
-truth_prediction_df$centralMutationType <- paste0(substr(truth_prediction_df$mutationType,4,4),".",substr(truth_prediction_df$mutationType,12,12))
+# CAREFUL HERE: need to make sure subsetting correclty now that it's 5mers
+# (you are)
+truth_prediction_df$centralMutationType <- paste0(substr(truth_prediction_df$mutationType_5mer,3,3),".",substr(truth_prediction_df$mutationType_5mer,9,9))
+# check it:
+tail(truth_prediction_df[,c("mutationType_5mer","centralMutationType")])
 # note this doesn't have the 1-coded pops unless you juice() it but rows are still in same order 
 rand_forest_Fold01_fit_predictions_plot <-  ggplot(truth_prediction_df, aes(y=.pred,x=outcome,color=centralMutationType,shape=population))+
   geom_point()+
@@ -262,11 +283,19 @@ rsqPerMutplot
 ggsave(paste0(outdir,"modelTrainedOnOneFold.Rsq.PerMutationType.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),rsqPerMutplot,height=3,width=5)
 
 ####  add rsq values to plot if possible ###
-rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(truth_prediction_df, aes(y=.pred,x=outcome,color=centralMutationType))+
+
+
+# make a label that has rsq in the central mutation type
+predictions_withData_WithPerMutationTypeMetrics <- merge(truth_prediction_df,rsqsPerSpeciesAndMutationType,by=c("population","centralMutationType"))
+
+
+########## combine pop and mutaiton type and rsq into one label to facet over 
+predictions_withData_WithPerMutationTypeMetrics$comboLabel <- paste0(predictions_withData_WithPerMutationTypeMetrics$population,"\n",predictions_withData_WithPerMutationTypeMetrics$centralMutationType,"\nrsq = ",round(predictions_withData_WithPerMutationTypeMetrics$.estimate,3))
+
+rand_forest_Fold01_fit_predictions_plot_faceted <-  ggplot(predictions_withData_WithPerMutationTypeMetrics, aes(y=.pred,x=outcome,color=centralMutationType))+
   geom_point()+
   geom_abline()+
-  geom_text(data=rsqsPerSpeciesAndMutationType,aes(x=1e-6,y=1e-4,label=round(.estimate,4)),color="black")+
-  facet_grid(~centralMutationType~population,scales="free")+
+  facet_wrap(~comboLabel,ncol=2,dir="v",scales="free")+
   #ggtitle(paste0(description,"\ntrained on Fold01\n(all odd Windows but one, tested on just Window",toString(unique(truth_prediction_df$newGroup)),")"))+
   theme_bw()
 rand_forest_Fold01_fit_predictions_plot_faceted
@@ -294,26 +323,189 @@ ggsave(paste0(outdir,"modelTrainedOnOneFold.VIP.Plot.AssessedOnWindow",toString(
 
 ######## want to try to find sites that are at very different rates between the mouse species and focus on those and what makes them tick #############
 head(truth_prediction_df)
-truth_prediction_df_spread <- pivot_wider(truth_prediction_df[,c("mutationType","population","outcome",".pred","centralMutationType")],id_cols = c(mutationType,population,centralMutationType),names_from=population,values_from=c(outcome,.pred)) 
+truth_prediction_df_spread <- pivot_wider(truth_prediction_df[,c("mutationType_5mer","population","outcome",".pred","centralMutationType")],id_cols = c(mutationType_5mer,population,centralMutationType),names_from=population,values_from=c(outcome,.pred)) 
 
 head(truth_prediction_df_spread)
 # this is really useful: plot the difference between the two species and how well the predictions do (species are off of y=x line because of diff muttion rates; model picks that up! super cool)
 speciesComparisonPlot <- ggplot(truth_prediction_df_spread,aes(x=outcome_Mmd,y=outcome_Ms))+
   geom_point()+
   geom_point(aes(x=.pred_Mmd,y=.pred_Ms),shape=1,color="red")+
-  geom_abline()
+  geom_abline()+
+  facet_wrap(~centralMutationType,scales="free")+
+  theme_bw()
 speciesComparisonPlot
 ggsave(paste0(outdir,"modelTrainedOnOneFold.SpeciesXYComparison.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),speciesComparisonPlot,height=5,width=7)
 
-# plot both species together
-plotBothSpeciesTogether <- ggplot(truth_prediction_df,aes(y=.pred,x=outcome,color=population))+
-  theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())+
-  geom_point(size=0.1)+
-  #scale_x_log10()+
-  #scale_y_log10()+
-  theme_bw()+
-  geom_abline()
-plotBothSpeciesTogether
-ggsave(paste0(outdir,"modelTrainedOnOneFold.ObsExpected.SpeciesTogether.AssessedOnWindow",toString(unique(truth_prediction_df$newGroup)),".png"),plotBothSpeciesTogether,height=5,width=7)
+######## SHAP VALUES ###########
+library(doParallel)
+registerDoParallel()
 
-sink()
+######### Need to juice the training and assessment data and exclude anything that isn't features ###### 
+
+# juice and get rid of outcome variables and anything that isn't predictions (like mutaiton type)
+Xtrain <- prep(rand_forest_processing_recipe, training(oneFoldSetToTrainAndAssessOn)) %>% 
+  juice() %>% 
+  select(-c(mutationType_5mer,outcome)) %>% 
+  as.matrix()
+head(Xtrain)
+
+
+Xtest <- prep(rand_forest_processing_recipe, testing(oneFoldSetToTrainAndAssessOn)) %>% 
+  juice() %>% 
+  select(-c(mutationType_5mer,outcome)) %>% 
+  as.matrix()
+head(Xtest)
+
+# function describing how to get predictions from the model 
+pfun <- function(object, newdata) {
+  predict(object, data = newdata)$predictions
+}
+
+
+# a bit slow: 
+
+shap <- fastshap::explain(ranger_obj, X = Xtrain,pred_wrapper=pfun,newdata=Xtest) ##
+saveRDS(shap,file=paste0(outdir,"SHAPResults.rds")) # 1536 *2 because one obs per species
+#read back in if you need it
+#shap <- readRDS(paste0(outdir,"SHAPResults.rds"))
+#eventually want: nsim=5,newdata=Xtest,adjust=T)
+# oooh is it working? try to increase nsim (number of MC simulations ); adjust ot satisfy additivity principle
+# VERY SLOW
+#shap
+
+#hist(shap$feature_1_Slide_4.ancestral)
+#hist(shap$feature_1_Shift_4.derived)
+
+# Aggregate Shapley values
+shap_imp <- data.frame(
+  Variable = names(shap),
+  Importance = apply(shap, MARGIN = 2, FUN = function(x) sum(abs(x)))
+)
+shap_imp
+
+shapplot1 <- ggplot(shap_imp, aes(reorder(Variable, Importance), Importance)) +
+  geom_col() +
+  coord_flip() +
+  xlab("") +
+  ylab("mean(|Shapley value|)")
+shapplot1
+ggsave(paste0(outdir,"random_forest.shapImportance.png"),shapplot1,height=10,width=6)
+######## shapley dependence plot ########
+# need dataframe of training data:
+# note X above was a matrix but this has to be a df
+Xdftrain <- prep(rand_forest_processing_recipe, training(oneFoldSetToTrainAndAssessOn)) %>% 
+  juice()  #%>%
+
+head(Xdftrain)
+
+# note X above was a matrix but this has to be a df
+Xdftest <- prep(rand_forest_processing_recipe, testing(oneFoldSetToTrainAndAssessOn)) %>% 
+  juice()  #%>%
+
+head(Xdftest)
+
+
+
+featuresToPlot=names(shap)
+dir.create(paste0(outdir,"perFeatureDependencePlots/"),showWarnings = F)
+for(feature in featuresToPlot){
+  
+  shapdependenceplot1 <- autoplot(shap, 
+                                  type = "dependence", 
+                                  feature = feature, 
+                                  X = Xdftest, # this hsould be test data if you ran shap with newdata=testing data! sholud be train if you just ran it without any new data
+                                  smooth = TRUE, color_by = "outcome")+
+    scale_color_viridis_c(trans="log10")+
+    ggtitle(feature)+
+    theme_bw()+
+    labs(color="outcome")
+  shapdependenceplot1
+  ggsave(paste0(outdir,"/perFeatureDependencePlots/random_forest.shapDependence.",feature,".png"),shapdependenceplot1,height=4,width=6)
+}
+
+
+####### SHAP summary plot (really useful) ######
+shap_labeled <- shap
+# need to label rows by their mutation type and pop observed in
+# note that shap$population_Ms is the shap values for that feature
+shap_labeled$mutationType_5mer <- Xdftest$mutationType_5mer
+shap_labeled$populationLabel_Ms <- Xdftest$population_Ms
+
+
+shap_melt <- melt(shap_labeled,id.vars = c("mutationType_5mer","populationLabel_Ms")) # dims are 1536*2 pops * 57 features = 175104
+head(shap_melt)
+colnames(shap_melt) <- c("mutationType_5mer","populationLabel_Ms","feature","SHAP.value")
+# combine with xdf:
+#Xdftrain_melt <- melt(Xdftrain,id.vars =c("mutationType_5mer","population_Ms","newGroup")) # are these based on train or test?
+#head(Xdftrain_melt)
+#colnames(Xdftrain_melt) <- c("mutationType_5mer","feature","feature.value")
+Xdftest$populationLabel_Ms <- Xdftest$population_Ms
+Xdftest_melt <- melt(Xdftest,id.vars=c("mutationType_5mer","populationLabel_Ms")) # are these based on train or test?
+dim(Xdftest_melt)
+head(Xdftest_melt)
+colnames(Xdftest_melt) <- c("mutationType_5mer","populationLabel_Ms","feature","feature.value")
+# still includes the 'outcome column fyi -- doesn't mess anything up tho
+
+shap_plusFeatures <- merge(shap_melt,Xdftest_melt[Xdftest_melt$feature!="outcome",],by=c("mutationType_5mer","feature","populationLabel_Ms")) # this merge created duplicates because I wasn't labelling points by what population they came from; fixed it
+dim(shap_plusFeatures) # yes now this is right with no dups
+###### do min max normalization of originalf feature values (for ease of plotting): 
+shap_plusFeatures <- shap_plusFeatures %>%
+  group_by(feature) %>%
+  mutate(minmaxnormalized.feature.value=(feature.value-min(feature.value))/(max(feature.value)-min(feature.value)))
+head(shap_plusFeatures)
+# try to merge shap and Xdf 
+# want to order by importance (mean abs shap )
+featuresInOrderOfImportance <- shap_imp %>%
+  arrange(desc(Importance))
+# order features in order of importance:
+shap_plusFeatures$feature <- factor(shap_plusFeatures$feature,levels=rev(featuresInOrderOfImportance$Variable))
+shapSummaryPlot <- ggplot(shap_plusFeatures,aes(y=feature,x=SHAP.value,color=minmaxnormalized.feature.value))+
+  #geom_point()+
+  geom_quasirandom(groupOnX = F) + # bee swarm so ti's like a violin plot
+  theme_bw()+
+  ggtitle(paste0("SHAP summary plot"))+
+  scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")
+shapSummaryPlot
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot.USEFUL.png"),shapSummaryPlot,height=12,width=10)
+
+# just do top 10 most important:
+top10 <- head(featuresInOrderOfImportance$Variable,10)
+shapSummaryPlot_top10 <- ggplot(shap_plusFeatures[shap_plusFeatures$feature %in% top10,],aes(y=feature,x=SHAP.value,color=minmaxnormalized.feature.value))+
+  #geom_point()+
+  geom_quasirandom(groupOnX = F) + # bee swarm so ti's like a violin plot; want to cluster on y though
+  
+  theme_bw()+
+  ggtitle(paste0("SHAP summary plot"))+
+  scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")
+shapSummaryPlot_top10
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+
+### just do all the population ones: 
+justPopulationRelatedFeatures=shap_plusFeatures[grepl("population",shap_plusFeatures$feature),]
+
+shapSummaryPlot_populationOnly <- ggplot(justPopulationRelatedFeatures,aes(y=feature,x=SHAP.value,color=minmaxnormalized.feature.value))+
+  #geom_point()+
+  geom_quasirandom(groupOnX = F) + # bee swarm so ti's like a violin plot; want to cluster on y though
+  
+  theme_bw()+
+  ggtitle(paste0("SHAP summary plot"))+
+  scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")
+shapSummaryPlot_populationOnly
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+
+### label outliers #########
+shapSummaryPlot_populationOnly_labelOutliers <- ggplot(justPopulationRelatedFeatures,aes(y=feature,x=SHAP.value,color=minmaxnormalized.feature.value))+
+  #geom_point()+
+  geom_quasirandom(groupOnX = F) + # bee swarm so ti's like a violin plot; want to cluster on y though
+  
+  theme_bw()+
+  ggtitle(paste0("SHAP summary plot"))+
+  scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")+
+  geom_label_repel(data=subset(justPopulationRelatedFeatures,abs(SHAP.value)>=2.5e-4),aes(label=mutationType_5mer),color="black",  size = 2,
+                   box.padding = unit(0.25, "lines"),
+                   point.padding = unit(0.5, "lines"),force = T,nudge_y = 0.1)+
+  facet_wrap(~populationLabel_Ms)
+
+shapSummaryPlot_populationOnly_labelOutliers
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+#sink()

@@ -113,6 +113,7 @@ unique(assessment(train_data_cv[[1]][[1]])$newGroup) # the held out newGroup:
 
 ########## RECIPE #########
 ####### should I sum up each non held-out fold somehow? skip for now. ##########
+# Note about recipes: You initialize the recipe with some data so that it gets the column names, but then when I do fit, I specify which data to use for fitting the model and it's not data that is in the recipe (so the recipe was initialized with the full trainign split, but then model is fit with the fold I am using, I got worried that somehow there could be some data leakage with that, but I don't think there is because the model used to initialize the recipe isn't used for fitting if I don't say to. But just to be safe in future models maybe initialize the recipe with the fold you're using # 
 rand_forest_processing_recipe <- 
   # which consists of the formula (outcome ~ predictors) (don't want to include the 'variable' column)
   
