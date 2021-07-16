@@ -23,13 +23,13 @@ set.seed(42) # so results are reproducible
 # doing this in the wrapper script instead:
 
 # running on laptop for now
-#args <- commandArgs(trailingOnly = TRUE)
-#description <- args[1]
-#outdir <- args[2]
-outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/experiments/20210714_model_013_RF.5mers_runOnLaptop/"
+args <- commandArgs(trailingOnly = TRUE)
+description <- args[1]
+outdir <- args[2]
+#outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/modeling/experiments/20210714_model_013_RF.5mers_runOnLaptop/"
 dir.create(outdir,showWarnings = F)
 # trying to use sink() to catch all output: (errors will go to a different file)
-#sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
+sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink output not errors (errors will still go into errors dir)
 
 #todaysdate=format(Sys.Date(), "%Y%m%d")
 #outcomeLabel="MutationRate"
@@ -46,10 +46,10 @@ dir.create(outdir,showWarnings = F)
 ############## read in shapes ##############
 print('reading in shapes')
 #shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
-#shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt"),header=T,sep="\t")
+shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt"),header=T,sep="\t")
 
 # for testing on home computer: 
-shapes <- read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt",header=T,sep="\t")
+#shapes <- read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/DNAShapeR/firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt",header=T,sep="\t")
 rownames(shapes) <- shapes$motif
 
 print('reading in spectrum')
@@ -58,9 +58,9 @@ print('reading in spectrum')
 # note: don't need to read in sequence encoded data -- am doing it below with tidymodels
 ####### Now including data that has 0 entries and for now has large multi-chromosome windows ############
 ## eventually make better windows : this is the 7mer spectrum but am going to sum up over 5mers below so don't worry :) 
-#allData_multipop <- read.table(paste0(spectrumdir,"TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt"),header=T) # this is the 7mer spectrum but down below you are going to sum up over 5mers 
+allData_multipop <- read.table(paste0(spectrumdir,"TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt"),header=T) # this is the 7mer spectrum but down below you are going to sum up over 5mers 
 # for testing on home computer:
-allData_multipop <- read.table("/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt",header=T)
+#allData_multipop <- read.table("/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.txt",header=T)
 
 dim(allData_multipop)
 # need to get rid of NA entries
@@ -71,10 +71,18 @@ dim(allData_multipop)
 
 ########## !!!!!! condense 7mer spectrum down to 5mer spectrum  !!!!!!! #########
 allData_multipop$mutationType_5mer <- paste0(substr(allData_multipop$mutationType,2,6),".",substr(allData_multipop$mutationType,10,14))
-
-
+# doing some debuggin:
+#allData_multipop$ancestral5mer <- substr(allData_multipop$mutationType,2,6)
+#allData_multipop[allData_multipop$ancestral5mer=="CGACG",]
+allData_multipop %>%
+  group_by(population,newGroup,mutationType) %>%
+  subset(ancestral5mer=="CGACG") %>%
+#  summarise(test_Ancestral5merCount=sum(ancestral7merCount)) %>%
+  View()
+  
 head(allData_multipop)
 tail(allData_multipop)
+
 allData_multipop <- allData_multipop %>%
   group_by(population,newGroup,label,mutationType_5mer) %>%
   summarise(mutationCount_5mer = sum(mutationCount),ancestral5merCount=sum(ancestral7merCount),mutationCount_divByTargetCount_5mer = mutationCount_5mer/ancestral5merCount) ##### is this double counting 5mer targets?
@@ -396,11 +404,18 @@ ggsave(paste0(outdir,"random_forest.shapImportance.png"),shapplot1,height=10,wid
 Xdftrain <- prep(rand_forest_processing_recipe, training(oneFoldSetToTrainAndAssessOn)) %>% 
   juice()  #%>%
 
-head(Xdftrain)
 
 # note X above was a matrix but this has to be a df
 Xdftest <- prep(rand_forest_processing_recipe, testing(oneFoldSetToTrainAndAssessOn)) %>% 
   juice()  #%>%
+
+# label categorically for nicer plots ; jsut make sure you get it right 
+Xdftest$populationLabel <- ""
+Xdftest[Xdftest$population_Ms==0,]$populationLabel <- "Mmd"
+Xdftest[Xdftest$population_Ms==1,]$populationLabel <- "Ms"
+Xdftest_melt <- melt(Xdftest,id.vars=c("mutationType_5mer","populationLabel")) # are these based on train or test?
+
+dim(Xdftest)
 
 head(Xdftest)
 
@@ -414,11 +429,11 @@ for(feature in featuresToPlot){
                                   type = "dependence", 
                                   feature = feature, 
                                   X = Xdftest, # this hsould be test data if you ran shap with newdata=testing data! sholud be train if you just ran it without any new data
-                                  smooth = TRUE, color_by = "outcome")+
-    scale_color_viridis_c(trans="log10")+
+                                  smooth = TRUE, color_by = "populationLabel")+ # going to try coloring by species membership
+    scale_color_manual(values=c("orange","steelblue"))+
     ggtitle(feature)+
     theme_bw()+
-    labs(color="outcome")
+    labs(color="population")
   shapdependenceplot1
   ggsave(paste0(outdir,"/perFeatureDependencePlots/random_forest.shapDependence.",feature,".png"),shapdependenceplot1,height=4,width=6)
 }
@@ -429,7 +444,9 @@ shap_labeled <- shap
 # need to label rows by their mutation type and pop observed in
 # note that shap$population_Ms is the shap values for that feature
 shap_labeled$mutationType_5mer <- Xdftest$mutationType_5mer
-shap_labeled$populationLabel_Ms <- Xdftest$population_Ms
+shap_labeled$populationLabel <- Xdftest$populationLabel
+
+
 
 
 shap_melt <- melt(shap_labeled,id.vars = c("mutationType_5mer","populationLabel_Ms")) # dims are 1536*2 pops * 57 features = 175104
@@ -439,14 +456,13 @@ colnames(shap_melt) <- c("mutationType_5mer","populationLabel_Ms","feature","SHA
 #Xdftrain_melt <- melt(Xdftrain,id.vars =c("mutationType_5mer","population_Ms","newGroup")) # are these based on train or test?
 #head(Xdftrain_melt)
 #colnames(Xdftrain_melt) <- c("mutationType_5mer","feature","feature.value")
-Xdftest$populationLabel_Ms <- Xdftest$population_Ms
-Xdftest_melt <- melt(Xdftest,id.vars=c("mutationType_5mer","populationLabel_Ms")) # are these based on train or test?
+
 dim(Xdftest_melt)
 head(Xdftest_melt)
-colnames(Xdftest_melt) <- c("mutationType_5mer","populationLabel_Ms","feature","feature.value")
+colnames(Xdftest_melt) <- c("mutationType_5mer","populationLabel","feature","feature.value")
 # still includes the 'outcome column fyi -- doesn't mess anything up tho
 
-shap_plusFeatures <- merge(shap_melt,Xdftest_melt[Xdftest_melt$feature!="outcome",],by=c("mutationType_5mer","feature","populationLabel_Ms")) # this merge created duplicates because I wasn't labelling points by what population they came from; fixed it
+shap_plusFeatures <- merge(shap_melt,Xdftest_melt[Xdftest_melt$feature!="outcome",],by=c("mutationType_5mer","feature","populationLabel")) # this merge created duplicates because I wasn't labelling points by what population they came from; fixed it
 dim(shap_plusFeatures) # yes now this is right with no dups
 ###### do min max normalization of originalf feature values (for ease of plotting): 
 shap_plusFeatures <- shap_plusFeatures %>%
@@ -458,6 +474,7 @@ head(shap_plusFeatures)
 featuresInOrderOfImportance <- shap_imp %>%
   arrange(desc(Importance))
 # order features in order of importance:
+
 shap_plusFeatures$feature <- factor(shap_plusFeatures$feature,levels=rev(featuresInOrderOfImportance$Variable))
 shapSummaryPlot <- ggplot(shap_plusFeatures,aes(y=feature,x=SHAP.value,color=minmaxnormalized.feature.value))+
   #geom_point()+
@@ -508,4 +525,92 @@ shapSummaryPlot_populationOnly_labelOutliers <- ggplot(justPopulationRelatedFeat
 
 shapSummaryPlot_populationOnly_labelOutliers
 ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+
+
+##### want to get 5mers that are outliers for population SHAP values ######
+# not sure about this cutoff -- should automate 
+populationSHAPoutlier_5mers_list <- subset(justPopulationRelatedFeatures,abs(SHAP.value)>=2.5e-4)$mutationType_5mer
+head(populationSHAPoutlier_5mers_list)
+
+# want to get heatmap: 
+truth_prediction_df_spread$truth_oddsRatio_mmd_ms_rescaledMutationRate <- truth_prediction_df_spread$outcome_Mmd / truth_prediction_df_spread$outcome_Ms
+
+
+truth_prediction_df_spread$modelPrediction_oddsRatio_mmd_ms_rescaledMutationRate <- truth_prediction_df_spread$.pred_Mmd / truth_prediction_df_spread$.pred_Ms
+
+truth_prediction_df_spread$outlierLabel <- "doesn't have a high SHAP value for population status"
+truth_prediction_df_spread[truth_prediction_df_spread$mutationType_5mer %in% populationSHAPoutlier_5mers_list,]$outlierLabel <- "population outlier from SHAP values"
+
+sandbox_predictionsOutliersPlot <- ggplot(truth_prediction_df_spread,aes(x=mutationType_5mer,y=truth_oddsRatio_mmd_ms,color=outlierLabel,shape="truth"))+
+  geom_point()+
+  geom_point(aes(x=mutationType_5mer,y=modelPrediction_oddsRatio_mmd_ms,color=outlierLabel,shape="model prediction"))+
+  scale_shape_manual(values=c(8,1))+
+  ggtitle("SHAP outliers for population don't have extreme odds ratios")+
+  facet_wrap(~centralMutationType)+
+  geom_hline(yintercept = 1)+
+  theme(axis.text.x = element_blank())
+sandbox_predictionsOutliersPlot
+ggsave(paste0(outdir,"sandbox.OutliersForPopulationSHap.NotOddsRatioOutliers.png"),sandbox_predictionsOutliersPlot,height=4,width=10)
+
+
+########## look at original data of 5mers with large odds ratios of the rescaled mutation rates #####
+## get shap values for the odds ratio outliers and see what's up
+listOfOutlier5mers_OddsRatio <- subset(truth_prediction_df_spread,truth_oddsRatio_mmd_ms>1.5 | truth_oddsRatio_mmd_ms<0.75)$mutationType_5mer
+
+# in truth dataset
+truth_prediction_df[truth_prediction_df$mutationType_5mer %in% listOfOutlier5mers_OddsRatio,]
+
+# do they have an overall weird odds ratio in seg sites?
+# sum up over groups/labels
+fracSegSites <- truth_prediction_df %>%
+  group_by(population,newGroup) %>%
+  mutate(fracOfSegSites = mutationCount_5mer/sum(mutationCount_5mer))
+head(fracSegSites)
+sum(fracSegSites[fracSegSites$population=="Ms" & truth_prediction_df$newGroup==1,]$fracOfSegSites) #  1 ;good
+
+fracSegSites_spread <- pivot_wider(fracSegSites[,c("mutationType_5mer","population","fracOfSegSites")],id_cols = c(mutationType_5mer,population),names_from=population,values_from=c(fracOfSegSites)) 
+
+head(fracSegSites_spread)
+fracSegSites_spread$fracSegSites_oddsRatio_Mmd_ms <- fracSegSites_spread$Mmd/fracSegSites_spread$Ms
+head(fracSegSites_spread)
+# outliers:
+listOfOutlier5mers_OddsRatio_FracSegSites <- subset(fracSegSites_spread,oddsRatio_Mmd_ms>1.5 | oddsRatio_Mmd_ms<0.75)$mutationType_5mer
+listOfOutlier5mers_OddsRatio_FracSegSites
+
+# let's compare odds ratios:
+mergeOddsRatios <- merge(fracSegSites_spread[,c("mutationType_5mer","fracSegSites_oddsRatio_Mmd_ms")],truth_prediction_df_spread[,c("mutationType_5mer","truth_oddsRatio_mmd_ms_rescaledMutationRate")],by="mutationType_5mer")
+
+comparingFracSegSites_MutationRateOddsRatios <- ggplot(mergeOddsRatios,aes(x=fracSegSites_oddsRatio_Mmd_ms,y=truth_oddsRatio_mmd_ms_rescaledMutationRate))+
+  geom_point()+
+  geom_abline()+
+  geom_text(data=subset(mergeOddsRatios,(fracSegSites_oddsRatio_Mmd_ms-truth_oddsRatio_mmd_ms_rescaledMutationRate)>0.2),aes(label=mutationType_5mer))
+comparingFracSegSites_MutationRateOddsRatios
+ggsave(paste0(outdir,"sandbox.comparingFracsegSitestoMutationRateOddsRatios.FracSegSitesAlwaysBigger.png"),comparingFracSegSites_MutationRateOddsRatios,height=4,width=7)
+
+# all the outliers are CGACG> ??? what's up with that.
+truth_prediction_df[truth_prediction_df$ancestral5mer=="CGACG",c("mutationType_5mer","mutationCount_5mer","ancestral5merCount","mutationCount_divByTargetCount_5mer","population")]
+# Okay *why* aren't then ancestral5mer counts the same HERE?
 #sink()
+###### DO DO : SAVE THESE PLTOS AND ADD TO PPT; close out ###########
+
+######### want to try tree shap interactions ########
+# https://www.r-bloggers.com/2021/01/treeshap%E2%80%8A-%E2%80%8Aexplain-tree-based-models-with-shap-values/
+require(treeshap)
+ranger_obj
+model_unified <- ranger.unify(ranger_obj, select(Xdftrain,-c(outcome,mutationType_5mer))) # unify model with the training data 
+# ranger.unify(ranger_obj,training data (must have same columns as training data so no outcome or type))
+# Reference dataset. A data.frame or matrix with the same columns as in the training set of the model. Usually dataset used to train model.  https://rdrr.io/github/ModelOriented/treeshap/man/randomForest.unify.html
+# note you can change ref dataset: unified2 <- set_reference_dataset(model_unified, aps_data[1:2000, ])
+# compute shap values:
+
+print(paste0(Sys.time()," staring treeshap with interactions"))
+treeshap_res <- treeshap(model_unified, select(Xdftest,-c(outcome,mutationType_5mer,populationLabel)),interactions = T) ## Interactions TRUE! 
+
+saveRDS(treeshap_res , paste0(outdir,"treeshapInteractions.rds"))
+# head(treeshap_res$shaps)
+# you get this error if a column is present that sholudn't be
+#Error in treeshap_cpp(x2, is_na, roots, yes, no, missing, feature, split,  : 
+#                        Not compatible with requested type: [type=character; target=double].
+
+sink()
+                              
