@@ -449,9 +449,9 @@ shap_labeled$populationLabel <- Xdftest$populationLabel
 
 
 
-shap_melt <- melt(shap_labeled,id.vars = c("mutationType_5mer","populationLabel_Ms")) # dims are 1536*2 pops * 57 features = 175104
+shap_melt <- melt(shap_labeled,id.vars = c("mutationType_5mer","populationLabel")) # dims are 1536*2 pops * 57 features = 175104
 head(shap_melt)
-colnames(shap_melt) <- c("mutationType_5mer","populationLabel_Ms","feature","SHAP.value")
+colnames(shap_melt) <- c("mutationType_5mer","populationLabel","feature","SHAP.value")
 # combine with xdf:
 #Xdftrain_melt <- melt(Xdftrain,id.vars =c("mutationType_5mer","population_Ms","newGroup")) # are these based on train or test?
 #head(Xdftrain_melt)
@@ -521,7 +521,7 @@ shapSummaryPlot_populationOnly_labelOutliers <- ggplot(justPopulationRelatedFeat
   geom_label_repel(data=subset(justPopulationRelatedFeatures,abs(SHAP.value)>=2.5e-4),aes(label=mutationType_5mer),color="black",  size = 2,
                    box.padding = unit(0.25, "lines"),
                    point.padding = unit(0.5, "lines"),force = T,nudge_y = 0.1)+
-  facet_wrap(~populationLabel_Ms)
+  facet_wrap(~populationLabel)
 
 shapSummaryPlot_populationOnly_labelOutliers
 ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
