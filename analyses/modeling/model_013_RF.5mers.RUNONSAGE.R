@@ -45,7 +45,7 @@ sink(paste0(outdir,"logfile.sink.txt"),type="output") # this will only sink outp
 
 ############## read in shapes ##############
 print('reading in shapes')
-#shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
+shapedir="/net/harris/vol1/home/beichman/DNAShape/shapeDataForModeling/"
 shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible5mers.FeatureValues.NOTNormalized.WillWorkForAnySpecies.notnormalized.UseForRandomForest.andTidyModels.5mer.txt"),header=T,sep="\t")
 
 # for testing on home computer: 
@@ -53,7 +53,7 @@ shapes <- read.table(paste0(shapedir,"firstOrder_featureTypes_allPossible5mers.F
 rownames(shapes) <- shapes$motif
 
 print('reading in spectrum')
-#spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse/"
+spectrumdir="/net/harris/vol1/home/beichman/DNAShape/spectrumDataForModeling/mouse/"
 
 # note: don't need to read in sequence encoded data -- am doing it below with tidymodels
 ####### Now including data that has 0 entries and for now has large multi-chromosome windows ############
