@@ -74,11 +74,11 @@ allData_multipop$mutationType_5mer <- paste0(substr(allData_multipop$mutationTyp
 # doing some debuggin:
 #allData_multipop$ancestral5mer <- substr(allData_multipop$mutationType,2,6)
 #allData_multipop[allData_multipop$ancestral5mer=="CGACG",]
-allData_multipop %>%
-  group_by(population,newGroup,mutationType) %>%
-  subset(ancestral5mer=="CGACG") %>%
+#allData_multipop %>%
+#  group_by(population,newGroup,mutationType) %>%
+#  subset(ancestral5mer=="CGACG") %>%
 #  summarise(test_Ancestral5merCount=sum(ancestral7merCount)) %>%
-  View()
+#  View()
   
 head(allData_multipop)
 tail(allData_multipop)
