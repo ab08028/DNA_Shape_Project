@@ -68,11 +68,11 @@ pfun <- function(object, newdata) {
 
 
 # a bit slow: 
-
-shap <- fastshap::explain(ranger_obj, X = Xtrain,pred_wrapper=pfun,newdata=Xtest) ##
-saveRDS(shap,file=paste0(outdir,"SHAPResults.rds")) # 1536 *2 because one obs per species
+#### REDOING IT 
+#shap <- fastshap::explain(ranger_obj, X = Xtrain,pred_wrapper=pfun,newdata=Xtest) ##
+#saveRDS(shap,file=paste0(outdir,"SHAPResults.rds")) # 1536 *2 because one obs per species
 #read back in if you need it
-#shap <- readRDS(paste0(outdir,"SHAPResults.rds"))
+shap <- readRDS(paste0(outdir,"SHAPResults.rds"))
 #eventually want: nsim=5,newdata=Xtest,adjust=T)
 # oooh is it working? try to increase nsim (number of MC simulations ); adjust ot satisfy additivity principle
 # VERY SLOW
