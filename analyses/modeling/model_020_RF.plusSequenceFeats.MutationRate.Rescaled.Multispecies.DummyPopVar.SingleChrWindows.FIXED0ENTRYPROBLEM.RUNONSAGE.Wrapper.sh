@@ -3,7 +3,7 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N model_019
+#$ -N model_020
 #$ -pe serial 5
 # note not parallel bc treeshap doesn't do parallel
 ######## trying to run modeling script in hoffman #######
