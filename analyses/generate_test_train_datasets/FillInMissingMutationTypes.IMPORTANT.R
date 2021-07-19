@@ -53,4 +53,4 @@ sum(is.na(allData_multipop_fillInMissingRows_merged)) # 1080 NA's
 sum(allData_multipop_fillInMissingRows_merged$ancestral7merCount==0) # 1080
 # okay cool so this generates NAs for rows that have 0 and 0 
 
-write.table(allData_multipop_fillInMissingRows_merged,paste0(spectrumoutdir,"MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.USETHIS.txt"),row.names=F,quote=F,sep="\t")
+### write.table(allData_multipop_fillInMissingRows_merged,paste0(spectrumoutdir,"MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.USETHIS.txt"),row.names=F,quote=F,sep="\t")

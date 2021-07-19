@@ -574,7 +574,7 @@ head(fracSegSites_spread)
 fracSegSites_spread$fracSegSites_oddsRatio_Mmd_ms <- fracSegSites_spread$Mmd/fracSegSites_spread$Ms
 head(fracSegSites_spread)
 # outliers:
-listOfOutlier5mers_OddsRatio_FracSegSites <- subset(fracSegSites_spread,oddsRatio_Mmd_ms>1.5 | oddsRatio_Mmd_ms<0.75)$mutationType_5mer
+listOfOutlier5mers_OddsRatio_FracSegSites <- subset(fracSegSites_spread,fracSegSites_oddsRatio_Mmd_ms>1.5 | fracSegSites_oddsRatio_Mmd_ms<0.75)$mutationType_5mer
 listOfOutlier5mers_OddsRatio_FracSegSites
 
 # let's compare odds ratios:
