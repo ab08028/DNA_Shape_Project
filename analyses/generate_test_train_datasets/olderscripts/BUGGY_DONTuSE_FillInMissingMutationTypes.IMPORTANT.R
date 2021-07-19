@@ -25,7 +25,7 @@ require(dplyr)
 # this data frame gives you the count of each ancestral 7mer per window/population
 # and inserts 0s for missing 7mer targets (rather than just having them  not represented)
 ancestral7mercounts_with0s <- allData_multipop %>%
-  complete(ancestral7mer,nesting(window,population,label),fill=list(ancestral7merCount=0)) %>%
+  complete(ancestral7mer,nesting(window,population,label),fill=list(ancestral7merCount=0)) %>% ####### THIS IS WRONG HERE -- don't want ancestral count to be 0 (??) 
   select(window,population,label,ancestral7mer,ancestral7merCount) %>%
   unique()
 dim(ancestral7mercounts_with0s) # 311258 
@@ -35,6 +35,7 @@ allData_multipop_fillInMissingRows <- allData_multipop %>%
   complete(nesting(mutationType,ancestral7mer),nesting(window,population,label),fill=list(mutationCount=0,mutationCount_divByTargetCount=0)) # don't want combinations of ancestral7mer and window that don't exist in the data so don't actually want it to be full length. or want to fill in targetcount = 0 if that is appropriate.
 dim(df)
 
+## did something wrong here ; some targets are 0 that shouldn't be !! fixing in new script 
 # now want to update ancestral counts: and take out old counts and old mutation rates
 allData_multipop_fillInMissingRows_merged <- merge(select(allData_multipop_fillInMissingRows,-c(ancestral7merCount,mutationCount_divByTargetCount)),ancestral7mercounts_with0s,by=c("ancestral7mer","window","population","label"))
 
