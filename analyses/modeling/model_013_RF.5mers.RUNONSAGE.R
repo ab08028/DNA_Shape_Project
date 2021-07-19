@@ -541,9 +541,9 @@ truth_prediction_df_spread$modelPrediction_oddsRatio_mmd_ms_rescaledMutationRate
 truth_prediction_df_spread$outlierLabel <- "doesn't have a high SHAP value for population status"
 truth_prediction_df_spread[truth_prediction_df_spread$mutationType_5mer %in% populationSHAPoutlier_5mers_list,]$outlierLabel <- "population outlier from SHAP values"
 
-sandbox_predictionsOutliersPlot <- ggplot(truth_prediction_df_spread,aes(x=mutationType_5mer,y=truth_oddsRatio_mmd_ms,color=outlierLabel,shape="truth"))+
+sandbox_predictionsOutliersPlot <- ggplot(truth_prediction_df_spread,aes(x=mutationType_5mer,y=truth_oddsRatio_mmd_ms_rescaledMutationRate,color=outlierLabel,shape="truth"))+
   geom_point()+
-  geom_point(aes(x=mutationType_5mer,y=modelPrediction_oddsRatio_mmd_ms,color=outlierLabel,shape="model prediction"))+
+  geom_point(aes(x=mutationType_5mer,y=modelPrediction_oddsRatio_mmd_ms_rescaledMutationRate,color=outlierLabel,shape="model prediction"))+
   scale_shape_manual(values=c(8,1))+
   ggtitle("SHAP outliers for population don't have extreme odds ratios")+
   facet_wrap(~centralMutationType)+
@@ -555,7 +555,7 @@ ggsave(paste0(outdir,"sandbox.OutliersForPopulationSHap.NotOddsRatioOutliers.png
 
 ########## look at original data of 5mers with large odds ratios of the rescaled mutation rates #####
 ## get shap values for the odds ratio outliers and see what's up
-listOfOutlier5mers_OddsRatio <- subset(truth_prediction_df_spread,truth_oddsRatio_mmd_ms>1.5 | truth_oddsRatio_mmd_ms<0.75)$mutationType_5mer
+listOfOutlier5mers_OddsRatio <- subset(truth_prediction_df_spread,truth_oddsRatio_mmd_ms_rescaledMutationRate>1.5 | truth_oddsRatio_mmd_ms_rescaledMutationRate<0.75)$mutationType_5mer
 
 # in truth dataset
 truth_prediction_df[truth_prediction_df$mutationType_5mer %in% listOfOutlier5mers_OddsRatio,]
@@ -591,7 +591,6 @@ ggsave(paste0(outdir,"sandbox.comparingFracsegSitestoMutationRateOddsRatios.Frac
 truth_prediction_df[truth_prediction_df$ancestral5mer=="CGACG",c("mutationType_5mer","mutationCount_5mer","ancestral5merCount","mutationCount_divByTargetCount_5mer","population")]
 # Okay *why* aren't then ancestral5mer counts the same HERE?
 #sink()
-###### DO DO : SAVE THESE PLTOS AND ADD TO PPT; close out ###########
 
 ######### want to try tree shap interactions ########
 # https://www.r-bloggers.com/2021/01/treeshap%E2%80%8A-%E2%80%8Aexplain-tree-based-models-with-shap-values/

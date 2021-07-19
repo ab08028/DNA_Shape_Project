@@ -2,7 +2,7 @@
 # and bigger windows (sum up some chrs)
 # chr 1 and 2 are on their own 
 # but the rest get summed up 
-
+require(dplyr)
 spectrumdir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_spectrum_target_merged_PerChr/" # eventually save in resutls dir of dnashape project 
 
 datadf <- read.table(paste0(spectrumdir,"MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.USETHIS.txt"),header=T,sep="\t")
@@ -23,6 +23,7 @@ datadf[datadf$window %in% c(14,16,18),]$newGroup <- 8
 df2 <- datadf %>%
   group_by(newGroup,population,ancestral7mer, mutationType) %>%
   summarise(ancestral7merCount=sum(ancestral7merCount),mutationCount=sum(mutationCount)) ### actually think it may be ok maybe ? this isn't right! shouldn't sum up 7mer count per group -- that'll lead to a big over estimation I think ! uhoh! fix this!
+# so issue I think is that it's somehow missing some 7mers?
 # oh! maybe I actually did this ok???? seems to add up correctly actually.... let's chill out and find out later.
 head(df2)
 View(df2)
