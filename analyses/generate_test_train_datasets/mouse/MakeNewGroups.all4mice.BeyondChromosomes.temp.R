@@ -7,10 +7,10 @@ spectrumdir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wil
 
 #datadf <- read.table(paste0(spectrumdir,"MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDES0Entries.USETHIS.txt"),header=T,sep="\t")
 # as of 20210719 changing to this one that has 0 entires dealt with *correctly*
-datadf <- read.table(paste0(spectrumdir,"Mmd_Ms_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.FixedMissingMutationTypes.usethis.txt"),header=T,sep="\t")
+datadf <- read.table(paste0(spectrumdir,"ALL4Mice_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.FixedMissingMutationTypes.usethis.txt"),header=T,sep="\t") # now doing all 4 mice!
 
 
-dim(datadf) # 933774 good
+dim(datadf) # 1867548 bigger because more species  good
 
 # okay I want to sum things up across multiple chroms
 # want 1+2, 2+4 to be on their own but then want 5+7 and 6+8 and 9+11+13 and 10+12 and 15+17+19 14+16+18
@@ -45,7 +45,7 @@ df2$label <- ""
 df2[df2$newGroup %% 2 ==0,]$label <- "TEST"
 df2[df2$newGroup %% 2 !=0,,]$label <- "TRAIN"
 
-write.table(df2,paste0(spectrumdir,"TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDESCorrected0Entries.txt"),row.names=F,quote=F,sep="\t")
+write.table(df2,paste0(spectrumdir,"TEMPORARY.NEWGROUPS.MULTIPOPULATION_spectrumCountsAndTargetCounts_perChromosome.allChrs.Labelled.INCLUDESCorrected0Entries.all4miceSpecies.txt"),row.names=F,quote=F,sep="\t")
 # okay this works. 
 #df2[df2$mutationType=="AAAAAAC.AAAGAAC",]
 
