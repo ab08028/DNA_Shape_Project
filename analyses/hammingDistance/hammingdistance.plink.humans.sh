@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=4:00:00,h_data=3G
+#$ -l h_rt=10:00:00,h_data=8G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
 #$ -m bea
@@ -13,12 +13,14 @@ module load  plink/1.90b6.18 # stick to 1.9, plink2 seems v different
 # https://www.cog-genomics.org/plink/1.9/distance#read_dists
 # this is super fast
 # this does allele counts (then maybe could divide myself?)
-interval=${SGE_TASK_ID}
-label=bears
+interval='chr${SGE_TASK_ID}'
+label=humans
 # running it on the same vcf I used for mutyper variants (phased SNPs -- so maybe missing some ; might undercall distance but should be ballpark right)
 # maybe I should rerun bears without phasing? tbd 
 #vcfdir=/net/harris/vol1/home/beichman/bears/variant_calling/mapped_to_brown_bear/vcfs/vcf_20200916_brown_bear/interval_${interval}/SNPsOnly/phased
-vcfdir=/net/harris/vol1/home/beichman/bears/analyses/mutyper/20200916/mutyperResults_20210331_7mer_NoStrict/mapped_to_brown_bear/mutyper_variant_files/interval_${interval}
+# mutyper variants! 
+vcfdir=/net/harris/vol1/home/beichman/humans/analyses/mutyper/mutyperResults_20211101_STRICT_PASSONLY_BEDMASK/mutyper_variant_files
+
 
 ### using 7mer mutyper variant files (so will be missing some SNPs that can't be phased/pol (was true when using vcf) or that don't have 7mer context)
 # logic is that I want same masking/filtering that is going into the mutation spectrum to be used for the hamming distance. as similar as possible to spectrum calcs
@@ -26,7 +28,8 @@ vcfdir=/net/harris/vol1/home/beichman/bears/analyses/mutyper/20200916/mutyperRes
 # so I think this is best -case
 
 # same vcf I used for mutyper variants (going to use targets as denominator as well)
-vcf=$vcfdir/allInds_samples_interval_${interval}.ref_brown_bear.mutyper.variants.mutationTypes.noFixedSites.AncestralDerivedNotRefAlt.SomeRevComped.NoStrict.7mer.ALLFREQS.vcf.gz
+vcf=$vcfdir/${interval}.mutyper.variants.mutationTypes.noMissingData.noFixedSites.7mers.StrictButThatsFineForHumans.PASSONLY.BEDMASKED.vcf.gz
+
 
 
 outdir=/net/harris/vol1/home/beichman/analyses/hamming_distance/${label}/perInterval
