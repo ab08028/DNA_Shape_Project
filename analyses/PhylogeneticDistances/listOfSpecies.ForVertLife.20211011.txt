@@ -1,0 +1,25 @@
+# go to vert life: http://vertlife.org/phylosubsets/
+# and get pruned trees (get mlutiple so you can average distances)
+
+Balaenoptera acutorostrata
+Balaenoptera musculus
+Balaenoptera physalus
+Tursiops truncatus
+Physeter macrocephalus
+Neophocaena phocaenoides
+Phocoena phocoena
+Orcinus orca
+Neophocaena asiaeorientalis
+Monodon monoceros
+Lagenorhynchus obliquidens
+Globicephala melas
+Delphinapterus leucas
+Phocoena sinus
+Ursus maritimus
+Ursus arctos
+Mus musculus
+Mus spretus
+Homo sapiens
+
+# as a list:
+# c("Balaenoptera_acutorostrata" ,"Balaenoptera_musculus" ,"Balaenoptera_physalus" ,"Tursiops_truncatus" ,"Physeter_macrocephalus" ,"Neophocaena_phocaenoides" ,"Phocoena_phocoena" ,"Orcinus_orca" ,"Neophocaena_asiaeorientalis" ,"Monodon_monoceros" ,"Lagenorhynchus_obliquidens" ,"Globicephala_melas" ,"Delphinapterus_leucas" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus" ,"Homo_sapiens")

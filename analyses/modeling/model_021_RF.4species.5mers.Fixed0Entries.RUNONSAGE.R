@@ -188,6 +188,8 @@ names(juicedData)
 #prepped <- prep(rand_forest_processing_recipe,training(split)) %>%
 #  juice()
 saveRDS(rand_forest_processing_recipe,paste0(outdir,"recipe.rds"))
+# read it back in if you need it
+#rand_forest_processing_recipe <- readRDS(paste0(outdir,"recipe.rds"))
 ######### MODEL SPECIFICATION #########
 rand_forest_ranger_model_specs <-
   rand_forest(trees = 1000, mtry = 19, min_n = 1) %>% # I added in tree number = 1000
@@ -252,7 +254,7 @@ windowOfAssessment
 saveRDS(truth_prediction_df,file=paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onWindow",windowOfAssessment,".rds")) # ah that's a problem for loading it back in -- need the window ID 
 
 # load it back in: 
-#truth_prediction_df <- readRDS(paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onChr",windowOfAssessment,".rds"))
+#truth_prediction_df <- readRDS(paste0(outdir,"modelTrainedOnOneFold.PREDICTIONS.onWindow7.rds"))
 # get rsq
 rsq(truth_prediction_df,truth=outcome,estimate=.pred)
 # 1 rsq     standard       0.980
@@ -475,9 +477,21 @@ Xdftest <- prep(rand_forest_processing_recipe, testing(oneFoldSetToTrainAndAsses
 
 # label categorically for nicer plots ; jsut make sure you get it right 
 Xdftest$populationLabel <- ""
-Xdftest[Xdftest$population_Ms==0,]$populationLabel <- "Mmd"
+Xdftest[Xdftest$population_Mmd==1,]$populationLabel <- "Mmd"
 Xdftest[Xdftest$population_Ms==1,]$populationLabel <- "Ms"
+Xdftest[Xdftest$population_Mmm==1,]$populationLabel <- "Mmm"
+# one hot encoded so if they all equal zero they are Mmc 
+Xdftest[Xdftest$population_Mmd==0 & Xdftest$population_Mmm==0 & Xdftest$population_Ms==0,]$populationLabel <- "Mmc"
 Xdftest_melt <- melt(Xdftest,id.vars=c("mutationType_5mer","populationLabel")) # are these based on train or test?
+
+
+# label categorically for nicer plots ; jsut make sure you get it right 
+Xdftrain$populationLabel <- ""
+Xdftrain[Xdftrain$population_Mmd==1,]$populationLabel <- "Mmd"
+Xdftrain[Xdftrain$population_Ms==1,]$populationLabel <- "Ms"
+Xdftrain[Xdftrain$population_Mmm==1,]$populationLabel <- "Mmm"
+# one hot encoded so if they all equal zero they are Mmc 
+Xdftrain[Xdftrain$population_Mmd==0 & Xdftrain$population_Mmm==0 & Xdftrain$population_Ms==0,]$populationLabel <- "Mmc"
 
 dim(Xdftest)
 
@@ -494,7 +508,7 @@ for(feature in featuresToPlot){
                                   feature = feature, 
                                   X = Xdftest, # this hsould be test data if you ran shap with newdata=testing data! sholud be train if you just ran it without any new data
                                   smooth = TRUE, color_by = "populationLabel")+ # going to try coloring by species membership
-    scale_color_manual(values=c("orange","steelblue"))+
+    scale_color_manual(values=c("orange","steelblue", "#009E73","#CC79A7",""))+
     ggtitle(feature)+
     theme_bw()+
     labs(color="population")
@@ -528,7 +542,7 @@ colnames(Xdftest_melt) <- c("mutationType_5mer","populationLabel","feature","fea
 
 shap_plusFeatures <- merge(shap_melt,Xdftest_melt[Xdftest_melt$feature!="outcome",],by=c("mutationType_5mer","feature","populationLabel")) # this merge created duplicates because I wasn't labelling points by what population they came from; fixed it
 dim(shap_plusFeatures) # yes now this is right with no dups
-###### do min max normalization of originalf feature values (for ease of plotting): 
+###### do min max normalization of originalf feature values (for ease of plotting):  ######
 shap_plusFeatures <- shap_plusFeatures %>%
   group_by(feature) %>%
   mutate(minmaxnormalized.feature.value=(feature.value-min(feature.value))/(max(feature.value)-min(feature.value)))
@@ -572,7 +586,7 @@ shapSummaryPlot_populationOnly <- ggplot(justPopulationRelatedFeatures,aes(y=fea
   ggtitle(paste0("SHAP summary plot"))+
   scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")
 shapSummaryPlot_populationOnly
-ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot.populationOnly.png"),shapSummaryPlot_populationOnly,height=10,width=10)
 
 ### label outliers #########
 shapSummaryPlot_populationOnly_labelOutliers <- ggplot(justPopulationRelatedFeatures,aes(y=feature,x=SHAP.value,color=minmaxnormalized.feature.value))+
@@ -584,11 +598,11 @@ shapSummaryPlot_populationOnly_labelOutliers <- ggplot(justPopulationRelatedFeat
   scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")+
   geom_label_repel(data=subset(justPopulationRelatedFeatures,abs(SHAP.value)>=2.5e-4),aes(label=mutationType_5mer),color="black",  size = 2,
                    box.padding = unit(0.25, "lines"),
-                   point.padding = unit(0.5, "lines"),force = T,nudge_y = 0.1)+
+                   point.padding = unit(0.5, "lines"),force = T,nudge_y = 0.1) +
   facet_wrap(~populationLabel)
 
 shapSummaryPlot_populationOnly_labelOutliers
-ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot_populationOnly_labelOutliers.USEFUL.png"),shapSummaryPlot_populationOnly_labelOutliers,height=10,width=10)
 
 
 ##### want to get 5mers that are outliers for population SHAP values ######
@@ -656,7 +670,164 @@ truth_prediction_df[truth_prediction_df$ancestral5mer=="CGACG",c("mutationType_5
 # Okay *why* aren't then ancestral5mer counts the same HERE?
 #sink()
 
-######### want to try tree shap interactions ########
+#### naive model comparing training and test data ########
+
+# want to predict 5mer in test by avg (?) of training predictions
+# get rsq 
+head(analysis(oneFoldSetToTrainAndAssessOn)[,c("mutationType_5mer","population","newGroup")]) # is across multiple windows
+
+# not sure if avg is best naive model? maybe just sum all up, get mutation rates and then rescale so it sums to 1 for each population:     
+summedTrainingData_oneFoldOnly <- analysis(oneFoldSetToTrainAndAssessOn) %>%
+  group_by(mutationType_5mer,population) %>%
+  summarise(totalMutationCount_trainingChrsInFold=sum(mutationCount_5mer),totalAncCount_trainingChrsInFold=sum(ancestral5merCount),recalcedMutationRate_allTrainingChrsInFold=totalMutationCount_trainingChrsInFold/totalAncCount_trainingChrsInFold) %>% 
+  ungroup() %>%
+  group_by(population) %>%
+  mutate(recalcedOutcomefromTraining=recalcedMutationRate_allTrainingChrsInFold/sum(recalcedMutationRate_allTrainingChrsInFold))
+
+# check that recalced outcome still sums to 1 for each spp:
+sum(summedTrainingData_oneFoldOnly[summedTrainingData_oneFoldOnly$population=="Mmd",]$recalcedOutcomefromTraining)
+### additionally to turn it into the same rescaled outcome variable need to rescale it by the sum of all mutation rates 
+head(summedTrainingData_oneFoldOnly)
+# don't just average outcomes because are based on really different amounts of data 
+
+# naive model is that the prediction is just the exact training data amount:
+head(assessment(oneFoldSetToTrainAndAssessOn)) # testing
+
+summedTrainingData_PlusTestData <- merge(summedTrainingData_oneFoldOnly[,c("recalcedOutcomefromTraining","mutationType_5mer","population")],assessment(oneFoldSetToTrainAndAssessOn)[,c("outcome","mutationType_5mer","population")],by=c("population","mutationType_5mer"))
+
+head(summedTrainingData_PlusTestData) # outcome is test
+
+colnames(summedTrainingData_PlusTestData) <- c("population","mutationType_5mer","recalcedOutcome_allTrainingChrsInFold","testingValueOfOutcome")
+summedTrainingData_PlusTestData$centralMutationType <- paste0(substr(summedTrainingData_PlusTestData$mutationType_5mer,3,3),".",substr(summedTrainingData_PlusTestData$mutationType_5mer,9,9))
+head(summedTrainingData_PlusTestData)
+##### add in rsqs:
+NAIVEMODEL_rsqsPerSpeciesAndMutationType <- summedTrainingData_PlusTestData %>%
+  group_by(centralMutationType,population) %>%
+  rsq(truth=testingValueOfOutcome,estimate=recalcedOutcome_allTrainingChrsInFold)
+NAIVEMODEL_rsqsPerSpeciesAndMutationType
+
+write.table(NAIVEMODEL_rsqsPerSpeciesAndMutationType,paste0(outdir,"NAIVEMODEL.Rsq.PerMutatationType.PredictionsAreJustTrainingValue.txt"),quote = F,row.names=F,sep="\t")
+
+
+NAIVEMODEL_rsqsPerSpeciesAndMutationType$label <- "Naive Model"
+rsqsPerSpeciesAndMutationType$label <- "trained model"
+allRsqs <- rbind(NAIVEMODEL_rsqsPerSpeciesAndMutationType,rsqsPerSpeciesAndMutationType)
+# compare with trained model:
+NAIVEMODEL_COMPARISON_rsqPerMutplot <- ggplot(allRsqs,aes(x=centralMutationType,y=.estimate,fill=label))+
+  geom_col(position="dodge")+
+  theme_bw()+
+  facet_wrap(~population)+
+  ylab("r-squared")
+NAIVEMODEL_COMPARISON_rsqPerMutplot
+
+ggsave(paste0(outdir,"comparingNaiveModelToTrainedModel.Rsq.png"),NAIVEMODEL_COMPARISON_rsqPerMutplot,height=4,width=6)
+
+####  add rsq values to plot if possible ###
+
+
+# make a label that has rsq in the central mutation type
+summedTrainingData_PlusTestData_WithPerMutationTypeMetrics <- merge(summedTrainingData_PlusTestData,NAIVEMODEL_rsqsPerSpeciesAndMutationType,by=c("population","centralMutationType"))
+
+head(summedTrainingData_PlusTestData_WithPerMutationTypeMetrics)
+
+########## combine pop and mutaiton type and rsq into one label to facet over 
+summedTrainingData_PlusTestData_WithPerMutationTypeMetrics$comboLabel <- paste0(summedTrainingData_PlusTestData_WithPerMutationTypeMetrics$population,"\n",summedTrainingData_PlusTestData_WithPerMutationTypeMetrics$centralMutationType,"\nrsq = ",round(summedTrainingData_PlusTestData_WithPerMutationTypeMetrics$.estimate,3))
+
+NAIVEMODEL_plot_faceted <-  ggplot(summedTrainingData_PlusTestData_WithPerMutationTypeMetrics, aes(y=recalcedOutcome_allTrainingChrsInFold,x=testingValueOfOutcome,color=centralMutationType))+
+  geom_point()+
+  geom_abline()+
+  facet_wrap(~comboLabel,ncol=4,dir="v",scales="free")+
+  #ggtitle(paste0(description,"\ntrained on Fold01\n(all odd Windows but one, tested on just Window",toString(unique(truth_prediction_df$newGroup)),")"))+
+  theme_bw()
+NAIVEMODEL_plot_faceted
+
+ggsave(paste0(outdir,"naiveModel.WithRsq.png"),NAIVEMODEL_plot_faceted,height=12,width=18)
+
+
+####################  want to pull out C>A outliers in Ms and see what's driving that ###########
+# want to find outliers 
+subset(truth_prediction_df_spread,centralMutationType=="C.A" & abs(.pred_Mmm - .pred_Ms) > 2*sd(abs(.pred_Mmm - .pred_Ms)))
+
+CA_outliers_Mmm_Ms <- truth_prediction_df_spread %>%
+  subset(centralMutationType=="C.A") %>%
+  mutate(absDiff.pred.Mmm_Ms=abs((.pred_Mmm - .pred_Ms)),sd.ForMutationType.InAbsDiff.pred.Mmm_Ms=sd(abs(.pred_Mmm - .pred_Ms))) %>%
+  subset(absDiff.pred.Mmm_Ms > 2* sd.ForMutationType.InAbsDiff.pred.Mmm_Ms)
+
+CA_outliers_Mmm_Ms
+CA_outliers_Mmm_Ms_plot <- ggplot(CA_outliers_Mmm_Ms,aes(x=.pred_Mmm,y=.pred_Ms))+
+  geom_point(color="red")+
+  geom_text_repel(color="red",aes(label=mutationType_5mer),size=1.5)+
+  geom_abline()+
+  geom_point(data=truth_prediction_df_spread[truth_prediction_df_spread$centralMutationType=="C.A",],aes(x=.pred_Mmm,y=.pred_Ms),shape=1)+
+  ggtitle("C>A mutations\ndiff in predictions of Mmm and Ms that are >2sd away from 0")
+CA_outliers_Mmm_Ms_plot
+ggsave(paste0(outdir,"Experiment.CA.outliers.png"),CA_outliers_Mmm_Ms_plot,height=5,width=7)
+# want to see what these outliers have in common with SHAPs:
+CA_outliers_Mmm_Ms_SHAP <- shap_labeled[shap_labeled$mutationType_5mer %in% CA_outliers_Mmm_Ms$mutationType_5mer & shap_labeled$populationLabel %in% c("Mmm","Ms"),]
+
+
+CA_outliers_Mmm_Ms_SHAP_melt <- melt(CA_outliers_Mmm_Ms_SHAP)
+head(CA_outliers_Mmm_Ms_SHAP_melt)
+# experimental plot: trying to see what the outlier C>A features have in common
+CA_outliers_Mmm_Ms_SHAP_plot1 <- ggplot(CA_outliers_Mmm_Ms_SHAP_melt,aes(y=variable,x=mutationType_5mer,fill=value))+
+  geom_tile()+
+  scale_fill_viridis_c()+
+  facet_wrap(~populationLabel)+
+  ggtitle("Shap values for outlier C>A 5mers when comparing Mmm and Ms")
+CA_outliers_Mmm_Ms_SHAP_plot1
+ggsave(paste0(outdir,"Experiment.CA.outliers.SHAP.png"),CA_outliers_Mmm_Ms_SHAP_plot1,height=5,width=7)
+
+
+# do something like a force plot: 
+CA_outliers_Mmm_Ms_SHAP_plot2 <- ggplot(CA_outliers_Mmm_Ms_SHAP_melt,aes(x=mutationType_5mer,y=value,fill=variable))+
+  geom_col()+
+  coord_flip()+
+  #scale_fill_viridis_c()+
+  facet_wrap(~populationLabel)+
+  ggtitle("Shap values for outlier C>A 5mers when comparing Mmm and Ms")+
+  geom_hline(yintercept = 0)+ # note coords are flipped
+  theme_bw()+
+  geom_text(data=subset(CA_outliers_Mmm_Ms_SHAP_melt,abs(value)>0.0005),aes(label=variable),position = position_stack(vjust = .5),size=2,angle=10) 
+CA_outliers_Mmm_Ms_SHAP_plot2
+ggsave(paste0(outdir,"Experiment.CA.outliers.SHAP.ForcePlotesque.png"),CA_outliers_Mmm_Ms_SHAP_plot2,height=9,width=17)
+
+
+### include only features that make a big impact #####
+# do something like a force plot: 
+CA_outliers_Mmm_Ms_SHAP_plot3 <- ggplot(subset(CA_outliers_Mmm_Ms_SHAP_melt,abs(value)>=5e-4),aes(x=mutationType_5mer,y=value,fill=variable))+
+  geom_col()+
+  coord_flip()+
+  #scale_fill_viridis_c()+
+  facet_wrap(~populationLabel)+
+  ggtitle("Shap values for outlier C>A 5mers when comparing Mmm and Ms -- only Features with abs(shap)>=5e-4")+
+  geom_hline(yintercept = 0)+ # note coords are flipped
+  theme_bw()+
+  geom_text(data=subset(CA_outliers_Mmm_Ms_SHAP_melt,abs(value)>=5e-4),aes(label=variable),position = position_stack(vjust = .5),size=2,angle=10) 
+CA_outliers_Mmm_Ms_SHAP_plot3
+ggsave(paste0(outdir,"Experiment.CA.outliers.SHAP.ForcePlotesque.OnlyImportantFeatures.png"),CA_outliers_Mmm_Ms_SHAP_plot3,height=9,width=17)
+### get original feature values added in with the shaps ###
+
+CA_outliers_Mmm_Ms_SHAP_PLUSOriginalFeatureValues <- merge(CA_outliers_Mmm_Ms_SHAP,Xdftest[Xdftest$populationLabel %in% c("Mmm","Ms") & Xdftest$mutationType_5mer %in% CA_outliers_Mmm_Ms$mutationType_5mer,],by=c("populationLabel","mutationType_5mer"),suffixes=c(".SHAPValue",".FeatureValue"))
+
+CA_outliers_Mmm_Ms_SHAP_PLUSOriginalFeatureValues[,c("mutationType_5mer","Pos_3.derived_T.FeatureValue","Pos_3.derived_T.SHAPValue","populationLabel")]
+#### ^^ maybe do something with this ######
+
+
+########### make heatmap for all features and all 5mers ##########
+shap_heatmap_plot <- ggplot(shap_melt,aes(y=feature,x=mutationType_5mer,fill=SHAP.value))+
+  geom_tile()+
+  scale_fill_viridis_c()+
+  facet_wrap(~populationLabel)+
+  ggtitle("Shap values")
+shap_heatmap_plot
+ggsave(paste0(outdir,"SHAP.heatmap.png"),shap_heatmap_plot,height=16,width=16)
+
+# want to try coloring by original feature value (?) 
+######## YOU ARE HERE 
+
+# can I do a real force plot? did it before.
+
+######### want to try tree shap interactions -- TOO SLOW!! took 6 days to get 12% ########
 # https://www.r-bloggers.com/2021/01/treeshap%E2%80%8A-%E2%80%8Aexplain-tree-based-models-with-shap-values/
 require(treeshap)
 ranger_obj

@@ -506,9 +506,10 @@ shapSummaryPlot_populationOnly <- ggplot(justPopulationRelatedFeatures,aes(y=fea
   
   theme_bw()+
   ggtitle(paste0("SHAP summary plot"))+
-  scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")
+  scale_color_viridis_c(labels=c("low","high"),breaks=c(0,1),limits=c(0,1),option = "plasma")+
+  theme(legend.position="none")
 shapSummaryPlot_populationOnly
-ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot.populationOnly.png"),shapSummaryPlot_populationOnly,height=4,width=10)
 
 ### label outliers #########
 shapSummaryPlot_populationOnly_labelOutliers <- ggplot(justPopulationRelatedFeatures,aes(y=feature,x=SHAP.value,color=minmaxnormalized.feature.value))+
@@ -521,10 +522,11 @@ shapSummaryPlot_populationOnly_labelOutliers <- ggplot(justPopulationRelatedFeat
   geom_label_repel(data=subset(justPopulationRelatedFeatures,abs(SHAP.value)>=2.5e-4),aes(label=mutationType_5mer),color="black",  size = 2,
                    box.padding = unit(0.25, "lines"),
                    point.padding = unit(0.5, "lines"),force = T,nudge_y = 0.1)+
-  facet_wrap(~populationLabel)
+  facet_wrap(~populationLabel)+
+  theme(legend.position = "none")
 
 shapSummaryPlot_populationOnly_labelOutliers
-ggsave(paste0(outdir,"random_forest.shapSummaryPlot.top10.USEFUL.png"),shapSummaryPlot_top10,height=4,width=10)
+ggsave(paste0(outdir,"random_forest.shapSummaryPlot_populationOnly_labelOutliers.USEFUL.png"),shapSummaryPlot_populationOnly_labelOutliers,height=4,width=10)
 
 
 ##### want to get 5mers that are outliers for population SHAP values ######
