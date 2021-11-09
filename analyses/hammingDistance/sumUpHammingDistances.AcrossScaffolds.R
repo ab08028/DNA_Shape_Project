@@ -3,6 +3,7 @@
 # 
 require(reshape2)
 require(ggplot2)
+require(dplyr)
 labels=c('humans','bears','mice','fin_whale')
 for(label in labels){
 wd=paste0("/net/harris/vol1/home/beichman/DNAShape/analyses/hamming_distance/",label,"/")
