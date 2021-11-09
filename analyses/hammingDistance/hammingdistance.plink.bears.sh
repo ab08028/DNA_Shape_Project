@@ -29,7 +29,7 @@ vcfdir=/net/harris/vol1/home/beichman/bears/analyses/mutyper/20200916/mutyperRes
 vcf=$vcfdir/allInds_samples_interval_${interval}.ref_brown_bear.mutyper.variants.mutationTypes.noFixedSites.AncestralDerivedNotRefAlt.SomeRevComped.NoStrict.7mer.ALLFREQS.vcf.gz
 
 
-outdir=/net/harris/vol1/home/beichman/analyses/hamming_distance/${label}/perInterval
+outdir=/net/harris/vol1/home/beichman/DNAShape/analyses/hamming_distance/${label}/perInterval
 outroot=$outdir/plink.${label}.interval.${interval}.FromMutyperVariantsVCF
 mkdir -p $outdir
 
