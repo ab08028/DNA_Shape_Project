@@ -11,13 +11,13 @@ list.files(indir)
 ######## count up dist files ########
 distFiles=list.files(indir,pattern=".dist$") # list dist files
 intervalCount=length(distFiles)
-intervals=unlist(lapply(strsplit(distFiles,"\\."),"[",3))
+intervals=unlist(lapply(strsplit(distFiles,"\\."),"[",4))
 #intervals # want to keep as strings because some will be '1' and others will be 'chr1'
 
 allDistances=data.frame()
 for(interval in intervals){
-  distdf=read.table(paste0(indir,"plink.interval.",interval,".",label,".dist"),header=F)
-  ids=read.table(paste0(indir,"plink.interval.",interval,".",label,".dist.id"),header=F)
+  distdf=read.table(paste0(indir,"plink",label,".interval.",interval,".FromMutyperVariantsVCF.dist"),header=F)
+  ids=read.table(paste0(indir,"plink",label,".interval.",interval,".FromMutyperVariantsVCF.dist.id"),header=F)
   colnames(distdf) <- ids$V2 # colnames 
   head(distdf)
   distdf$ind2 <- as.character(ids$V2) # this works because its a sqaure with 0s on diagonal 
