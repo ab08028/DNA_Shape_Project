@@ -1,10 +1,11 @@
 #! /bin/bash
 #$ -l h_rt=10:00:00,h_data=8G
-#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
-#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
+#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
+#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -t 1-31
+#$ -t 1-19
+#$ -N distHumans
 
 # experiment with plink
 # 
@@ -13,7 +14,7 @@ module load  plink/1.90b6.18 # stick to 1.9, plink2 seems v different
 # https://www.cog-genomics.org/plink/1.9/distance#read_dists
 # this is super fast
 # this does allele counts (then maybe could divide myself?)
-interval='chr${SGE_TASK_ID}'
+interval=chr${SGE_TASK_ID}
 label=humans
 # running it on the same vcf I used for mutyper variants (phased SNPs -- so maybe missing some ; might undercall distance but should be ballpark right)
 # maybe I should rerun bears without phasing? tbd 

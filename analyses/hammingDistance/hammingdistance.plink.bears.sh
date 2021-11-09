@@ -1,11 +1,11 @@
 #! /bin/bash
 #$ -l h_rt=4:00:00,h_data=3G
-#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
-#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
+#$ -o  /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
+#$ -e  /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -t 1-31
-
+#$ -N distBears
 # experiment with plink
 # 
 module load modules modules-init modules-gs # initialize modules 
