@@ -1,7 +1,7 @@
 #! /bin/bash
 #$ -l h_rt=50:00:00,h_data=1G
-#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
-#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
+#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/mutyper
+#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/mutyper
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 
@@ -32,9 +32,10 @@ IndividualsToExclude=$5
 kmersize=7
 
 outdir=/net/harris/vol1/home/beichman/apes/analyses/mutyper/mutyperResults_${todaysdate}
-mkdir $outdir
+mkdir -p $outdir
 ksfsdir=$outdir/mutyper_ksfs_files
 variantsdir=$outdir/mutyper_variant_files
+mkdir -p $variantsdir
 
 mkdir -p $ksfsdir
 
