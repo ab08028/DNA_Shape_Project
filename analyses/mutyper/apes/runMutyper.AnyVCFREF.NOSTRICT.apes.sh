@@ -1,7 +1,7 @@
 #! /bin/bash
 #$ -l h_rt=50:00:00,h_data=1G
-#$ -o /net/harris/vol1/home/beichman/vaquita/reports/mutyper/
-#$ -e /net/harris/vol1/home/beichman/vaquita/reports/mutyper/
+#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
+#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 
@@ -47,7 +47,7 @@ whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Inte
 
 # separate mask by chromosomes:
 chr_callability_mask=${whole_callability_mask%.bed}.$label.bed
-grep -w $label ${whole_callability_mask} | awk 'BEGIN {OFS="\t"}; {print $1,$2,$3}'> ${chr_callability_mask}
+zcat ${whole_callability_mask} | grep -w $label | awk 'BEGIN {OFS="\t"}; {print $1,$2,$3}'> ${chr_callability_mask}
 
 
 
