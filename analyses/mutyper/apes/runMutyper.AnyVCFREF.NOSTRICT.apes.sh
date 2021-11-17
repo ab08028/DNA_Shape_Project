@@ -86,7 +86,7 @@ fi
 
 fi
 
-
+######## skipping spectrum for now; just need 7mer ksfs #########
 
 ############ ksfs #################
 
