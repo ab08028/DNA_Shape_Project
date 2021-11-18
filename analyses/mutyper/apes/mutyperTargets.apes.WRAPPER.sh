@@ -6,6 +6,7 @@ script=$scriptdir/mutyperTargets.apes.sh
 
 
 speciesList='Gorilla Pan_paniscus Pan_troglodytes Pongo_abelii Pongo_pygmaeus'
+#speciesList="Gorilla"
 for species in $speciesList
 do
 

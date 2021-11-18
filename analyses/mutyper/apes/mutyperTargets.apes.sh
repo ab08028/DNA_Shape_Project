@@ -1,7 +1,7 @@
 #! /bin/bash
 #$ -l h_rt=60:00:00,h_data=8G
-#$ -o /net/harris/vol1/home/beichman/vaquita/reports/mutyper/
-#$ -e /net/harris/vol1/home/beichman/vaquita/reports/mutyper/
+#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/mutyper
+#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/mutyper
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -t 1-22
