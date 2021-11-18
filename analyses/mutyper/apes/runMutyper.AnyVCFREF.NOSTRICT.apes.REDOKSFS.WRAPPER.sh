@@ -17,7 +17,8 @@ vcfdir=/net/harris/vol1/data/great_ape_genome_project/eichlerlab.gs.washington.e
 #gorilla low cov samples to exclude: Gorilla_gorilla_gorilla-X00108_Abe , Gorilla_gorilla_gorilla-KB7973_Porta 
 
 
-speciesList='Gorilla Pan_paniscus Pan_troglodytes Pongo_abelii Pongo_pygmaeus'
+speciesList='Gorilla Pan_paniscus Pongo_abelii Pongo_pygmaeus'
+# Pan_troglodytes is in diff script
 #speciesList="Gorilla"
 ### need to update name of each fasta file to be chr1, 2 etc.:
 # once (only in my dir)
