@@ -47,7 +47,7 @@ whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Inte
 # is originally from: /net/harris/vol1/data/great_ape_genome_project/eichlerlab.gs.washington.edu/greatape/data/VCFs/SNPs/Callable_regions # is positive mask
 
 # separate mask by chromosomes:
-chr_callability_mask=${whole_callability_mask%.bed}.$label.bed
+chr_callability_mask=${whole_callability_mask%.bed.gz}.$label.bed
 zcat ${whole_callability_mask} | grep -w $label | awk 'BEGIN {OFS="\t"}; {print $1,$2,$3}'> ${chr_callability_mask}
 
 
