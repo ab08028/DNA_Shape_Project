@@ -17,8 +17,8 @@ vcfdir=/net/harris/vol1/data/great_ape_genome_project/eichlerlab.gs.washington.e
 #gorilla low cov samples to exclude: Gorilla_gorilla_gorilla-X00108_Abe , Gorilla_gorilla_gorilla-KB7973_Porta 
 
 
-#speciesList='Gorilla Pan_paniscus Pan_troglodytes Pongo_abelii Pongo_pygmaeus'
-speciesList="Gorilla"
+speciesList='Gorilla Pan_paniscus Pan_troglodytes Pongo_abelii Pongo_pygmaeus'
+#speciesList="Gorilla"
 ### need to update name of each fasta file to be chr1, 2 etc.:
 # once (only in my dir)
 #for chr in {1..22}
@@ -48,7 +48,7 @@ else
 indsToRemove="none"
 fi
 
-for chr in {1..1}
+for chr in {1..22}
 do 
 
 label=chr${chr}
