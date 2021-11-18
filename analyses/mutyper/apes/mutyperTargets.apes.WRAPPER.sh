@@ -9,6 +9,6 @@ speciesList='Gorilla Pan_paniscus Pan_troglodytes Pongo_abelii Pongo_pygmaeus'
 for species in $speciesList
 do
 
-qsub $script $species
+qsub -N targets.${species} $script $species
 
 done
