@@ -16,8 +16,8 @@ module load htslib/1.9 bcftools/1.9 # for filtering out fixed sites
 set -o pipefail
 
 
-todaysdate=`date +%Y%m%d` # date you run mutyper 
-#todaysdate=20211101
+#todaysdate=`date +%Y%m%d` # date you run mutyper 
+todaysdate=20211118
 
 
 vcffilename=$1
@@ -43,12 +43,12 @@ mkdir -p $ksfsdir
 variantsoutfile=$variantsdir/${species}.${label}.mutyper.variants.mutationTypes.noMissingData.noFixedSites.${kmersize}mers.nostrict.PASSONLY.BEDMASKED.vcf.gz
 
 # ONLY DO ONCE 
-whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Intersect_filtered_cov8.bed.gz # same for all species 
+#whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Intersect_filtered_cov8.bed.gz # same for all species 
 # is originally from: /net/harris/vol1/data/great_ape_genome_project/eichlerlab.gs.washington.edu/greatape/data/VCFs/SNPs/Callable_regions # is positive mask
 
 # separate mask by chromosomes:
-chr_callability_mask=${whole_callability_mask%.bed.gz}.$label.bed
-zcat ${whole_callability_mask} | grep -w $label | awk 'BEGIN {OFS="\t"}; {print $1,$2,$3}'> ${chr_callability_mask}
+#chr_callability_mask=${whole_callability_mask%.bed.gz}.$label.bed
+#zcat ${whole_callability_mask} | grep -w $label | awk 'BEGIN {OFS="\t"}; {print $1,$2,$3}'> ${chr_callability_mask}
 
 
 
@@ -58,34 +58,34 @@ zcat ${whole_callability_mask} | grep -w $label | awk 'BEGIN {OFS="\t"}; {print 
 # adding bed mask 
 # need to remove sepcific inds for chimp and gorilla -- how? 
 
-if individualsToExclude=="none"
-then
-
-bcftools view -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize --sep "\s" $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
-
-exitVal=$?
-if [ ${exitVal} -ne 0 ]; then
-	echo "error in mutyper variants"
-	exit 1
-else
-	echo "finished"
-fi
-
-elif individualsToExclude!="none"
-
-then
-bcftools view -s ^$individualsToExclude -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou  $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
-exitVal=$?
-
-if [ ${exitVal} -ne 0 ]; then
-	echo "error in mutyper variants"
-	exit 1
-else
-	echo "finished"
-fi
-
-
-fi
+# if individualsToExclude=="none"
+# then
+# 
+# bcftools view -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize --sep "\s" $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
+# 
+# exitVal=$?
+# if [ ${exitVal} -ne 0 ]; then
+# 	echo "error in mutyper variants"
+# 	exit 1
+# else
+# 	echo "finished"
+# fi
+# 
+# elif individualsToExclude!="none"
+# 
+# then
+# bcftools view -s ^$individualsToExclude -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou  $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
+# exitVal=$?
+# 
+# if [ ${exitVal} -ne 0 ]; then
+# 	echo "error in mutyper variants"
+# 	exit 1
+# else
+# 	echo "finished"
+# fi
+# 
+# 
+# fi
 
 ######## skipping spectrum for now; just need 7mer ksfs #########
 

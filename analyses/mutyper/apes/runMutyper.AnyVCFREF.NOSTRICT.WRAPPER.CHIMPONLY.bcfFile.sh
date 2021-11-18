@@ -1,7 +1,9 @@
 ###### script to set jobs going
 # submit for each chromosome
 
-
+####### CHIMP ONLY HERE: the P. tro vcf file on the eichler server is truncated (no EOF)
+# michael did a workaround when converted to bcf so it doesn't trigger errors. seems like large file but may be missing 
+# some sites at the end. should be okay for my purposes but keep an eye on it. 
 gitdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project
 scriptdir=$gitdir/analyses/mutyper/apes/
 script=$scriptdir/runMutyper.AnyVCFREF.NOSTRICT.apes.sh
@@ -17,9 +19,9 @@ vcfdir=/net/harris/vol1/data/great_ape_genome_project/eichlerlab.gs.washington.e
 #gorilla low cov samples to exclude: Gorilla_gorilla_gorilla-X00108_Abe , Gorilla_gorilla_gorilla-KB7973_Porta 
 
 
-speciesList='Gorilla Pan_paniscus Pongo_abelii Pongo_pygmaeus'
+speciesList='Pan_troglodytes'
 
-# going to do Pan_troglodytes in separate script!
+# going to do Pan_troglodytes down below
 #speciesList="Gorilla"
 ### need to update name of each fasta file to be chr1, 2 etc.:
 # once (only in my dir)
@@ -55,7 +57,7 @@ do
 
 label=chr${chr}
 reference=${species}_${label}.fa
-vcf=${species}.vcf.gz
+vcf=${species}.bcf # for chimp only, use Michael's bcf file 
 
 
 label="chr${chr}"

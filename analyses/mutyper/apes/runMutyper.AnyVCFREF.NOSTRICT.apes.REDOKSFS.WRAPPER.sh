@@ -4,7 +4,7 @@
 
 gitdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project
 scriptdir=$gitdir/analyses/mutyper/apes/
-script=$scriptdir/runMutyper.AnyVCFREF.NOSTRICT.apes.sh
+script=$scriptdir/runMutyper.AnyVCFREF.NOSTRICT.apes.REDOKSFS.sh
 # originally in /net/harris/vol1/project/primate_ervs/hg18_references_with_gagp_ancestral_alleles_exclude_recurrent
 # but I copied to : so I can make .fai files 
 # cp /net/harris/vol1/project/primate_ervs/hg18_references_with_gagp_ancestral_alleles_exclude_recurrent/*fa 
@@ -17,9 +17,7 @@ vcfdir=/net/harris/vol1/data/great_ape_genome_project/eichlerlab.gs.washington.e
 #gorilla low cov samples to exclude: Gorilla_gorilla_gorilla-X00108_Abe , Gorilla_gorilla_gorilla-KB7973_Porta 
 
 
-speciesList='Gorilla Pan_paniscus Pongo_abelii Pongo_pygmaeus'
-
-# going to do Pan_troglodytes in separate script!
+speciesList='Gorilla Pan_paniscus Pan_troglodytes Pongo_abelii Pongo_pygmaeus'
 #speciesList="Gorilla"
 ### need to update name of each fasta file to be chr1, 2 etc.:
 # once (only in my dir)
@@ -65,4 +63,3 @@ qsub -N ${species}.chr.${chr} $script $vcfdir/$vcf $refdir/$reference $species $
 
 done
 done
-
