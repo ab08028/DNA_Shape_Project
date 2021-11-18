@@ -61,7 +61,7 @@ zcat ${whole_callability_mask} | grep -w $label | awk 'BEGIN {OFS="\t"}; {print 
 if individualsToExclude=="none"
 then
 
-bcftools view -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou  $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
+bcftools view -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize --sep "\s" $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
