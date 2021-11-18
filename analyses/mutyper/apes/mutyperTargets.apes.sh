@@ -4,7 +4,7 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/mutyper
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -t 1-1
+#$ -t 1-22
 ######## human targets #########
 module load modules modules-init modules-gs # initialize modules 
 module load python/3.7.7 # need python >3.7
