@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=50:00:00,h_data=1G
+#$ -l h_rt=50:00:00,mfree=6G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/mutyper
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/mutyper
 #$ -m bea

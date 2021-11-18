@@ -1,4 +1,4 @@
-#$ -l h_rt=30:00:00,mfree=25G
+#$ -l h_rt=5:00:00,mfree=15G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/modeling
 #$ -m bea
