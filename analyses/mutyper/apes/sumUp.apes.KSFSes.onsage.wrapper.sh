@@ -12,7 +12,7 @@ module load pcre2/10.35 hdf5/1.10.1 R/4.0.4
 module load gcc/10.2.0 # necessary for reshape2
 
 script=sumUp.apes.KSFSes.onsage.R
-scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNAShapeProject/scripts/DNA_Shape_Project/analyses/mutyper/apes
+scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs//DNA_Shape_Project/analyses/mutyper/apes
 
 Rscript $scriptdir/$script
 
