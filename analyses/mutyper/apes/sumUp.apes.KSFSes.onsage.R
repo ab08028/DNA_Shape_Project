@@ -6,7 +6,7 @@ indir="/net/harris/vol1/home/beichman/apes/analyses/mutyper/mutyperResults_20211
 outdir=paste0(indir,"summedOverAllIntervals/")
 dir.create(outdir)
 intervals=paste0("chr",seq(1,22)) 
-ListOfPopulations=c('Gorilla', 'Pan_paniscus', 'Pongo_abelii', 'Pongo_pygmaeus', 'Pan_troglodytes')  # treating as pops even though are diff species - just a naming thing for convenience of merging with other datasets
+populationList=c('Gorilla', 'Pan_paniscus', 'Pongo_abelii', 'Pongo_pygmaeus', 'Pan_troglodytes')  # treating as pops even though are diff species - just a naming thing for convenience of merging with other datasets
 
 speciesLabel="apes"
 # adding population; very big so have to sum as you go.
