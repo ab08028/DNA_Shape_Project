@@ -4,7 +4,7 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -t 1-19
+#$ -t 1-22
 #$ -N distHumans
 
 # experiment with plink
