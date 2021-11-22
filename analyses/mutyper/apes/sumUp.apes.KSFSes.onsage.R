@@ -4,7 +4,7 @@ require(dplyr)
 ######### human info ###############
 indir="/net/harris/vol1/home/beichman/apes/analyses/mutyper/mutyperResults_20211118/mutyper_ksfs_files/"
 outdir=paste0(indir,"summedOverAllIntervals/")
-dir.create(outdir)
+dir.create(outdir,showWarnings = F)
 intervals=paste0("chr",seq(1,22)) 
 populationList=c('Gorilla', 'Pan_paniscus', 'Pongo_abelii', 'Pongo_pygmaeus', 'Pan_troglodytes')  # treating as pops even though are diff species - just a naming thing for convenience of merging with other datasets
 

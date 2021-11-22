@@ -25,6 +25,11 @@ head(speciesCodes)
 phyloDistances = read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/vertlife_phylogeneticTrees/raxml_tree/raxml.cophenetic.pairwisedistances.fromUphametal.MYSPECIES.usethis.txt",header=T)
 head(phyloDistances) # not all spp are present
 
+
+########## read in hamming distances: 
+hammingDistances = read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/hamming_distance/ALLSPECIESCOMBINED.totalAlleleCounts.HammingDistance.allIntervals.WITHPOPINFO.AVERAGEDPERCOMPARISONTYPE.DIVIDEDBY2xGenomeSIZE.usethis.txt",header=T)
+
+
 # dleu2 has this one weird non7mer in its spectrum-- GAAAG.GCAAG
 # that messes stuff up (why didn't that come up before?)
 # okay have to work ith table 
@@ -80,7 +85,7 @@ all1merSpectraOnly <- allProjectedSpectra %>%
   group_by(species,population,label,ancestral1mer,mutation_1mer) %>%
   summarise(total_mutations_projected = sum(totalSites_projectedDown_allFreqsSummed)) 
 # if you don't want to partition over CpGs you can use mutation_1mer_CpGNotLabeled instead
-  # okay NOTE HERE: "C" counts are nonCpG and then C_CpG are CpG ancestral targets
+# okay NOTE HERE: "C" counts are nonCpG and then C_CpG are CpG ancestral targets
 
 # okay do need to process the targets #
 ########## read in targets ##############
@@ -178,9 +183,9 @@ processSpectra <- function(spectradf){
     mutate(total_mutations_projected_plusEpsilon = (total_mutations_projected+epsilon),mutation_rate_projected = (total_mutations_projected/total_target_count), mutation_rate_projected_plusEpsilon=(total_mutations_projected_plusEpsilon/total_target_count)) %>%
     group_by(species,population,label) %>%
     mutate(mutation_rate_projected_normalized = (mutation_rate_projected/sum(mutation_rate_projected)),fractionOfSegregatingSites_projected=(total_mutations_projected/sum(total_mutations_projected)), mutation_rate_projected_normalized_plusEpsilon=(mutation_rate_projected_plusEpsilon/sum(mutation_rate_projected_plusEpsilon)),fractionOfSegregatingSites_projected_plusEpsilon=(total_mutations_projected_plusEpsilon/sum(total_mutations_projected_plusEpsilon))) # adding plus1 versions.
-
+  
   return(spectradf)
-
+  
 }
 # test function:
 test = processSpectra(all7merSpectra)
@@ -210,7 +215,7 @@ clr_or_ilr_calculations <- function(pivotedspectradf_plusEpsilonVersionOfVariabl
   #clr_matrix <- clr(t(tableWithoutIDVars)) # if you do it this way it matches when I do it just on on un-tranposed column by itself. if you do it without transposing then you get weird row-wise results that are WRONG. so be cautious here. 
   # so alternative without tranposing is to use sapply -- this is a lot nicer I think
   if(ilr_or_clr=="clr"){
-  df <- data.frame(sapply(tableWithoutIDVars,clr)) # this way you don't have to transpose and you get a much nicer shaped output
+    df <- data.frame(sapply(tableWithoutIDVars,clr)) # this way you don't have to transpose and you get a much nicer shaped output
   } else if(ilr_or_clr=="ilr"){
     df <- data.frame(sapply(tableWithoutIDVars,ilr)) # this way you don't have to transpose and you get a much nicer shaped output
     
@@ -249,8 +254,8 @@ euclideanDistance <- function(pivotedspectradf){
 }
 
 euclideanDistance_ilr_or_clr <- function(pivotedspectradf){
-# make it a matrix with each row as a species (transposed and all numeric)
-# variable in question:
+  # make it a matrix with each row as a species (transposed and all numeric)
+  # variable in question:
   # distances are row-wise nto column wise so need to transpose 
   distances <- tidy(dist(t(pivotedspectradf))) # transpose for dist otherwise it goes along rows and is wrong
   colnames(distances) <- c("item1","item2","spectrum_distance")
@@ -274,15 +279,37 @@ addPhyloDistances_excludeNas <- function(dfWithSpeciesCodesAdded,phylodistancesd
   dfWithSpeciesCodesAdded$comparisonLabel_common_alphabetical <-  paste0(pmin(dfWithSpeciesCodesAdded$common_name.item1,dfWithSpeciesCodesAdded$common_name.item2),".",pmax(dfWithSpeciesCodesAdded$common_name.item1,dfWithSpeciesCodesAdded$common_name.item2))
   
   dfWithSpeciesCodesAdded$comparisonLabel_broad_alphabetical <-  paste0(pmin(dfWithSpeciesCodesAdded$broad_classification.item1,dfWithSpeciesCodesAdded$broad_classification.item2),".",pmax(dfWithSpeciesCodesAdded$broad_classification.item1,dfWithSpeciesCodesAdded$broad_classification.item2))
-
+  
   merge1 <- merge(dfWithSpeciesCodesAdded,phylodistancesdf,by="comparisonLabel")
   return(merge1)
 }
+
+addHammingDistances <- function(spectrumdistancesdf,hammingdistancesdf) {
+
+  # add alphabetical comparison label:
+  # switch to characters not factors:
+  spectrumdistancesdf$item1 <- as.character(spectrumdistancesdf$item1)
+  spectrumdistancesdf$item2 <- as.character(spectrumdistancesdf$item2)
+  
+  spectrumdistancesdf$comparisonLabel <- paste0(pmin(spectrumdistancesdf$item1,spectrumdistancesdf$item2),".",pmax(spectrumdistancesdf$item1,spectrumdistancesdf$item2))
+  # note hamming distances already has a dumb comp label that is just ABC.ABC = not useful. need ot use labels
+  hammingdistancesdf$comparisonLabel <- paste0(pmin(hammingdistancesdf$pop1,hammingdistancesdf$pop2),".",pmax(hammingdistancesdf$pop1,hammingdistancesdf$pop2))
+  
+  merge1 <- merge(spectrumdistancesdf,hammingdistancesdf,by="comparisonLabel")
+  return(merge1)
+}
+
+# this drops any comparisons with EUR BBs because didnt cinlude (would have led to lower projection) and any that are self-self
 ######### get euclidean distances for fraction of seg sites ########## :
 # aha it's a problem that bears are also EUR! and humans are EUR! aha! that's funny. Okay need to deal with t
 # updating to do clr? 
-#DO CLR and ILR here# HERE: 
-speciesToInclude_1=c("mice_Mmd","mice_Ms","bears_ABC","bears_PB","vaquita","fin_whale_ENP") # human_AFR
+#DO CLR and ILR here# HERE:
+# for phylo distances:
+speciesToInclude_1=c("mice_Mmd","mice_Ms","bears_ABC","bears_PB","vaquita","fin_whale_GOC","humans_AFR") # human_AFR# switching to GOC fin whale for now due to ksfs weirdness
+
+#for hamming distances:
+speciesToInclude_hamming = c("bears_ABC"  , "bears_PB", "fin_whale_ENP" ,"fin_whale_GOC", "humans_AFR"   , "humans_AMR" ,"humans_EAS"  ,  "humans_EUR"  ,  "humans_SAS" ,   "mice_Mmc"      ,"mice_Mmd"   ,   "mice_Mmm" ,   "mice_Ms") # excluding bears_EUR because would be too low a projection value
+
 # comparisons to include : 
 # mouse-mouse, bear-bear, whale-whale, human-mouse, human-bear, human-whale 
 
@@ -294,17 +321,17 @@ speciesToInclude_1=c("mice_Mmd","mice_Ms","bears_ABC","bears_PB","vaquita","fin_
 
 ####### combine functions ##########
 # input: spectrum, variable (frac seg sites or mut rate), label (1mer , 5mer etc, and choice of ilr or clr)
-combo_function <- function(spectrumdf,variable,label,ilr_or_clr){
+combo_function <- function(spectrumdf,variable,transform_label,ilr_or_clr,speciesToInclude,speciesCodes,phyloDistances){
   distance_dataframe <- 
     processSpectra(spectrumdf) %>%
     pivotSpectra_perVariable(.,variable)  %>%
-    select(c(variable,mutation_label,speciesToInclude_1)) %>% # just get the cols for the species you want 
+    select(c(variable,mutation_label,speciesToInclude)) %>% # just get the cols for the species you want 
     clr_or_ilr_calculations(.,ilr_or_clr) %>%
     euclideanDistance_ilr_or_clr(.) %>%
     addFullSpeciesNamesIfPresentInRaxmlTreeToDistancedf(.,speciesCodes)  %>%
     addPhyloDistances_excludeNas(.,phyloDistances) %>%
     select(comparisonLabel,item1,item2,common_name.item1,common_name.item2,comparisonLabel_common_alphabetical,comparisonLabel_broad_alphabetical,spectrum_distance,cophenetic_distance)  %>%
-    mutate(label=label,variable=variable,ilr_or_clr=ilr_or_clr)
+    mutate(transform_label=transform_label,variable=variable,ilr_or_clr=ilr_or_clr)
   
   
   return(distance_dataframe)
@@ -312,24 +339,41 @@ combo_function <- function(spectrumdf,variable,label,ilr_or_clr){
   
 }
 
+######### hamming distance funciton ###########
+# input: spectrum, variable (frac seg sites or mut rate), label (1mer , 5mer etc, and choice of ilr or clr)
+combo_function_hamming <- function(spectrumdf,variable,transform_label,ilr_or_clr,speciesToInclude,hammingDistances){
+  distance_dataframe <- 
+    processSpectra(spectrumdf) %>%
+    pivotSpectra_perVariable(.,variable)  %>%
+    select(c(variable,mutation_label,speciesToInclude)) %>% # just get the cols for the species you want 
+    clr_or_ilr_calculations(.,ilr_or_clr) %>%
+    euclideanDistance_ilr_or_clr(.) %>%
+    addHammingDistances(.,hammingDistances) %>%
+    mutate(transform_label=transform_label,variable=variable,ilr_or_clr=ilr_or_clr)
+  
+  
+  return(distance_dataframe)
+  
+  
+}
 # get all types and stack them:
 ######## MUTATION RATE ##########
 ####### CLR: ########
-clr_distance_rescaledMutRate_1mer = combo_function(all1merSpectra,"mutation_rate_projected_normalized_plusEpsilon","1mer_clr","clr")
+clr_distance_rescaledMutRate_1mer = combo_function(all1merSpectra,"mutation_rate_projected_normalized_plusEpsilon","1mer_clr","clr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-clr_distance_rescaledMutRate_3mer = combo_function(all3merSpectra,"mutation_rate_projected_normalized_plusEpsilon","3mer_clr","clr")
+clr_distance_rescaledMutRate_3mer = combo_function(all3merSpectra,"mutation_rate_projected_normalized_plusEpsilon","3mer_clr","clr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-clr_distance_rescaledMutRate_5mer = combo_function(all5merSpectra,"mutation_rate_projected_normalized_plusEpsilon","5mer_clr","clr")
+clr_distance_rescaledMutRate_5mer = combo_function(all5merSpectra,"mutation_rate_projected_normalized_plusEpsilon","5mer_clr","clr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-clr_distance_rescaledMutRate_7mer = combo_function(all7merSpectra,"mutation_rate_projected_normalized_plusEpsilon","7mer_clr","clr")
+clr_distance_rescaledMutRate_7mer = combo_function(all7merSpectra,"mutation_rate_projected_normalized_plusEpsilon","7mer_clr","clr",speciesToInclude_1,speciesCodes,phyloDistances)
 
 
 ######### ILR  -- SLOW !!! ##############
-ilr_distance_rescaledMutRate_1mer = combo_function(all1merSpectra,"mutation_rate_projected_normalized_plusEpsilon","1mer_ilr","ilr")
+ilr_distance_rescaledMutRate_1mer = combo_function(all1merSpectra,"mutation_rate_projected_normalized_plusEpsilon","1mer_ilr","ilr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-ilr_distance_rescaledMutRate_3mer = combo_function(all3merSpectra,"mutation_rate_projected_normalized_plusEpsilon","3mer_ilr","ilr")
+ilr_distance_rescaledMutRate_3mer = combo_function(all3merSpectra,"mutation_rate_projected_normalized_plusEpsilon","3mer_ilr","ilr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-ilr_distance_rescaledMutRate_5mer = combo_function(all5merSpectra,"mutation_rate_projected_normalized_plusEpsilon","5mer_ilr","ilr")
+ilr_distance_rescaledMutRate_5mer = combo_function(all5merSpectra,"mutation_rate_projected_normalized_plusEpsilon","5mer_ilr","ilr",speciesToInclude_1,speciesCodes,phyloDistances)
 
 # TOO SLOW exhausts vector memory: ilr_distance_rescaledMutRate_7mer = combo_function(all7merSpectra,"mutation_rate_projected_normalized_plusEpsilon","7mer_ilr","ilr")
 
@@ -349,23 +393,106 @@ ilrclr_plot1 <- ggplot(all_clr_ilr_dists_mutrate,aes(x=cophenetic_distance,y=spe
 ilrclr_plot1
 ggsave(paste0(plotdir,"ilr.clr.distances.mutationRate.plusEpsilon.",as.character(epsilon),".PROJECTEDCOUNTS.png"),ilrclr_plot1,width=13,height=7)
 
+
+
+####### hamming : mutation rate #############
+
+clr_distance_rescaledMutRate_hamming_1mer = combo_function_hamming(all1merSpectra,"mutation_rate_projected_normalized_plusEpsilon","1mer_clr","clr",speciesToInclude_hamming,hammingDistances)
+
+clr_distance_rescaledMutRate_hamming_3mer = combo_function_hamming(all3merSpectra,"mutation_rate_projected_normalized_plusEpsilon","3mer_clr","clr",speciesToInclude_hamming,hammingDistances)
+
+clr_distance_rescaledMutRate_hamming_5mer = combo_function_hamming(all5merSpectra,"mutation_rate_projected_normalized_plusEpsilon","5mer_clr","clr",speciesToInclude_hamming,hammingDistances)
+
+clr_distance_rescaledMutRate_hamming_7mer = combo_function_hamming(all7merSpectra,"mutation_rate_projected_normalized_plusEpsilon","7mer_clr","clr",speciesToInclude_hamming,hammingDistances)
+
+all_clr_ilr_dists_mutrate_hamming <- bind_rows(clr_distance_rescaledMutRate_hamming_1mer,clr_distance_rescaledMutRate_hamming_3mer,clr_distance_rescaledMutRate_hamming_5mer,clr_distance_rescaledMutRate_hamming_7mer) # eventually do ilr
+
+head(all_clr_ilr_dists_mutrate_hamming)
+# need to do non transformed as well
+hamming_mutrate_plot1 <- ggplot(all_clr_ilr_dists_mutrate_hamming,aes(x=average_HammingDistance_divBy2xGenomeSize,y=spectrum_distance))+
+  facet_wrap(~transform_label,scales="free_y")+
+  geom_point()+
+  geom_text_repel(aes(label=comparisonLabel),size=1.8)+
+  theme_bw()
+hamming_mutrate_plot1
+
+ggsave(paste0(plotdir,"HAMMING.ilr.clr.distances.mutationRate.plusEpsilon.",as.character(epsilon),".PROJECTEDCOUNTS.png"),hamming_mutrate_plot1,width=13,height=7)
+
+# log10:
+hamming_mutrate_plot2 <- hamming_mutrate_plot1+
+  scale_x_log10()+
+  xlab("log10 hamming distance")
+hamming_mutrate_plot2
+
+ggsave(paste0(plotdir,"HAMMING.ilr.clr.distances.mutationRate.plusEpsilon.",as.character(epsilon),".PROJECTEDCOUNTS.log10.png"),hamming_mutrate_plot2,width=13,height=7)
+
+# humans only:
+hamming_mutrate_plot3 <- ggplot(all_clr_ilr_dists_mutrate_hamming[all_clr_ilr_dists_mutrate_hamming$item1 %in% c("humans_AFR","humans_EUR","humans_EAS","humans_SAS","humans_AMR") & all_clr_ilr_dists_mutrate_hamming$item2 %in% c("humans_AFR","humans_EUR","humans_EAS","humans_SAS","humans_AMR"),],aes(x=average_HammingDistance_divBy2xGenomeSize,y=spectrum_distance))+
+  facet_wrap(~transform_label,scales="free_y")+
+  geom_point()+
+  geom_text_repel(aes(label=comparisonLabel),size=1.8)+
+  theme_bw() 
+hamming_mutrate_plot3
+
+ggsave(paste0(plotdir,"HAMMING.ilr.clr.distances.mutationRate.plusEpsilon.",as.character(epsilon),".PROJECTEDCOUNTS.HUMANSONLY.png"),hamming_mutrate_plot3,width=13,height=7)
+
+# add in cophenetic distance
+hamming_plus_phylo_mutrate_plot1 <- ggplot(all_clr_ilr_dists_mutrate_hamming,aes(x=average_HammingDistance_divBy2xGenomeSize,y=spectrum_distance,shape="hamming",label=comparisonLabel))+
+  facet_wrap(~transform_label,scales="free_y")+
+  geom_point()+
+  geom_text(size=1.8)+
+  geom_point(data=all_clr_ilr_dists_mutrate,aes(x=cophenetic_distance,y=spectrum_distance,shape="phylo"))+
+  geom_text_repel(data=all_clr_ilr_dists_mutrate,aes(x=cophenetic_distance,y=spectrum_distance,label=comparisonLabel_common_alphabetical),size=1.8)+
+  theme_bw()+
+  xlab("hamming distance (if mapped to same genome) or phylogenetic distance (cophenetic)")
+hamming_plus_phylo_mutrate_plot1
+ggsave(paste0(plotdir,"HAMMING.PLUS.PHYLO.ilr.clr.distances.mutationRate.plusEpsilon.",as.character(epsilon),".PROJECTEDCOUNTS.png"),hamming_plus_phylo_mutrate_plot1,width=13,height=7)
+
+# log10 scale it:
+hamming_plus_phylo_mutrate_plot2 <- hamming_plus_phylo_mutrate_plot1+scale_x_log10()+ggtitle('log10')
+hamming_plus_phylo_mutrate_plot2
+ggsave(paste0(plotdir,"HAMMING.PLUS.PHYLO.ilr.clr.distances.mutationRate.plusEpsilon.",as.character(epsilon),".PROJECTEDCOUNTS.log10.png"),hamming_plus_phylo_mutrate_plot2,width=13,height=7)
+
+# humans/mice only:
+humansMice=c("humans_AFR","humans_EUR","humans_EAS","humans_SAS","humans_AMR","mice_Mmd","mice_Ms","mouse_Ms","mouse_Mmd","mice_Mmm","mice_Mmc")
+hamming_plus_phylo_mutrate_plot3 <- ggplot(all_clr_ilr_dists_mutrate_hamming[all_clr_ilr_dists_mutrate_hamming$item1 %in% humansMice & all_clr_ilr_dists_mutrate_hamming$item2 %in% humansMice,],aes(x=average_HammingDistance_divBy2xGenomeSize,y=spectrum_distance,shape="hamming",label=comparisonLabel))+
+  facet_wrap(~transform_label,scales="free_y")+
+  geom_point()+
+  geom_text(size=1.8)+
+  geom_point(data=all_clr_ilr_dists_mutrate[all_clr_ilr_dists_mutrate$item1 %in% humansMice & all_clr_ilr_dists_mutrate$item2 %in% humansMice,],aes(x=cophenetic_distance,y=spectrum_distance,shape="phylo"))+
+  geom_text_repel(data=all_clr_ilr_dists_mutrate[all_clr_ilr_dists_mutrate$item1 %in% humansMice & all_clr_ilr_dists_mutrate$item2 %in% humansMice,],aes(x=cophenetic_distance,y=spectrum_distance,label=comparisonLabel_common_alphabetical),size=1.8)+
+  theme_bw()+
+  xlab("hamming distance (if mapped to same genome) or phylogenetic distance (cophenetic)")
+hamming_plus_phylo_mutrate_plot3
+ggsave(paste0(plotdir,"HAMMING.PLUS.PHYLO.ilr.clr.distances.mutationRate.plusEpsilon.",as.character(epsilon),".PROJECTEDCOUNTS.HUMANSMICEONLY.png"),hamming_plus_phylo_mutrate_plot3,width=13,height=7)
+
+hamming_plus_phylo_mutrate_plot4 <- hamming_plus_phylo_mutrate_plot3+
+  scale_x_log10()+
+  xlab("hamming distance (if mapped to same genome) or phylogenetic distance (cophenetic) -- log10")+
+  ggtitle('log10')
+hamming_plus_phylo_mutrate_plot4
+ggsave(paste0(plotdir,"HAMMING.PLUS.PHYLO.ilr.clr.distances.mutationRate.plusEpsilon.",as.character(epsilon),".PROJECTEDCOUNTS.HUMANSMICEONLY.log10.png"),hamming_plus_phylo_mutrate_plot4,width=13,height=7)
+
+########## YOU ARE HERE: try actualy adding to same plot as cophenetic distance (looks pretty similar for mouse-mouse and bear-bear) ###########
+#could make pts diff shapes as to whether they are hamming or not
+#
 ######## Frac seg sites ##########
 ####### CLR: ########
-clr_distance_FracSegSites_1mer = combo_function(all1merSpectra,"fractionOfSegregatingSites_plusEpsilon","1mer_clr","clr")
+clr_distance_FracSegSites_1mer = combo_function(all1merSpectra,"fractionOfSegregatingSites_plusEpsilon","1mer_clr","clr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-clr_distance_FracSegSites_3mer = combo_function(all3merSpectra,"fractionOfSegregatingSites_plusEpsilon","3mer_clr","clr")
+clr_distance_FracSegSites_3mer = combo_function(all3merSpectra,"fractionOfSegregatingSites_plusEpsilon","3mer_clr","clr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-clr_distance_FracSegSites_5mer = combo_function(all5merSpectra,"fractionOfSegregatingSites_plusEpsilon","5mer_clr","clr")
+clr_distance_FracSegSites_5mer = combo_function(all5merSpectra,"fractionOfSegregatingSites_plusEpsilon","5mer_clr","clr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-clr_distance_FracSegSites_7mer = combo_function(all7merSpectra,"fractionOfSegregatingSites_plusEpsilon","7mer_clr","clr")
+clr_distance_FracSegSites_7mer = combo_function(all7merSpectra,"fractionOfSegregatingSites_plusEpsilon","7mer_clr","clr",speciesToInclude_1,speciesCodes,phyloDistances)
 
 
 ######### ILR  -- SLOW !!! ##############
-ilr_distance_FracSegSites_1mer = combo_function(all1merSpectra,"fractionOfSegregatingSites_plusEpsilon","1mer_ilr","ilr")
+ilr_distance_FracSegSites_1mer = combo_function(all1merSpectra,"fractionOfSegregatingSites_plusEpsilon","1mer_ilr","ilr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-ilr_distance_FracSegSites_3mer = combo_function(all3merSpectra,"fractionOfSegregatingSites_plusEpsilon","3mer_ilr","ilr")
+ilr_distance_FracSegSites_3mer = combo_function(all3merSpectra,"fractionOfSegregatingSites_plusEpsilon","3mer_ilr","ilr",speciesToInclude_1,speciesCodes,phyloDistances)
 
-ilr_distance_FracSegSites_5mer = combo_function(all5merSpectra,"fractionOfSegregatingSites_plusEpsilon","5mer_ilr","ilr")
+ilr_distance_FracSegSites_5mer = combo_function(all5merSpectra,"fractionOfSegregatingSites_plusEpsilon","5mer_ilr","ilr",speciesToInclude_1,speciesCodes,phyloDistances)
 
 # TOO SLOW exhausts vector memory: ilr_distance_FracSegSites_7mer = combo_function(all7merSpectra,"mutation_rate_projected_normalized_plusEpsilon","7mer_ilr","ilr")
 ####### combine and plot ######
@@ -570,7 +697,7 @@ mutRateNorm_plot3_subsetOfSpecies <- ggplot(spectrum_and_phylo_dist_allKmers_nor
   facet_wrap(~label,scales="free")+
   theme_bw()+
   geom_text_repel(aes(x=cophenetic_distance,y=spectrum_distance,label=comparisonLabel_common_alphabetical),size=4,color="black")#+
-  #geom_smooth()
+#geom_smooth()
 mutRateNorm_plot3_subsetOfSpecies
 ggsave(paste0(plotdir,"mutRateNorm_SUBSETOFSPECIES.png"),mutRateNorm_plot3_subsetOfSpecies,height=15,width=20)
 
@@ -582,7 +709,7 @@ fracsegsites_plot3_subsetOfSpecies <- ggplot(spectrum_and_phylo_dist_allKmers_fr
   theme_bw()+
   geom_text_repel(aes(label=comparisonLabel_common_alphabetical),size=4)+
   ggtitle("fraction of segregating sites") #+
-  #geom_smooth()
+#geom_smooth()
 fracsegsites_plot3_subsetOfSpecies
 ggsave(paste0(plotdir,"fracsegsitesplot.SUBSETOFSPECIES.png"),fracsegsites_plot3_subsetOfSpecies,height=15,width=20)
 

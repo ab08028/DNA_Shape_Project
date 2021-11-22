@@ -17,11 +17,16 @@ raxmlMLTree <- read.tree("/Users/annabelbeichman/Documents/UW/DNAShapeProject/in
 raxmlMLTree
 
 # use keep.tip
-speciesList=c("Balaenoptera_acutorostrata" ,"Balaenoptera_musculus" ,"Balaenoptera_physalus" ,"Tursiops_truncatus" ,"Physeter_macrocephalus" ,"Neophocaena_phocaenoides" ,"Phocoena_phocoena" ,"Orcinus_orca" ,"Neophocaena_asiaeorientalis" ,"Monodon_monoceros" ,"Lagenorhynchus_obliquidens" ,"Globicephala_melas" ,"Delphinapterus_leucas" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus" ,"Homo_sapiens")
-# SIMPLIFIED
+speciesList=c("Balaenoptera_acutorostrata" ,"Balaenoptera_musculus" ,"Balaenoptera_physalus" ,"Tursiops_truncatus" ,"Physeter_macrocephalus" ,"Neophocaena_phocaenoides" ,"Phocoena_phocoena" ,"Orcinus_orca" ,"Neophocaena_asiaeorientalis" ,"Monodon_monoceros" ,"Lagenorhynchus_obliquidens" ,"Globicephala_melas" ,"Delphinapterus_leucas" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus" ,"Homo_sapiens","Pongo_pygmaeus","Pongo_abelii","Pan_troglodytes","Pan_paniscus","Gorilla_gorilla")
+
+
 speciesList2=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus" ,"Homo_sapiens")
 
 speciesList3=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus")
+
+speciesList4=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus","Homo_sapiens","Pan_paniscus") # add in human bonobo for another pair
+
+speciesList5=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus","Homo_sapiens","Pongo_pygmaeus","Pongo_abelii","Pan_troglodytes","Pan_paniscus","Gorilla_gorilla") # add in human bonobo for another pair
 ########## plot subset of tips ##########
 listOftips <- raxmlMLTree$tip.label
 
@@ -30,6 +35,8 @@ tipsToKeep2 <- listOftips[grepl(paste(speciesList2, collapse="|"),listOftips)] #
 
 tipsToKeep3 <- listOftips[grepl(paste(speciesList3, collapse="|"),listOftips)] # tips I want
 
+tipsToKeep4 <- listOftips[grepl(paste(speciesList4, collapse="|"),listOftips)]
+tipsToKeep5 <- listOftips[grepl(paste(speciesList5, collapse="|"),listOftips)]
 outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/vertlife_phylogeneticTrees/raxml_tree/"
 # okay this is good. maybe slightly fewer species but will work well and is direclty based on DNA!
 
@@ -58,6 +65,15 @@ dev.off()
 
 png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.NoHumans.WithoutTipLabels.png"),width = 7,height=5,units="in",res=300)
 plot(keep.tip(raxmlMLTree,tipsToKeep3),show.tip.label = F)
+dev.off()
+
+### add in apes:
+png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.HumansAndAllApes.WithTipLabels.png"),width = 14,height=5,units="in",res=300)
+plot(keep.tip(raxmlMLTree,tipsToKeep5),show.tip.label =T)
+dev.off()
+
+png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.HumansAndAllApes.WithoutTipLabels.png"),width = 7,height=5,units="in",res=300)
+plot(keep.tip(raxmlMLTree,tipsToKeep5),show.tip.label =F)
 dev.off()
 
 ########## get distances #########
@@ -92,7 +108,7 @@ write.table(pairwiseDistances_melt,paste0(outdir,"raxml.cophenetic.pairwisedista
 # okay want to pull my species out 
 
 ##### want to restrict just to my species list #######
-speciesList=c("Balaenoptera_acutorostrata" ,"Balaenoptera_musculus" ,"Balaenoptera_physalus" ,"Tursiops_truncatus" ,"Physeter_macrocephalus" ,"Neophocaena_phocaenoides" ,"Phocoena_phocoena" ,"Orcinus_orca" ,"Neophocaena_asiaeorientalis" ,"Monodon_monoceros" ,"Lagenorhynchus_obliquidens" ,"Globicephala_melas" ,"Delphinapterus_leucas" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus" ,"Homo_sapiens")
+# speciesList defined above speciesList=c("Balaenoptera_acutorostrata" ,"Balaenoptera_musculus" ,"Balaenoptera_physalus" ,"Tursiops_truncatus" ,"Physeter_macrocephalus" ,"Neophocaena_phocaenoides" ,"Phocoena_phocoena" ,"Orcinus_orca" ,"Neophocaena_asiaeorientalis" ,"Monodon_monoceros" ,"Lagenorhynchus_obliquidens" ,"Globicephala_melas" ,"Delphinapterus_leucas" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus" ,"Homo_sapiens")
 # want to grep these 
 
 pairwiseDistances_melt_mySpecies <- pairwiseDistances_melt[pairwiseDistances_melt$Sp1_species %in% speciesList & pairwiseDistances_melt$Sp2_species %in% speciesList,]

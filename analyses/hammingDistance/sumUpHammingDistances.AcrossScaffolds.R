@@ -28,8 +28,8 @@ for(interval in intervals){
   distdf_melt$interval <- as.character(interval)
   distdf_melt$label <- label
   # make an alphabetical comparison label so that even if are in different orders this label will always label the same comparisons the same way: 
-  distdf_melt$ind1_alphabetical <- pmin(as.character(distdf_melt$ind1),distdf_melt$ind2)
-  distdf_melt$ind2_alphabetical <- pmax(as.character(distdf_melt$ind1),distdf_melt$ind2)
+  distdf_melt$ind1_alphabetical <- pmin(as.character(distdf_melt$ind1),distdf_melt$ind2) # note his is ind1 and ind2 not just ind1 -- is selecting the first alphabetically
+  distdf_melt$ind2_alphabetical <- pmax(as.character(distdf_melt$ind1),distdf_melt$ind2) # note this should be ind1 and ind2
   distdf_melt$comparisonLabel <-  paste0(distdf_melt$ind1_alphabetical,".",distdf_melt$ind2_alphabetical)
   allDistances <- bind_rows(allDistances,distdf_melt)
   

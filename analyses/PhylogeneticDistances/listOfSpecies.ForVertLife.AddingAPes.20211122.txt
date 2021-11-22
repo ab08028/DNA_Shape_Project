@@ -1,0 +1,27 @@
+# go to vert life: http://vertlife.org/phylosubsets/
+# and get pruned trees (get mlutiple so you can average distances)
+
+Balaenoptera acutorostrata
+Balaenoptera musculus
+Balaenoptera physalus
+Tursiops truncatus
+Physeter macrocephalus
+Neophocaena phocaenoides
+Phocoena phocoena
+Orcinus orca
+Neophocaena asiaeorientalis
+Monodon monoceros
+Lagenorhynchus obliquidens
+Globicephala melas
+Delphinapterus leucas
+Phocoena sinus
+Ursus maritimus
+Ursus arctos
+Mus musculus
+Mus spretus
+Homo sapiens
+Gorilla gorilla
+Pan paniscus
+Pan troglodytes
+Pongo abelii
+Pongo pygmaeus

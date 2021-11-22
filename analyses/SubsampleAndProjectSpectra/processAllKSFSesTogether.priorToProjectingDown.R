@@ -9,49 +9,8 @@ outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/allKSFSes_an
 
 
 ######### human info ###############
-human_indir="/Users/annabelbeichman/Documents/UW/WhaleProject/vaquita/results/mutyper/humans/mutyperResults_20210329_CONTAINSNONPASSSITES_NOTBEDMASKED_BAD/mutyper_ksfs_files/" #TEMPORARY!!!! INCLUDES BAD SITES. JUST USE FOR NOW.
-human_intervals=paste0("chr",seq(1,22)) 
-human_pops=c("AFR","AMR", "EAS", "EUR", "SAS") # addd more?
-#human_pops=c("AFR")
-human_speciesLabel="human"
-# adding population; very big so have to sum as you go.
-ksfsFunction_humanSpecific <- function(indir,vectorOfIntervals,ListOfPopulations,speciesLabel,pop){
-  allKSFSes_summedUp = data.frame()
-  # need to add as I go 
-  #for(pop in ListOfPopulations){
-  #print(paste0("starting ",pop))
-  for(interval in vectorOfIntervals){
-    print(interval)
-    ksfs=read.table(paste0(indir,pop,"/",pop,".",interval,".mutyper.spectrum.Population.NOSTRICT.txt"),header=T)
-    ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
-    colnames(ksfs_melt) <- c("sample_frequency","variable","totalSites")
-    #ksfs_melt$interval <- as.character(interval)
-    #ksfs_melt$species <- speciesLabel
-    #ksfs_melt$population <- pop 
-    allKSFSes_summedUp=bind_rows(allKSFSes_summedUp,ksfs_melt)
-    # re sum up:
-    allKSFSes_summedUp <- allKSFSes_summedUp %>% group_by(variable,sample_frequency) %>% # don't need to group by pop because this is all pop specific already
-      summarise(totalSites=sum(totalSites))
-  }
-  # allKSFSes_summed <- allKSFSes %>% group_by(species,population,variable,sample_frequency) %>%
-  #  summarise(totalSites=sum(value))
-  allKSFSes_summed$species <- speciesLabel
-  allKSFSes_summed$population <- pop
-  return(allKSFSes_summed)
-}
+# NOTE : humans occur in their own script because it needs to be run on sage (too big/slow for laptop)
 
-for(pop in human_pops){
-  print(pop)
-  human_ksfs_onePop = ksfsFunction_humanSpecific(human_indir,human_intervals,human_pops,human_speciesLabel,pop)
-  write.table(human_ksfs,paste0(outdir,"ksfs.7mer.humans.TEMPORARY.BADSITES.",pop,".txt"),row.names = F,quote=F,sep="\t")
-  write.table(human_ksfs,paste0(human_indir,"ksfs.7mer.humans.TEMPORARY.BADSITES.",pop,".txt"),row.names = F,quote=F,sep="\t")
-  
-}
-
-
-
-
-########## need to do humans #########
 
 ######## bear info ##########
 bear_indir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/20200916/mutyperResults_20210331_7mer_NoStrict/mapped_to_brown_bear/mutyper_ksfs_files/" # just brown bear ref
@@ -188,3 +147,11 @@ write.table(vaquita_ksfs,paste0(outdir,"ksfs.7mer.vaquita.txt"),row.names = F,qu
 write.table(vaquita_ksfs,paste0(vaquita_indir,"ksfs.7mer.vaquita.melted.txt"),row.names = F,quote=F,sep="\t")
 
 
+############ write a note on where the ksfses came from ###########
+sink(paste0(outdir,"mutyperRunsUsedToMakeTheseKSFes.txt"))
+print(Sys.Date())
+print(bear_indir)
+print(mice_indir)
+print(vaquita_indir)
+print(finwhale_indir)
+sink()

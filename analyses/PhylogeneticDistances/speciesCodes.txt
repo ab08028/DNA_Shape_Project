@@ -22,6 +22,11 @@ Ursus_arctos	bears_ABC	brown_bear_ABC	bear
 Ursus_arctos	bears_EUR	brown_bear_EUR	bear
 Mus_musculus	mice_Mmd	mouse_Mmd	mouse
 Mus_spretus	mice_Ms	mouse_Ms	mouse
-Homo_sapiens	human_AFR	human_AFR	human
-Balaenoptera_physalus fin_whale_ENP	fin_whale_ENP	baleen_whale
-Balaenoptera_physalus fin_whale_GOC	fin_whale_GOC	baleen_whale
+Homo_sapiens	humans_AFR	humans_AFR	humans
+Balaenoptera_physalus	fin_whale_ENP	fin_whale_ENP	baleen_whale
+Balaenoptera_physalus	fin_whale_GOC	fin_whale_GOC	baleen_whale
+Gorilla_gorilla	apes_Gorilla	gorilla	apes
+Pan_paniscus	apes_Pan_paniscus	bonobo	apes
+Pongo_abelii	apes_Pongo_abelii	sumatran_orangutan	apes
+Pongo_pygmaeus	apes_Pongo_pygmaeus	bornean_orangutan	apes
+Pan_troglodytes	apes_Pan_troglodytes	chimpanzee	apes
