@@ -7,9 +7,13 @@ require(reshape2)
 require(scales)
 # human pop files #
 popfiledir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/information/populationFiles/"
-labels=c('humans','bears','fin_whale','mice')
+# note not doing hamming for apes or vaquita
 hammingindir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/hamming_distance/"
-
+# update to make sure this is correct !! targets must be masked in same way as hamming distances
+# so if rep masking occurred for hamming dist, rep masking must occur for targets (can stay consisten by using targets and variants files from same mutyper runs)
+### note th
+tableOfTargetsToInclude=read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/information/spectra/tableOfSpectraToIncludeInComparisons.SpeciesWithMultipleIndividualsOnly.PlusApes.MaskedMouse.Vaquita.20211123.txt",header=T,sep="\t") 
+labels=c("mice","humans","bears","fin_whale")
 # read in pop files 
 allPopFiles=data.frame()
 for(label in labels){
@@ -62,8 +66,9 @@ ggsave(paste0(hammingindir,"hammingDistance.raw.notYetCorrectedByTargetSize.png"
 
 
 ######## need to gather/read in targets ##########
-tableOfTargetsToInclude=read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/information/spectra/tableOfSpectraToIncludeInComparisons.SpeciesWithMultipleIndividualsOnly.20211026.txt",header=T,sep="\t") # this also has info on spectra but don't use that. 
+# this also has info on spectra but don't use that. 
 all7merTargets=data.frame()
+# exclude vaquita because not needed for hamming 
 for(sample in tableOfTargetsToInclude$sample){
   # some 'samples' may contain multipops like mice and bears
   sampleinfo = tableOfTargetsToInclude[tableOfTargetsToInclude$sample==sample,]
@@ -72,13 +77,14 @@ for(sample in tableOfTargetsToInclude$sample){
   targets=read.table(targetsfilename,header=sampleinfo$targetsHeader) # assigns whether has header or not
   colnames(targets) <- c("target_7mer","countOverAllIntervals")
   targets$sample <- sample
-
   all7merTargets = bind_rows(all7merTargets,targets)
 
 }
+# note: vaquita not needed for hamming
+########## you are here -- something is odd with halbels
 # change "human" sample label to "humans"
 all7merTargets$label <- as.character(all7merTargets$sample)
-all7merTargets[all7merTargets$sample=="human",]$label <- "humans"
+#all7merTargets[all7merTargets$sample=="human",]$label <- "humans"
 # get total callable genome size
 totalCallableGenome <- all7merTargets %>%
   group_by(sample,label) %>%
@@ -97,7 +103,6 @@ hamming_with_callableGenome$average_HammingDistance_divBy2xGenomeSize <- hamming
 head(hamming_with_callableGenome)
 write.table(hamming_with_callableGenome,paste0(hammingindir,"ALLSPECIESCOMBINED.totalAlleleCounts.HammingDistance.allIntervals.WITHPOPINFO.AVERAGEDPERCOMPARISONTYPE.DIVIDEDBY2xGenomeSIZE.usethis.txt"),quote=F,sep="\t",row.names=F)
 
-
 plot2 <- ggplot(hamming_with_callableGenome,aes(x=pop1,y=pop2,fill=log10(average_HammingDistance_divBy2xGenomeSize)))+
   geom_tile()+
   theme(axis.text.x = element_text(angle=90))+
@@ -107,4 +112,3 @@ plot2 <- ggplot(hamming_with_callableGenome,aes(x=pop1,y=pop2,fill=log10(average
 plot2
 ggsave(paste0(hammingindir,"hammingDistance.perSite.CorrectedBy2xGenomeSizee.log10.png"),plot2,height=8,width = 15)
 
-######## need to get spectra distances ##########
