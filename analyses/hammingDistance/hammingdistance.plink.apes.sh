@@ -12,7 +12,8 @@
 # but then I am *CALLABILITY MASKING* them in the same way that I did the mutyper variants files
 # but note that if you do more masking in future mutyper runs you should probably remask these
 # but won't make a huge difference. 
-
+# so the vcf you're using here is merged across all apes and has been callability masked (see merge.ape.vcfs.ForHamming.sh script)
+# so can use the targets with the callability mask as approximate denominator 
 # experiment with plink
 # 
 module load modules modules-init modules-gs # initialize modules 
@@ -36,12 +37,12 @@ vcfdir=/net/harris/vol1/home/beichman/apes/merged_vcf
 # so I think this is best -case
 
 # same vcf I used for mutyper variants (going to use targets as denominator as well)
-vcf=$vcfdir/${interval}.mutyper.variants.mutationTypes.noMissingData.noFixedSites.7mers.StrictButThatsFineForHumans.PASSONLY.BEDMASKED.vcf.gz
+vcf=$vcfdir/ALLAPES.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf.gz
 
 
 
-outdir=/net/harris/vol1/home/beichman/DNAShape/analyses/hamming_distance/${label}/perInterval
-outroot=$outdir/plink.${label}.interval.${interval}.FromMutyperVariantsVCF
+outdir=/net/harris/vol1/home/beichman/DNAShape/analyses/hamming_distance/${label}
+outroot=$outdir/plink.${label}.FromMutyperVariantsVCF
 mkdir -p $outdir
 
 plink --vcf $vcf --distance square0 flat-missing --const-fid --allow-extra-chr --out $outroot

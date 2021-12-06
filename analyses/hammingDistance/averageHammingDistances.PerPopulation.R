@@ -7,7 +7,7 @@ require(reshape2)
 require(scales)
 # human pop files #
 popfiledir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/information/populationFiles/"
-# note not doing hamming for apes or vaquita
+# note not doing hamming for vaquita; adding apes on 20211206
 hammingindir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/hamming_distance/"
 # update to make sure this is correct !! targets must be masked in same way as hamming distances
 # so if rep masking occurred for hamming dist, rep masking must occur for targets (can stay consisten by using targets and variants files from same mutyper runs)
