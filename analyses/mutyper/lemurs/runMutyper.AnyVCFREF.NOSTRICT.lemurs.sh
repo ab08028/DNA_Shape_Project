@@ -21,7 +21,7 @@ todaysdate=`date +%Y%m%d` # date you run mutyper
 
 
 vcffilename=/net/harris/vol1/home/beichman/lemurs/VCF/L35_d6_wholeGenome.bam.vcf
-refgenome=/net/harris/vol1/home/beichman/reference_genomes/gray_mouse_lemur/GCF_000165445.2_Mmur_3.0_genomic.fna.gz # NOTE : NOT YET POLARIZED
+refgenome=/net/harris/vol1/home/beichman/reference_genomes/gray_mouse_lemur/GCF_000165445.2_Mmur_3.0_genomic.fna # NOTE : NOT YET POLARIZED
 species=gray_mouse_lemur
 IndsToINCLUDE='GL/CRC-L2,GL/CRC-L6'
 
