@@ -36,7 +36,11 @@ vcfdir=/net/harris/vol1/home/beichman/apes/merged_vcf
 # but that does mean distances are probably slightly undercalled  (though hopefully similar masking is being used for target files which will be denominator)
 # so I think this is best -case
 
-# same vcf I used for mutyper variants (going to use targets as denominator as well)
+# NOTE: unlike other spp this is NOT the vcf I used for mutyper variants
+# but I used the callability mask on it the same way so muytper targets is okay to use with it
+# this has been callablity masked (not rep masked)
+# have to index for excluding regions
+
 vcf=$vcfdir/ALLAPES.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf.gz
 
 
