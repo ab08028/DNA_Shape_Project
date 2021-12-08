@@ -19,8 +19,10 @@ set -o pipefail
 todaysdate=`date +%Y%m%d` # date you run mutyper 
 #todaysdate=20211101
 
-
-vcffilename=/net/harris/vol1/home/beichman/lemurs/VCF/L35_d6_wholeGenome.bam.vcf
+# had to bgzip this
+vcffilename=/net/harris/vol1/home/beichman/lemurs/VCF/L35_d6_wholeGenome.bam.vcf.gz
+# need to index
+# ONLY ONCE: bcftools index $vcffilename
 refgenome=/net/harris/vol1/home/beichman/reference_genomes/gray_mouse_lemur/GCF_000165445.2_Mmur_3.0_genomic.fna # NOTE : NOT YET POLARIZED
 species=gray_mouse_lemur
 IndsToINCLUDE='GL/CRC-L2,GL/CRC-L6'
@@ -40,7 +42,7 @@ mkdir -p $variantsdir
 mkdir -p $ksfsdir
 
 
-variantsoutfile=$variantsdir/${species}.mutyper.variants.mutationTypes.noMissingData.noFixedSites.${kmersize}mers.nostrict.unrelatedIndsOnly.NOTPOLARIZED.vcf.gz
+variantsoutfile=$variantsdir/${species}.mutyper.variants.mutationTypes.noMissingData.noFixedSites.${kmersize}mers.nostrict.unrelatedIndsOnly.NOTPOLARIZED.noXChrom.vcf.gz
 
 # no callability mask.
 # no rep mask (yet)
@@ -52,8 +54,9 @@ variantsoutfile=$variantsdir/${species}.mutyper.variants.mutationTypes.noMissing
 # need to remove sepcific inds for chimp and gorilla -- how? 
 
 
-
-bcftools view -s $IndsToINCLUDE  $vcffilename -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Ou | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize --sep "\s" $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
+# need to exclude: NC_033692.1 (x chromosome) 
+# can only use ^ with -t not with -r in bcftools fyi
+bcftools view -t ^'NC_033692.1' $vcffilename -Ou | bcftools view -s $IndsToINCLUDE -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Ou | bcftools view -g ^miss -Ou | mutyper variants --k $kmersize --sep "\s" $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from Will's code, different way to output bcftools output
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
@@ -71,7 +74,7 @@ fi
 
 ksfsoutfile=$ksfsdir/${species}.mutyper.ksfs.nostrict.unrelatedIndsOnly.NOTPOLARIZED.txt
 # restrict to just one population and sites that are variant for that population: 
-bcftools view -c 1:minor $variantsoutfile | mutyper ksfs - > $ksfsoutfile
+bcftools view -c 1:minor $variantsoutfile -Oz | mutyper ksfs - > $ksfsoutfile
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then

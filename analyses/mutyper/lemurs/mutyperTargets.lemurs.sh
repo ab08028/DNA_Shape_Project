@@ -20,4 +20,23 @@ refgenome=/net/harris/vol1/home/beichman/reference_genomes/gray_mouse_lemur/GCF_
 
 outdir=/net/harris/vol1/home/beichman/lemurs/analyses/mutyper/mutyperResults_20211206/mutyper_targets_files
 mkdir -p $outdir
-mutyper targets $refgenome --k ${k} > $outdir/${species}.mutyper.targets.NOSTRICT.NOTPOLARIZED.NOMASKING.${k}mers.txt
+# want to restrict just to the scaffolds that are in the vcf file
+
+# got list of scaffolds:
+# zcat gray_mouse_lemur.mutyper.variants.mutationTypes.noMissingData.noFixedSites.7mers.nostrict.unrelatedIndsOnly.NOTPOLARIZED.noXChrom.vcf.gz | grep -v "#" | awk '{print $1}' | sort | uniq  > listOfScaffolds.txt
+# this excludes X chromosome
+
+# and want to get tehse from the fai file
+# just once:
+#listOfScaffs=/net/harris/vol1/home/beichman/lemurs/analyses/mutyper/mutyperResults_20211206/mutyper_variant_files/listOfScaffolds.txt
+
+#faiFile=/net/harris/vol1/home/beichman/reference_genomes/gray_mouse_lemur/GCF_000165445.2_Mmur_3.0_genomic.fna.fai
+bedFile=/net/harris/vol1/home/beichman/reference_genomes/gray_mouse_lemur/scaffoldsForLemurTargets.OnlyScaffsinVcffile.noXchrom.bed
+#> $bedFile
+#cat $listOfScaffs | while read scaffold
+#do
+#grep $scaffold $faiFile | awk 'BEGIN {OFS="\t"}; {print $1,0,$2}' >> $bedFile
+
+#done 
+
+mutyper targets $refgenome --k ${k} --bed $bedFile > $outdir/${species}.mutyper.targets.NOSTRICT.NOTPOLARIZED.NOMASKING.${k}mers.OnlyScaffsInVCF.noXchrom.txt
