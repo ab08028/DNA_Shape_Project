@@ -8,26 +8,27 @@ require(dplyr)
 labels=c("merged_apes")
 for(label in labels){
 wd=paste0("/net/harris/vol1/home/beichman/DNAShape/analyses/hamming_distance/",label,"/")
-indir=paste0(wd,"/perInterval/")
+#indir=paste0(wd,"/perInterval/")
+indir=wd # for apes, all vcfs are merged so justone interval
 list.files(indir)
 ######## count up dist files ########
 distFiles=list.files(indir,pattern=".dist$") # list dist files
-intervalCount=length(distFiles)
-intervals=unlist(lapply(strsplit(distFiles,"\\."),"[",4))
+#intervalCount=length(distFiles)
+#intervals=unlist(lapply(strsplit(distFiles,"\\."),"[",4))
 #intervals # want to keep as strings because some will be '1' and others will be 'chr1'
 # note this misses if some chromosomes have been left off
 # maybe code up better in future (missed that humans 20-22 were missing but i've fixed that now -20211122)
 allDistances=data.frame()
-for(interval in intervals){
-  distdf=read.table(paste0(indir,"plink.",label,".interval.",interval,".FromMutyperVariantsVCF.dist"),header=F)
-  ids=read.table(paste0(indir,"plink.",label,".interval.",interval,".FromMutyperVariantsVCF.dist.id"),header=F)
+#for(interval in intervals){
+  distdf=read.table(paste0(indir,"plink.",label,".FromMutyperVariantsVCF.dist"),header=F)
+  ids=read.table(paste0(indir,"plink.",label,".FromMutyperVariantsVCF.dist.id"),header=F)
   colnames(distdf) <- ids$V2 # colnames 
   head(distdf)
   distdf$ind2 <- as.character(ids$V2) # this works because its a sqaure with 0s on diagonal 
   distdf_melt <- melt(distdf,variable.name = "ind1") # note ind2 is a character, ind1 is factor - leads to some annoyances
   # get rid of the empty part of the triangle (0 entries):
   distdf_melt <- distdf_melt[distdf_melt$value!=0,]
-  distdf_melt$interval <- as.character(interval)
+  distdf_melt$interval <- "all_intervals_were_merged" # as.character(interval)
   distdf_melt$label <- label
   # make an alphabetical comparison label so that even if are in different orders this label will always label the same comparisons the same way: 
   distdf_melt$ind1_alphabetical <- pmin(as.character(distdf_melt$ind1),distdf_melt$ind2) # note his is ind1 and ind2 not just ind1 -- is selecting the first alphabetically
@@ -35,12 +36,13 @@ for(interval in intervals){
   distdf_melt$comparisonLabel <-  paste0(distdf_melt$ind1_alphabetical,".",distdf_melt$ind2_alphabetical)
   allDistances <- bind_rows(allDistances,distdf_melt)
   
-}
+#}
 head(allDistances)
-if(length(unique(allDistances$interval))!=length(intervals)){
-  print('something is wrong!')
-  break
-}
+#if(length(unique(allDistances$interval))!=length(intervals)){
+#  print('something is wrong!')
+#  break
+#}
+# dont need to sum but doing for consistency -- should just be the same value for apes (one interval)
 allDistances_summedUp <- allDistances %>%
   group_by(label,comparisonLabel,ind1_alphabetical,ind2_alphabetical) %>% # don't gorup by ind1 and ind2 any more
   summarise(totalHammingDistance=sum(value))
