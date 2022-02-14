@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=20:00:00,h_data=8G
+#$ -l h_rt=100:00:00,h_data=8G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
 #$ -m bea
@@ -23,7 +23,7 @@ outdir=/net/harris/vol1/home/beichman/apes/merged_vcf
 whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Intersect_filtered_cov8.bed.gz # same for all species 
 
 
-#bcftools merge -m all $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_paniscus.vcf.gz $vcfdir/Pan_troglodytes.bcf $vcfdir/Pongo_abelii.vcf.gz $vcfdir/Pongo_pygmaeus.vcf.gz -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Ou | bcftools convert -Oz -o $outdir/ALLAPES.mergedVCFs.ForHammingDistance.vcf.gz
+bcftools merge -m all $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_paniscus.vcf.gz $vcfdir/Pan_troglodytes.bcf $vcfdir/Pongo_abelii.vcf.gz $vcfdir/Pongo_pygmaeus.vcf.gz -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Ou | bcftools convert -Oz -o $outdir/ALLAPES.mergedVCFs.ForHammingDistance.vcf.gz
 # then restrict to just snps again 
 # needs index and bgzip
 #
