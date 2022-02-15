@@ -18,15 +18,17 @@ label=mice
 # running it on the same vcf I used for mutyper variants (phased SNPs -- so maybe missing some ; might undercall distance but should be ballpark right)
 # maybe I should rerun bears without phasing? tbd 
 #vcfdir=/net/harris/vol1/home/beichman/bears/variant_calling/mapped_to_brown_bear/vcfs/vcf_20200916_brown_bear/interval_${interval}/SNPsOnly/phased
-vcfdir=/net/harris/vol1/home/beichman/mice/analyses/mutyper/mutyperResults_20210317_NOSTRICT_7mer/mutyper_variant_files/
+#vcfdir=/net/harris/vol1/home/beichman/mice/analyses/mutyper/mutyperResults_20210317_NOSTRICT_7mer/mutyper_variant_files/
 
+# OKAY as of 20211124 I am rerunning this to use the rep masked version 
+vcfdir=/net/harris/vol1/home/beichman/mice/analyses/mutyper/mutyperResults_20211123_NOSTRICT_7mer_REPEATMASKED/mutyper_variant_files/
 ### using 7mer mutyper variant files (so will be missing some SNPs that can't be phased/pol (was true when using vcf) or that don't have 7mer context)
 # logic is that I want same masking/filtering that is going into the mutation spectrum to be used for the hamming distance. as similar as possible to spectrum calcs
 # but that does mean distances are probably slightly undercalled  (though hopefully similar masking is being used for target files which will be denominator)
 # so I think this is best -case
 
 # same vcf I used for mutyper variants (going to use targets as denominator as well)
-vcf=$vcfdir/${interval}.mutyper.variants.mutationTypes.noFixedSites.AncestralDerivedNotRefAlt.SomeRevComped.NOSTRICT.ALLFREQS.7mer.vcf.gz
+vcf=$vcfdir/${interval}.REPEATMASKED.mutyper.variants.mutationTypes.noFixedSites.AncestralDerivedNotRefAlt.SomeRevComped.NOSTRICT.ALLFREQS.7mer.vcf.gz
 
 
 

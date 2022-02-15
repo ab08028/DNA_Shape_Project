@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=20:00:00,h_data=8G
+#$ -l h_rt=100:00:00,h_data=8G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
 #$ -m bea
@@ -29,6 +29,7 @@ whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Inte
 # --missing-to-ref so that a site that is missing from pan_pan gets set to all 0/0 
 # not totally sure if this will work but let's try it
 
+<<<<<<< HEAD
 #bcftools merge -m all $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_paniscus.vcf.gz $vcfdir/Pan_troglodytes.bcf $vcfdir/Pongo_abelii.vcf.gz $vcfdir/Pongo_pygmaeus.vcf.gz -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Ou | bcftools convert -Oz -o $outdir/ALLAPES.mergedVCFs.ForHammingDistance.vcf.gz
 bcftools merge -m all --missing-to-ref $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_paniscus.vcf.gz $vcfdir/Pan_troglodytes.bcf $vcfdir/Pongo_abelii.vcf.gz $vcfdir/Pongo_pygmaeus.vcf.gz -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Oz -o $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz
 
@@ -38,6 +39,7 @@ bcftools merge -m all --missing-to-ref $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_panisc
 # note this is going to be a bit different from other species 
 # want  to exclude sex chromosomes and only be chrs 1-22
 # needs to be indexed
+<<<<<<< HEAD
 bcftools index $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz
 # aha! forgot to bgzip -- whoops! in future will use -Oz 
 bcftools view -R ${whole_callability_mask} $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz -Oz -o $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf.gz

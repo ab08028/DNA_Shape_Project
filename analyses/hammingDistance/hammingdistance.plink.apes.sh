@@ -4,7 +4,7 @@
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/distance
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-#$ -N distHumans
+#$ -N distApes
 ###### NOTE: for other species, I used mutyper variants files
 # but for apes I need to merge their vcfs. am worried about merging post mutyper variants
 # because of teh ref allele recoding etc
