@@ -29,7 +29,6 @@ whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Inte
 # --missing-to-ref so that a site that is missing from pan_pan gets set to all 0/0 
 # not totally sure if this will work but let's try it
 
-<<<<<<< HEAD
 #bcftools merge -m all $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_paniscus.vcf.gz $vcfdir/Pan_troglodytes.bcf $vcfdir/Pongo_abelii.vcf.gz $vcfdir/Pongo_pygmaeus.vcf.gz -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Ou | bcftools convert -Oz -o $outdir/ALLAPES.mergedVCFs.ForHammingDistance.vcf.gz
 bcftools merge -m all --missing-to-ref $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_paniscus.vcf.gz $vcfdir/Pan_troglodytes.bcf $vcfdir/Pongo_abelii.vcf.gz $vcfdir/Pongo_pygmaeus.vcf.gz -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Oz -o $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz
 
@@ -39,10 +38,10 @@ bcftools merge -m all --missing-to-ref $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_panisc
 # note this is going to be a bit different from other species 
 # want  to exclude sex chromosomes and only be chrs 1-22
 # needs to be indexed
-<<<<<<< HEAD
+
 bcftools index $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz
 # aha! forgot to bgzip -- whoops! in future will use -Oz 
-bcftools view -R ${whole_callability_mask} $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz -Oz -o $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf.gz
+bcftools view -r chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22 $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz  -Ou | bcftools view -R ${whole_callability_mask} -Oz -o $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.chr1-22only.vcf.gz
 
 # note I then deleted the non callabilit masked vcf to save space 
 # still is plenty of missing data 
