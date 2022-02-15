@@ -22,13 +22,25 @@ outdir=/net/harris/vol1/home/beichman/apes/merged_vcf
 
 whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Intersect_filtered_cov8.bed.gz # same for all species 
 
+#### 20220215: making a change. Since these are SNP sets, they introduce a LOT of missing data that seems to mess up my hamming calculations
+# instead want to assume that if a site is seen in Gorilla.vcf but NOT in Pan-pan that doesn't mean that all of Pan_pan inds had missing data there, but rather that they are monomorphic there
+# but mono for reference or mono for alternate!?!?! would have to be for reference otherwise would be a fixed site (?)
+# so going to use the flag https://samtools.github.io/bcftools/bcftools.html#merge
+# --missing-to-ref so that a site that is missing from pan_pan gets set to all 0/0 
+# not totally sure if this will work but let's try it
 
 #bcftools merge -m all $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_paniscus.vcf.gz $vcfdir/Pan_troglodytes.bcf $vcfdir/Pongo_abelii.vcf.gz $vcfdir/Pongo_pygmaeus.vcf.gz -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Ou | bcftools convert -Oz -o $outdir/ALLAPES.mergedVCFs.ForHammingDistance.vcf.gz
+bcftools merge -m all --missing-to-ref $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_paniscus.vcf.gz $vcfdir/Pan_troglodytes.bcf $vcfdir/Pongo_abelii.vcf.gz $vcfdir/Pongo_pygmaeus.vcf.gz -Ou | bcftools view -c 1:minor -m2 -M2 -v snps -Oz -o $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz
+
 # then restrict to just snps again 
 # needs index and bgzip
 #
 # note this is going to be a bit different from other species 
 # want  to exclude sex chromosomes and only be chrs 1-22
 # needs to be indexed
-bcftools index $outdir/ALLAPES.mergedVCFs.ForHammingDistance.vcf.gz
-bcftools view -R ${whole_callability_mask} $outdir/ALLAPES.mergedVCFs.ForHammingDistance.vcf.gz > $outdir/ALLAPES.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf.gz
+bcftools index $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz
+# aha! forgot to bgzip -- whoops! in future will use -Oz 
+bcftools view -R ${whole_callability_mask} $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz -Oz -o $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf.gz
+
+# note I then deleted the non callabilit masked vcf to save space 
+# still is plenty of missing data 

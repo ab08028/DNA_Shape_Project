@@ -73,3 +73,9 @@ plink --vcf $vcf --distance square0 flat-missing --const-fid --allow-extra-chr -
  # yes it's basically hamming but then divided by 1-missingness frequency (not totally sure how calc'd) to make distance slightly bigger
  # maybe need to deal with missingness in targets but not yet. for now just use 2*targets as denominator in R
  
+ ####### APES seem weird. missing data issues? batch effects?
+ #looking at missing data amounts:
+ # plink --vcf ALLAPES.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf --const-fid --allow-extra-chr  --missing
+ #
+# what about doing sites that are all-called? would be very few of them. but could count them all? how to count monomorphics tho?
+ 
