@@ -251,3 +251,4 @@ ggplot(allAveragedHamming_apes_withPHYLO,aes(x=cophenetic_distance,y=average_Ham
 #  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #  !!!!!!!!!!!!!!!!!!!!! # when I merge, it's not necessarily that the species isn't called at that site. but that it doesn't have a snp. so may be missing or monormorphic. so lots and and lots of missing and will be correlated with 
 # so not necessarily missing data. aha. # ahhhha. hmmmm what to do about THAT ...
+###### AHA AHA AHA 

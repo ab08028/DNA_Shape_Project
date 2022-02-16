@@ -20,8 +20,38 @@ outdir=/net/harris/vol1/home/beichman/apes/merged_vcf
 # all lets all things be merged so no dup records are created (hopefully)
 # use the bcf of PanTro 
 
-whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Intersect_filtered_cov8.bed.gz # same for all species 
+#whole_callability_mask=/net/harris/vol1/home/beichman/apes/callability_mask/Intersect_filtered_cov8.bed.gz # same for all species 
 
+# chr1
+# chr10
+# chr11
+# chr12
+# chr13
+# chr14
+# chr15
+# chr16
+# chr17
+# chr18
+# chr19
+# chr2
+# chr20
+# chr21
+# chr22
+# chr3
+# chr4
+# chr5
+# chr6
+# chr7
+# chr8
+# chr9
+# need to remove:
+# chrX
+# chrY
+
+# restrict this to just 1-22
+# only once: zcat $whole_callability_mask | grep -v "chrX" | grep -v "chrY" | bgzip > ${whole_callability_mask%.bed.gz}.chr1-22.bed.gz
+
+whole_callability_mask_1_22=/net/harris/vol1/home/beichman/apes/callability_mask/Intersect_filtered_cov8.chr1-22.bed.gz
 #### 20220215: making a change. Since these are SNP sets, they introduce a LOT of missing data that seems to mess up my hamming calculations
 # instead want to assume that if a site is seen in Gorilla.vcf but NOT in Pan-pan that doesn't mean that all of Pan_pan inds had missing data there, but rather that they are monomorphic there
 # but mono for reference or mono for alternate!?!?! would have to be for reference otherwise would be a fixed site (?)
@@ -41,7 +71,7 @@ bcftools merge -m all --missing-to-ref $vcfdir/Gorilla.vcf.gz $vcfdir/Pan_panisc
 
 bcftools index $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz
 # aha! forgot to bgzip -- whoops! in future will use -Oz 
-bcftools view -r chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22 $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz  -Ou | bcftools view -R ${whole_callability_mask} -Oz -o $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.chr1-22only.vcf.gz
+bcftools view -R ${whole_callability_mask_1_22} $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.vcf.gz -Oz -o $outdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.chr1-22only.vcf.gz
 
 # note I then deleted the non callabilit masked vcf to save space 
 # still is plenty of missing data 
