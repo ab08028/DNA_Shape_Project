@@ -41,8 +41,8 @@ vcfdir=/net/harris/vol1/home/beichman/apes/merged_vcf
 # this has been callablity masked (not rep masked)
 # have to index for excluding regions
 
-vcf=$vcfdir/ALLAPES.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf.gz
-
+#vcf=$vcfdir/ALLAPES.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf.gz
+vcf=$vcfdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.chr1-22only.vcf.gz
 
 
 outdir=/net/harris/vol1/home/beichman/DNAShape/analyses/hamming_distance/${label}
@@ -75,7 +75,7 @@ plink --vcf $vcf --distance square0 flat-missing --const-fid --allow-extra-chr -
  
  ####### APES seem weird. missing data issues? batch effects?
  #looking at missing data amounts:
- # plink --vcf ALLAPES.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.vcf --const-fid --allow-extra-chr  --missing
+plink --vcf $vcfdir/ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.chr1-22only.vcf.gz --const-fid --allow-extra-chr  --missing --out ALLAPES.missingToREF.mergedVCFs.ForHammingDistance.CALLABILITYMASKED.chr1-22only_missingness
  #
 # what about doing sites that are all-called? would be very few of them. but could count them all? how to count monomorphics tho?
  
