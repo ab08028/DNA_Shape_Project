@@ -36,4 +36,3 @@ ancestralFasta=/net/harris/vol1/home/beichman/apes/polarized_ref_fastas/hg18_ref
 outdir=/net/harris/vol1/home/beichman/apes/analyses/mutyper/mutyperResults_20211118/mutyper_targets_files
 mkdir -p $outdir
 mutyper targets $ancestralFasta --k ${k} --bed ${chr_callability_mask} > $outdir/${species}.mutyper.targets.chr.${SGE_TASK_ID}.NOSTRICT.BedMasked.${k}mers.txt
-# okay so here strict is acceptable because IN THE ANCESTRAL FASTA it refers to regions that couldn't be well polarized. only place that strict makes sense.

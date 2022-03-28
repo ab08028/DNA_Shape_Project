@@ -1,0 +1,15 @@
+# go to http://www.timetree.org/
+#up load this file to create a time tree
+
+Balaenoptera physalus
+Phocoena sinus
+Ursus maritimus
+Ursus arctos
+Mus musculus
+Mus spretus
+Homo sapiens
+Gorilla gorilla
+Pan paniscus
+Pan troglodytes
+Pongo abelii
+Pongo pygmaeus

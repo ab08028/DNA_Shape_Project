@@ -17,16 +17,24 @@ raxmlMLTree <- read.tree("/Users/annabelbeichman/Documents/UW/DNAShapeProject/in
 raxmlMLTree
 
 # use keep.tip
-speciesList=c("Balaenoptera_acutorostrata" ,"Balaenoptera_musculus" ,"Balaenoptera_physalus" ,"Tursiops_truncatus" ,"Physeter_macrocephalus" ,"Neophocaena_phocaenoides" ,"Phocoena_phocoena" ,"Orcinus_orca" ,"Neophocaena_asiaeorientalis" ,"Monodon_monoceros" ,"Lagenorhynchus_obliquidens" ,"Globicephala_melas" ,"Delphinapterus_leucas" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus" ,"Homo_sapiens","Pongo_pygmaeus","Pongo_abelii","Pan_troglodytes","Pan_paniscus","Gorilla_gorilla")
-
+speciesList=c("Balaenoptera_acutorostrata" ,"Balaenoptera_musculus" ,"Balaenoptera_physalus" ,"Tursiops_truncatus" ,"Physeter_macrocephalus" ,"Neophocaena_phocaenoides" ,"Phocoena_phocoena" ,"Orcinus_orca" ,"Neophocaena_asiaeorientalis" ,"Monodon_monoceros" ,"Lagenorhynchus_obliquidens" ,"Globicephala_melas" ,"Delphinapterus_leucas" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus" ,"Homo_sapiens","Pongo_pygmaeus","Pongo_abelii","Pan_troglodytes","Pan_paniscus","Gorilla_gorilla","Microcebus_murinus")
+# 20211206 adding mouse lemur Microcebus murinus
 
 speciesList2=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus" ,"Homo_sapiens")
 
-speciesList3=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus")
+speciesList3=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus","Homo_sapiens")
 
 speciesList4=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus","Homo_sapiens","Pan_paniscus") # add in human bonobo for another pair
 
 speciesList5=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus","Homo_sapiens","Pongo_pygmaeus","Pongo_abelii","Pan_troglodytes","Pan_paniscus","Gorilla_gorilla") # add in human bonobo for another pair
+
+speciesList6=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus","Homo_sapiens","Pongo_pygmaeus","Pongo_abelii","Pan_troglodytes","Pan_paniscus","Gorilla_gorilla","Microcebus_murinus") # added lemur
+
+# no fin whale:
+speciesList7=c("Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus","Homo_sapiens","Pongo_pygmaeus","Pongo_abelii","Pan_troglodytes","Pan_paniscus","Gorilla_gorilla")
+
+# for mantel test etc 
+speciesList_PAG =speciesList5
 ########## plot subset of tips ##########
 listOftips <- raxmlMLTree$tip.label
 
@@ -37,46 +45,96 @@ tipsToKeep3 <- listOftips[grepl(paste(speciesList3, collapse="|"),listOftips)] #
 
 tipsToKeep4 <- listOftips[grepl(paste(speciesList4, collapse="|"),listOftips)]
 tipsToKeep5 <- listOftips[grepl(paste(speciesList5, collapse="|"),listOftips)]
+tipsToKeep6 <- listOftips[grepl(paste(speciesList6, collapse="|"),listOftips)]
+tipsToKeep7 <- listOftips[grepl(paste(speciesList7, collapse="|"),listOftips)]
+
+tipsToKeep_PAG <- listOftips[grepl(paste(speciesList_PAG, collapse="|"),listOftips)]
 outdir="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/vertlife_phylogeneticTrees/raxml_tree/"
+
 # okay this is good. maybe slightly fewer species but will work well and is direclty based on DNA!
+
 
 png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.WithTipLabels.Allwhalesincluded.png"),width = 15,height=5,units="in",res=300)
 plot(keep.tip(raxmlMLTree,tipsToKeep),show.tip.label = T)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
 dev.off()
 
 png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.WithoutTipLabels.Allwhalesincluded.png"),width = 7,height=5,units="in",res=300)
 plot(keep.tip(raxmlMLTree,tipsToKeep),show.tip.label = F)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
 dev.off()
 
 
 png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.WithTipLabels.png"),width = 12,height=5,units="in",res=300)
 plot(keep.tip(raxmlMLTree,tipsToKeep2),show.tip.label = T)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
 dev.off()
 
 png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.WithoutTipLabels.png"),width = 7,height=5,units="in",res=300)
 plot(keep.tip(raxmlMLTree,tipsToKeep2),show.tip.label = F)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
 dev.off()
 
 # plot without humans
 
 png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.NoHumans.WithTipLabels.png"),width = 12,height=5,units="in",res=300)
 plot(keep.tip(raxmlMLTree,tipsToKeep3),show.tip.label = T)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
 dev.off()
 
 png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.NoHumans.WithoutTipLabels.png"),width = 7,height=5,units="in",res=300)
 plot(keep.tip(raxmlMLTree,tipsToKeep3),show.tip.label = F)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
 dev.off()
 
 ### add in apes:
 png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.HumansAndAllApes.WithTipLabels.png"),width = 14,height=5,units="in",res=300)
 plot(keep.tip(raxmlMLTree,tipsToKeep5),show.tip.label =T)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
 dev.off()
 
 png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.HumansAndAllApes.WithoutTipLabels.png"),width = 7,height=5,units="in",res=300)
 plot(keep.tip(raxmlMLTree,tipsToKeep5),show.tip.label =F)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
 dev.off()
 
+### add in lemur:
+png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.HumansAndAllApes.Lemur.WithTipLabels.png"),width = 14,height=5,units="in",res=300)
+plot(keep.tip(raxmlMLTree,tipsToKeep6),show.tip.label =T)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
+dev.off()
+
+png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.HumansAndAllApes.Lemur.WithoutTipLabels.png"),width = 7,height=5,units="in",res=300)
+plot(keep.tip(raxmlMLTree,tipsToKeep6),show.tip.label =F)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
+dev.off()
+
+# remove fin whale:
+png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.HumansAndAllApes.v.WithTipLabels.png"),width = 14,height=5,units="in",res=300)
+plot(keep.tip(raxmlMLTree,tipsToKeep7),show.tip.label =T)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
+dev.off()
+
+png(paste0(outdir,"plotOfRaxmlTree.subsetofTips.HumansAndAllApes.NoFinWhale.WithoutTipLabels.png"),width = 7,height=5,units="in",res=300)
+plot(keep.tip(raxmlMLTree,tipsToKeep7),show.tip.label =F)
+axisPhylo(side = 1, root.time = NULL, backward = FALSE)
+
+dev.off()
+
+
 ########## get distances #########
+
 
 pairwiseDistances <- cophenetic.phylo(raxmlMLTree) # okay this gets pairwise distances between all pairs for all trees
 
@@ -124,14 +182,8 @@ pairwiseDistances_melt_mySpecies$comparisonLabel <- paste0(pmin(pairwiseDistance
 pairwiseDistances_melt_mySpecies_distinct <- pairwiseDistances_melt_mySpecies[pairwiseDistances_melt_mySpecies$Sp1!=pairwiseDistances_melt_mySpecies$Sp2,]
 # and get rid of reciprocal dups (sp A - B and sp B- A)
 pairwiseDistances_melt_mySpecies_distinct <- pairwiseDistances_melt_mySpecies_distinct %>%
+  ungroup() %>% # adding ungroup as a safety measure on 20211201 not sure if ottally necessary though
   distinct(comparisonLabel,.keep_all=T)  # restrict to just distinct comparison labels. 
 dim(pairwiseDistances_melt_mySpecies_distinct)
 write.table(pairwiseDistances_melt_mySpecies_distinct,paste0(outdir,"raxml.cophenetic.pairwisedistances.fromUphametal.MYSPECIES.usethis.txt"),quote=F,row.names = F,sep="\t")
 
-############ plot tree ################
-
-
-
-### need to make distinct
-#ggplot(pairwiseDistances_melt_mySpecies,aes(x=Sp1_species,y=Sp2_species,fill=cophenetic_distance))+
- # geom_tile()
