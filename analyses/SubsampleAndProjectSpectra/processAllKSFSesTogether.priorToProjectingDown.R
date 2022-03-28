@@ -53,7 +53,10 @@ write.table(bear_ksfs,paste0(bear_indir,"ksfs.7mer.bears.txt"),row.names = F,quo
 
 
 ########## mice info #############
-mice_indir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_ksfs_files/"
+# as of 20211123 am using new rep masked ksfs:
+
+#mice_indir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20210317_NOSTRICT_7mer/mutyper_ksfs_files/"
+mice_indir="/Users/annabelbeichman/Documents/UW/BearProject/results/mutyper/wild_mouse_data/mutyperResults_20211123_NOSTRICT_7mer_REPEATMASKED/mutyper_ksfs_files/"
 mice_intervals=paste0("chr",seq(1,19))
 mice_pops=c("Mmc","Mmd","Mmm","Ms")
 mice_speciesLabel="mice"
@@ -64,7 +67,7 @@ ksfsFunction_miceSpecific <- function(indir,vectorOfIntervals,ListOfPopulations,
     print(paste0("starting ",pop))
     for(interval in vectorOfIntervals){
       print(interval)
-      ksfs=read.table(paste0(indir,pop,"/",interval,"_",pop,"_samples.mutyper.ksfs.7mer.notRepMasked.txt"),header=T)
+      ksfs=read.table(paste0(indir,pop,"/",pop,"_samples_interval_",interval,".mutyper.ksfs.7mer.nostrict.REPEATMASKED.txt"),header=T)
       ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
       ksfs_melt$interval <- as.character(interval)
       ksfs_melt$species <- speciesLabel
@@ -84,9 +87,9 @@ ksfsFunction_miceSpecific <- function(indir,vectorOfIntervals,ListOfPopulations,
 
 mice_ksfs = ksfsFunction_miceSpecific(mice_indir,mice_intervals,mice_pops,mice_speciesLabel)
 
-write.table(mice_ksfs,paste0(outdir,"ksfs.7mer.mice.NotRepeatMasked.AllIntervals.summed.txt"),row.names = F,quote=F,sep="\t")
+write.table(mice_ksfs,paste0(outdir,"ksfs.7mer.mice.RepeatMasked.AllIntervals.summed.txt"),row.names = F,quote=F,sep="\t")
 # write another copy out in original dir
-write.table(mice_ksfs,paste0(mice_indir,"ksfs.7mer.mice.NotRepeatMasked.AllIntervals.summed.txt"),row.names = F,quote=F,sep="\t")
+write.table(mice_ksfs,paste0(mice_indir,"ksfs.7mer.mice.RepeatMasked.AllIntervals.summed.txt"),row.names = F,quote=F,sep="\t")
 
 
 ############ fin whale info ############

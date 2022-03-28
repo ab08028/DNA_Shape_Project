@@ -1,8 +1,8 @@
 ############### getting branch lengths of phylogenetic tree #################
 require(ape)
-require(plyr)
-require(dplyr)
 require(reshape2)
+require(dplyr) # must load after reshape2
+
 # this is
 
 # these are from vertlife # go to vert life: http://vertlife.org/phylosubsets/
@@ -21,7 +21,7 @@ wd=paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/vertlife_
 for(datatype in datatypes){
   for(datingtype in datingtypes){
     indir=paste0(wd,datatype,"/",datingtype,"/")
-    jobid=list.files(indir)
+    jobid=list.files(indir,pattern="tree-pruner")
     nexusFile = read.nexus(paste0(indir,jobid,"/output.nex"))
     
     allTreesPairwiseDistances <- lapply(nexusFile,cophenetic.phylo) # okay this gets pairwise distances between all pairs for all trees
@@ -33,7 +33,11 @@ for(datatype in datatypes){
     
     colnames(allTreesPairwiseDistances_melt) <- c("Sp1","Sp2","branchLength","treeLabel")
     
-    allTreesPairwiseDistances_melt$comparisonLabel <- paste0(allTreesPairwiseDistances_melt$Sp1,".",allTreesPairwiseDistances_melt$Sp2)
+    # need to maket his alphabetical to get rid of reciprocal duplicates
+    allTreesPairwiseDistances_melt$Sp1 <- as.character(allTreesPairwiseDistances_melt$Sp1)
+    allTreesPairwiseDistances_melt$Sp2 <- as.character(allTreesPairwiseDistances_melt$Sp2)
+    
+    allTreesPairwiseDistances_melt$comparisonLabel_alphabetical <- paste0(pmin(allTreesPairwiseDistances_melt$Sp1,allTreesPairwiseDistances_melt$Sp2),".",pmax(allTreesPairwiseDistances_melt$Sp1,allTreesPairwiseDistances_melt$Sp2))
     
     head(allTreesPairwiseDistances_melt)
     ## get avg and std 
@@ -44,9 +48,15 @@ for(datatype in datatypes){
     write.table(allTreesPairwiseDistances_melt,paste0(indir,"cophenetic.Pairwise.BranchLengthSums.PerTree.txt"),row.names = F,quote=F,sep="\t")
     
     averages <- allTreesPairwiseDistances_melt %>%
-      group_by(Sp1,Sp2,comparisonLabel,datingType,dataType) %>%
+      group_by(Sp1,Sp2,comparisonLabel_alphabetical,datingType,dataType) %>%
       summarize(avgBranchLen=mean(branchLength),sdBranchLen=sd(branchLength)) 
     
-    write.table(averages,paste0(indir,"cophenetic.Pairwise.BranchLengthSums.AveragedOverTrees.avg.sd.txt"),row.names = F,quote=F,sep="\t")
+    averages_distinct <- averages[averages$Sp1!=averages$Sp2,]
+    # get rid of reciprocal dups (sp A - B and sp B- A)
+    averages_distinct <- averages_distinct %>%
+      ungroup() %>% # need to ungroup and then it works (weird); seems like grouping is odd now
+      dplyr::distinct(comparisonLabel_alphabetical,.keep_all=T)  # restrict to just distinct comparison labels. 
+    
+    write.table(averages_distinct,paste0(indir,"cophenetic.Pairwise.BranchLengthSums.AveragedOverTrees.avg.sd.txt"),row.names = F,quote=F,sep="\t")
   }
 }

@@ -16,8 +16,8 @@ separateCpGs="no" # yes or no
 
 ########## table of target locations ########
 # restricting to just species with >1 individual:
-tableOfTargetsToInclude=read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/information/spectra/tableOfSpectraToIncludeInComparisons.SpeciesWithMultipleIndividualsOnly.20211026.txt",header=T,sep="\t") # this also has info on spectra but don't use that. 
-
+#tableOfTargetsToInclude=read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/information/spectra/tableOfSpectraToIncludeInComparisons.SpeciesWithMultipleIndividualsOnly.20211026.txt",header=T,sep="\t") # this also has info on spectra but don't use that. 
+tableOfTargetsToInclude=read.table("/Users/annabelbeichman/Documents/UW/DNAShapeProject/information/spectra/tableOfSpectraToIncludeInComparisons.SpeciesWithMultipleIndividualsOnly.PlusApes.MaskedMouse.Vaquita.20211123.txt",header=T,sep="\t")
 
 # okay do need to process the targets #
 ########## read in targets ##############
@@ -69,6 +69,12 @@ for(sample in tableOfTargetsToInclude$sample){
   
   
 }
+
+# plot all targets
+p0 <- ggplot(all1merTargets,aes(y=species,x=total_target_count,fill=target_1mer))+
+  geom_col(position="dodge")
+p0
+ggsave(paste0(plotdir,"plot0.comparing1merTargets.counts.png"),p0)
 
 head(all7merTargets)
 p1 <- ggplot(all7merTargets[all7merTargets$target_7mer %in% c("AAAAAAA","AAAAAAC","TTTAAAA"),],aes(x=species,y=total_target_count,fill=target_7mer))+

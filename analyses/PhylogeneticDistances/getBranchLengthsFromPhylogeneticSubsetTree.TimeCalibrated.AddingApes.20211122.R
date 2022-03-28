@@ -14,6 +14,8 @@ require(reshape2)
 date="20211122_addingApes"
 datatypes=c("All_Species","DNA_only")
 datingtypes=c("node_dated","tip_dated")
+
+
 ############## YOU ARE HERE --- only did it for sandbox set of trees, need to get for all.
 # finish up
 wd=paste0("/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/vertlife_phylogeneticTrees/time_calibrated_trees/",date,"/")
@@ -45,17 +47,48 @@ for(datatype in datatypes){
     allTreesPairwiseDistances_melt$datingType <- datingtype
     allTreesPairwiseDistances_melt$dataType <- datatype
     
+    allTreesPairwiseDistances_melt$Sp1 <- as.character(allTreesPairwiseDistances_melt$Sp1)
+    allTreesPairwiseDistances_melt$Sp2 <- as.character(allTreesPairwiseDistances_melt$Sp2)
+    
+    allTreesPairwiseDistances_melt$comparisonLabel <- paste0(pmin(allTreesPairwiseDistances_melt$Sp1,allTreesPairwiseDistances_melt$Sp2),".",pmax(allTreesPairwiseDistances_melt$Sp1,allTreesPairwiseDistances_melt$Sp2))
+    
     write.table(allTreesPairwiseDistances_melt,paste0(indir,"cophenetic.Pairwise.BranchLengthSums.PerTree.txt"),row.names = F,quote=F,sep="\t")
     
     averages <- allTreesPairwiseDistances_melt %>%
       group_by(Sp1,Sp2,comparisonLabel,datingType,dataType) %>%
       summarise(avgBranchLen=mean(branchLength),sdBranchLen=sd(branchLength)) 
     
-    write.table(averages,paste0(indir,"cophenetic.Pairwise.BranchLengthSums.AveragedOverTrees.avg.sd.txt"),row.names = F,quote=F,sep="\t")
+    # need to make distinct and no reciprocal dups
+    
+
+    
+    averages_distinct <- averages[averages$Sp1!=averages$Sp2,]
+    # get rid of reciprocal dups (sp A - B and sp B- A)
+    averages_distinct <- averages_distinct %>%
+      ungroup() %>% # need to ungroup and then it works (weird); seems like grouping is odd now
+      dplyr::distinct(comparisonLabel,.keep_all=T)  # restrict to just distinct comparison labels. 
+    
+    write.table(averages_distinct,paste0(indir,"cophenetic.Pairwise.BranchLengthSums.AveragedOverTrees.avg.sd.txt"),row.names = F,quote=F,sep="\t")
     
     png(filename=paste0(indir,"plottingOneRepresentativeTree.timecal.png"))
     plot(nexusFile[1])
     dev.off()
+    # subset to just the tips in my talk:
+    # simplified set of tips to plot:
+    speciesList=c("Balaenoptera_physalus" ,"Phocoena_sinus" ,"Ursus_maritimus" ,"Ursus_arctos" ,"Mus_musculus" ,"Mus_spretus","Homo_sapiens","Pongo_pygmaeus","Pongo_abelii","Pan_troglodytes","Pan_paniscus","Gorilla_gorilla","Microcebus_murinus")
+    listOftips <- nexusFile[[1]]$tip.label
+    # note you a
+    tipsToKeep <- listOftips[grepl(paste(speciesList, collapse="|"),listOftips)] # tips I want
+    png(paste0(indir,"plotOfOneRepresentativeTimCalTree.subsetofSpecies.WithoutTipLabels.png"),width = 7,height=7,units="in",res=300)
+    plot(keep.tip(nexusFile[[1]],tipsToKeep),show.tip.label =F)
+    axisPhylo(side = 1, root.time = NULL, backward = TRUE)
+    dev.off()
+    
+    png(paste0(indir,"plotOfOneRepresentativeTimCalTree.subsetofSpecies.WithTipLabels.png"),width = 12,height=7,units="in",res=300)
+    plot(keep.tip(nexusFile[[1]],tipsToKeep),show.tip.label =T)
+    axisPhylo(side = 1, root.time = NULL, backward = TRUE)
+    dev.off()    
+    # plot a subset of tips:
   }
 }
 

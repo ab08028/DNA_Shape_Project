@@ -9,7 +9,8 @@ require(tidyr)
 wd="/Users/annabelbeichman/Documents/UW/DNAShapeProject/results/allKSFSes_and_projected_Spectra/"
 bears=read.table(paste0(wd,"ksfs.7mer.bears.txt"),header=T,sep="\t")
 vaquita=read.table(paste0(wd,"ksfs.7mer.vaquita.WholeGenome.PASSOnly.allIntervals.txt"),header=T,sep="\t")
-mice=read.table(paste0(wd,"ksfs.7mer.mice.NotRepeatMasked.AllIntervals.summed.txt"),header=T,sep="\t")
+# as of 20211123 now have repeat masked mouse mice=read.table(paste0(wd,"ksfs.7mer.mice.NotRepeatMasked.AllIntervals.summed.txt"),header=T,sep="\t")
+mice=read.table(paste0(wd,"ksfs.7mer.mice.RepeatMasked.AllIntervals.summed.txt"),header=T,sep="\t") # now this is rep masked
 finwhale=read.table(paste0(wd,"ksfs.7mer.finwhale.WholeGenome.PASSOnly.allIntervals.txt"),header=T,sep="\t")
 # humans="" # getting from sage
 
@@ -102,5 +103,5 @@ projectedSFSes <- speciesIWant_SFSes %>%
 #sum(intermediateFile[intermediateFile$species=="vaquita" & intermediateFile$variable=="AAAAAAA.AAACAAA",]$totalSites_projected_intermediate) # should observe fewer sites
 #projectedSFSes[projectedSFSes$species=="vaquita" & projectedSFSes$variable=="AAAAAAA.AAACAAA",]
 head(projectedSFSes)
-
-write.table(projectedSFSes,paste0(wd,"All_SpectrumCounts_ProjectedDownTo.",k,".Haploids.includesApes.txt"),col.names =T,row.names = F,quote=F)
+todaysdate=format(Sys.Date(),"%Y%m%d")
+write.table(projectedSFSes,paste0(wd,todaysdate,"_All_SpectrumCounts_ProjectedDownTo.",k,".Haploids.includesApes.RepMaskedMice.txt"),col.names =T,row.names = F,quote=F)
