@@ -49,7 +49,7 @@ awk 'BEGIN{OFS="\t"} {print $1,$2}' $faiFile > $chrLenFile
 #name output file:
 echo "converting gff/gtf file to bed and adding +-10kb buffer to exons"
 exonfinal=$outdir/${label}.exonMask.fromGFF_or_GTF.plusminus10kb.0based.sorted.merged.bed
-zcat $gff_or_gtf | grep -v "#" | awk 'BEGIN{OFS="\t"} {if($3=="exon") print $1,$4-1,$5}' | bedtools slop -i stdin -g $chrLenFile -b 10000 | bedtools sort -i stdin | bedtools merge -i stdin > $exonfinal
+zcat $gff_or_gtf | grep -v "#" | awk 'BEGIN{OFS="\t"} {if($3=="exon") print $1,$4-1,$5}' | bedtools slop -i stdin -g $chrLenFile -b 10000 | sort-bed - | bedtools merge -i stdin > $exonfinal
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
@@ -64,7 +64,7 @@ fi
 ######### repeat masker: need to make sure are sorted and bed formatted (not all are )#######
 echo "sorting and merging rep mask bed"
 repmaskfinal=$outdir/${label}.repeatMasker.0based.sorted.merged.bed # name outfile
-bedtools sort -i $repeatMaskerBed | bedtools merge -i stdin > $repmaskfinal
+sort-bed $repeatMaskerBed | bedtools merge -i stdin > $repmaskfinal
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
 	echo "error in repmask conversion"
@@ -78,12 +78,13 @@ fi
 #gunzip canFam3.fa.out.gz
 # from bedops:
 #rmsk2bed < canFam3.fa.out > canFam3.fa.RepeatMasker.sorted.bed 
+# seems like bedtools sort can't handle >3 columsn -- just leads to blank! so can use sort-bed in bedops instead
 
 ############## trf output ################
 # already in bed format ; merge and sort it over 
 echo "sorting and merging trf bed"
 trffinal=$outdir/${label}.trf.0based.sorted.merged.bed
-bedtools sort -i $trfBed | bedtools merge -i stdin > $trffinal
+sort-bed $trfBed | bedtools merge -i stdin > $trffinal
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
 	echo "error in trf conversion"
