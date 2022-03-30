@@ -1,11 +1,11 @@
 #! /bin/bash
-#$ -l h_rt=100:00:00,h_data=3G
+#$ -l h_rt=100:00:00,mfree=6G
 #$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/repeats
 #$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/repeats
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N TRF_RepMasker
-#$ -pe serial 5
+#$ -pe serial 10
 
 
 # script to run TRF (tandem repeat finder) https://github.com/Benson-Genomics-Lab/TRF
@@ -28,8 +28,10 @@ genomeFasta=brown_bear.fasta
 
 ########### run repeat masker ############
 # needs a fair bit of memory (min 10G or gets killed)
-mkdir  -p $wd/RepeatMaskerOutput
-RepeatMasker -species carnivore -pa 5 -dir $wd/repeatmaskeroutput $wd/$genomeFasta
+
+mkdir  -p $wd/RepeatMaskerOutput_parallel
+cd $wd/RepeatMaskerOutput_parallel
+RepeatMasker -species carnivore -pa 10 -dir $wd/RepeatMaskerOutput_parallel $wd/$genomeFasta
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
