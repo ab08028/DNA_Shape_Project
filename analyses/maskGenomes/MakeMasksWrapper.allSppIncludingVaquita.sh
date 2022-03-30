@@ -33,9 +33,9 @@ qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff
 
 ###### mouse ###########
 label=mouse
-faiFile=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/mm10.fa.fai
+faiFile=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/mm10.fa.ADDEDCHRTONUMBERS.fai
 gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/annotation/mm10.ensGene.gtf.gz
-repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/REPEATS/mm10.rmsk.bed.gz
+repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/REPEATS/mm10.rmsk.bed
 trfBed=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/REPEATS/trfMaskChrom/mm10.trf.chr1-19_ONLY.ABcombined.bed
 
 qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
