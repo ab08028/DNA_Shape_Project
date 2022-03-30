@@ -10,6 +10,7 @@
 #repeatMaskerBed=$4 # full path to species rep masker file *in bed format *
 #trfBed=$5 # full path to species trf file *in bed format*  # note for vaquita that trf and rep mask are alrready combined so need a slightly different script.
 
+scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/maskGenomes
 
 ############ humans ###########
 label=humans
@@ -51,7 +52,7 @@ trfBed= # RUNNING ON SAGE >> need to convert to bed?
 
 ########## dog ##########
 label=dog
-faiFile=/net/harris/vol1/home/beichman/reference_genomes/canFam3/ canFam3.fa.fai 
+faiFile=/net/harris/vol1/home/beichman/reference_genomes/canFam3/canFam3.fa.fai 
 gtf_or_gff=/net/harris/vol1/home/beichman/reference_genomes/canFam3/annotation/canFam3.ensGene.gtf.gz 
 repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/canFam3/canFam3.fa.RepeatMasker.sorted.bed	
 trfBed=/net/harris/vol1/home/beichman/reference_genomes/canFam3/canFam3.trf.bed.gz

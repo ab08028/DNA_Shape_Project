@@ -34,7 +34,7 @@ mkdir -p $outdir
 ###### mask exons +-1kb from GTF files ########
 
 # make genome file for bedtools
-
+echo "making chr file for bedtools"
 chrLenFile=${faiFile%.fai}.CHRLENGTHSFORBEDTOOLS # make this in line below 
 awk 'BEGIN{OFS="\t"} {print $1,$2}' $faiFile > $chrLenFile
 
@@ -47,12 +47,14 @@ awk 'BEGIN{OFS="\t"} {print $1,$2}' $faiFile > $chrLenFile
 
 # https://bedtools.readthedocs.io/en/latest/content/tools/slop.html # bedtools slop is great: it will not make things negative and will 'clip' to length of chr
 #name output file:
+echo "converting gff/gtf file to bed and adding +-10kb buffer to exons"
 exonfinal=$outdir/${label}.exonMask.fromGFF_or_GTF.plusminus10kb.0based.sorted.merged.bed
 zcat $gff_or_gtf | grep -v "#" | awk 'BEGIN{OFS="\t"} {if($3=="exon") print $1,$4-1,$5}' | bedtools slop -i stdin -g $chrLenFile -b 10000 | bedtools sort -i stdin | bedtools merge -i stdin > $exonfinal
 
 # some exons are repeated/overlapping, but with sort/merge that doesn't matter
 
 ######### repeat masker: need to make sure are sorted and bed formatted (not all are )#######
+echo "sorting and merging rep mask bed"
 repmaskfinal=$outdir/${label}.repeatMasker.0based.sorted.merged.bed # name outfile
 bedtools sort -i $repeatMaskerBed | bedtools merge -i stdin > $repmaskfinal
 
@@ -65,7 +67,7 @@ bedtools sort -i $repeatMaskerBed | bedtools merge -i stdin > $repmaskfinal
 
 ############## trf output ################
 # already in bed format ; merge and sort it over 
-
+echo "sorting and merging trf bed"
 trffinal=$outdir/${label}.trf.0based.sorted.merged.bed
 bedtools sort -i $trfBed | bedtools merge -i stdin > $trffinal
 
@@ -82,9 +84,11 @@ bedtools sort -i $trfBed | bedtools merge -i stdin > $trffinal
 # what about 'callability' ? mapping depth? 
 
 ########### combine into one giant negative mask #############
+echo "combining exons rm and trf"
 bedops --merge $exonfinal $repmaskfinal $trffinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.bed
 
 
 ####### combine just the repeats (to match JAR's RM+trf) ###########
+echo "combining repeats only (rm and trf)"
 bedops --merge $repmaskfinal $trffinal > $outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.bed
 
