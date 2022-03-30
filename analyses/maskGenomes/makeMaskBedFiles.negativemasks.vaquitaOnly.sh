@@ -54,15 +54,37 @@ awk 'BEGIN{OFS="\t"} {print $1,$2}' $faiFile > $chrLenFile
 exonfinal=$outdir/${label}.exonMask.fromGFF_or_GTF.plusminus10kb.0based.sorted.merged.bed
 zcat $gff_or_gtf | grep -v "#" | awk 'BEGIN{OFS="\t"} {if($3=="exon") print $1,$4-1,$5}' | bedtools slop -i stdin -g $chrLenFile -b 10000 | bedtools sort -i stdin | bedtools merge -i stdin > $exonfinal
 
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in gff conversion"
+	exit 1
+else
+	echo "finished"
+fi
+
+
 # some exons are repeated/overlapping, but with sort/merge that doesn't matter
 
 ######### repeat masker + trf : need to make sure are sorted and bed formatted (not all are )#######
 repeatsfinal=$outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.bed # name outfile
 bedtools sort -i $repeatMaskerPlusTrfBed | bedtools merge -i stdin > $repeatsfinal
 
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in repmask conversion"
+	exit 1
+else
+	echo "finished"
+fi
 
 
 ########### combine into one giant negative mask #############
 bedops --merge $exonfinal $repeatsfinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.bed
 
-
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in merging"
+	exit 1
+else
+	echo "finished"
+fi

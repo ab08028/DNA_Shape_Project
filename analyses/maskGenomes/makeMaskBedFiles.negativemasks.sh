@@ -51,13 +51,27 @@ echo "converting gff/gtf file to bed and adding +-10kb buffer to exons"
 exonfinal=$outdir/${label}.exonMask.fromGFF_or_GTF.plusminus10kb.0based.sorted.merged.bed
 zcat $gff_or_gtf | grep -v "#" | awk 'BEGIN{OFS="\t"} {if($3=="exon") print $1,$4-1,$5}' | bedtools slop -i stdin -g $chrLenFile -b 10000 | bedtools sort -i stdin | bedtools merge -i stdin > $exonfinal
 
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in gff conversion"
+	exit 1
+else
+	echo "finished"
+fi
+
 # some exons are repeated/overlapping, but with sort/merge that doesn't matter
 
 ######### repeat masker: need to make sure are sorted and bed formatted (not all are )#######
 echo "sorting and merging rep mask bed"
 repmaskfinal=$outdir/${label}.repeatMasker.0based.sorted.merged.bed # name outfile
 bedtools sort -i $repeatMaskerBed | bedtools merge -i stdin > $repmaskfinal
-
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in repmask conversion"
+	exit 1
+else
+	echo "finished"
+fi
 
 # at least with dog need to skip header lines -- to convert to bed are all the same ? 
 #only needed to do once for dog: 
@@ -70,7 +84,13 @@ bedtools sort -i $repeatMaskerBed | bedtools merge -i stdin > $repmaskfinal
 echo "sorting and merging trf bed"
 trffinal=$outdir/${label}.trf.0based.sorted.merged.bed
 bedtools sort -i $trfBed | bedtools merge -i stdin > $trffinal
-
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in trf conversion"
+	exit 1
+else
+	echo "finished"
+fi
 # once for mice: need to combine across all chrs:
 #cd /net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/REPEATS/trfMaskChrom
 #> mm10.trf.chr1-19.ABcombined.bed # combined by me 
@@ -86,9 +106,22 @@ bedtools sort -i $trfBed | bedtools merge -i stdin > $trffinal
 ########### combine into one giant negative mask #############
 echo "combining exons rm and trf"
 bedops --merge $exonfinal $repmaskfinal $trffinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.bed
-
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in merging1"
+	exit 1
+else
+	echo "finished"
+fi
 
 ####### combine just the repeats (to match JAR's RM+trf) ###########
 echo "combining repeats only (rm and trf)"
 bedops --merge $repmaskfinal $trffinal > $outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.bed
 
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in merging2"
+	exit 1
+else
+	echo "finished"
+fi
