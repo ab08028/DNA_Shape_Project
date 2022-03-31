@@ -64,7 +64,9 @@ fi
 ######### repeat masker: need to make sure are sorted and bed formatted (not all are )#######
 echo "sorting and merging rep mask bed"
 repmaskfinal=$outdir/${label}.repeatMasker.0based.sorted.merged.bed # name outfile
+#awk 'BEGIN {OFS="\t"} {print $1,$2,$3}' $repeatMaskerBed | sort-bed - | bedtools merge -i stdin > $repmaskfinal
 sort-bed $repeatMaskerBed | bedtools merge -i stdin > $repmaskfinal
+
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
 	echo "error in repmask conversion"
