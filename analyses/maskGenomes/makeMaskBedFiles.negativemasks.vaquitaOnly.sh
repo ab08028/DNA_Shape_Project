@@ -54,7 +54,7 @@ awk 'BEGIN{OFS="\t"} {print $1,$2}' $faiFile > $chrLenFile
 # https://bedtools.readthedocs.io/en/latest/content/tools/slop.html # bedtools slop is great: it will not make things negative and will 'clip' to length of chr
 #name output file:
 exonfinal=$outdir/${label}.exonMask.fromGFF_or_GTF.plusminus10kb.0based.sorted.merged.bed
-zcat $gff_or_gtf | grep -v "#" | awk 'BEGIN{OFS="\t"} {if($3=="exon") print $1,$4-1,$5}' | bedtools slop -i stdin -g $chrLenFile -b 10000 | bed-sort - | bedtools merge -i stdin > $exonfinal
+zcat $gff_or_gtf | grep -v "#" | awk 'BEGIN{OFS="\t"} {if($3=="exon") print $1,$4-1,$5}' | bedtools slop -i stdin -g $chrLenFile -b 10000 | sort-bed - | bedtools merge -i stdin > $exonfinal
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
