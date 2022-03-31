@@ -1,5 +1,5 @@
 #! /bin/bash
-#$ -l h_rt=10:00:00,h_data=2G
+#$ -l h_rt=10:00:00,mfree=2G
 #$ -o  /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/masks
 #$ -e  /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/masks
 #$ -m bea
