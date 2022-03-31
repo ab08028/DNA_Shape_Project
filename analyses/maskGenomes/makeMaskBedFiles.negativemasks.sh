@@ -69,7 +69,7 @@ else
 	echo "finished"
 fi
 
-awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $exonfinal > $outdir/TOTALAMOUNTOFSEQUENCE.${exonfinal%.bed}.txt
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $exonfinal > ${exonfinal%.bed}.TOTALAMOUNTOFSEQUENCE.txt
 # some exons are repeated/overlapping, but with sort/merge that doesn't matter
 
 ######### repeat masker: need to make sure are sorted and bed formatted (not all are )#######
@@ -87,7 +87,7 @@ else
 	echo "finished"
 fi
 
-awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $repmaskfinal > $outdir/TOTALAMOUNTOFSEQUENCE.${repmaskfinal%.bed}.txt
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $repmaskfinal > ${repmaskfinal%.bed}.TOTALAMOUNTOFSEQUENCE.txt
 
 
 ############## trf output ################
@@ -104,7 +104,7 @@ else
 	echo "finished"
 fi
 
-awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $trffinal > $outdir/TOTALAMOUNTOFSEQUENCE.${trffinal%.bed}.txt
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $trffinal > ${trffinal%.bed}.TOTALAMOUNTOFSEQUENCE.txt
 
 
 # output want to have a bed file for the 3 masks: coding sequence +-10kb, rep masker, and trf . need to use these for targets and for 
@@ -121,6 +121,8 @@ else
 	echo "finished"
 fi
 
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.TOTALAMOUNTOFSEQUENCE.txt
+
 ####### combine just the repeats (to match JAR's RM+trf) ###########
 echo "combining repeats only (rm and trf)"
 bedops --merge $repmaskfinal $trffinal > $outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.bed
@@ -133,7 +135,4 @@ else
 	echo "finished"
 fi
 
-###### calculate total amount masked ########
-awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed > $outdir/TOTALAMOUNTOFSEQUENCE.${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.txt
-
-awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.bed > $outdir/TOTALAMOUNTOFSEQUENCE.${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.txt
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.bed > $outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.TOTALAMOUNTOFSEQUENCE.txt
