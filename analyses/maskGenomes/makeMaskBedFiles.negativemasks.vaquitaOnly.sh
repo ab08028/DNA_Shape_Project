@@ -7,6 +7,8 @@
 
 
 ########## script to generate bed masks for ref genomes in consistent way #########
+set -euxo pipefail
+
 
 module load modules modules-init modules-gs # initialize modules 
 module load bedtools/2.29.2 
@@ -67,7 +69,7 @@ fi
 
 ######### repeat masker + trf : need to make sure are sorted and bed formatted (not all are )#######
 repeatsfinal=$outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.bed # name outfile
-bed-sort $repeatMaskerPlusTrfBed | bedtools merge -i stdin > $repeatsfinal
+sort-bed $repeatMaskerPlusTrfBed | bedtools merge -i stdin > $repeatsfinal
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
