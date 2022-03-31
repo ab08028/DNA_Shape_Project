@@ -6,6 +6,7 @@
 #$ -M annabel.beichman@gmail.com
 
 ########## script to generate bed masks for ref genomes in consistent way #########
+set -euxo pipefail
 
 module load modules modules-init modules-gs # initialize modules 
 module load bedtools/2.29.2 
@@ -25,7 +26,7 @@ trfBed=$5 # full path to species trf file *in bed format*  # note for vaquita th
 #cat homo_sapiens_ancestor_${i}.fa.fai >> allChrs.fai
 #done
 
-outdir=/net/harris/vol1/home/beichman/unifiedBedMasksForAllGenomes/$label
+outdir=/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/$label
 mkdir -p $outdir
 
 

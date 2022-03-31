@@ -20,7 +20,7 @@ gtf_or_gff=$3 # full path to species annotation file (gff or gtf is fine); must 
 repeatMaskerPlusTrfBed=$4 # full path to combined species rep masker + trf output *in bed format *
 
 
-outdir=/net/harris/vol1/home/beichman/unifiedBedMasksForAllGenomes/$label
+outdir=/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/$label
 mkdir -p $outdir
 
 
