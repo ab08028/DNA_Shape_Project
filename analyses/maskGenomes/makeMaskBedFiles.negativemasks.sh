@@ -86,7 +86,8 @@ fi
 # already in bed format ; merge and sort it over 
 echo "sorting and merging trf bed"
 trffinal=$outdir/${label}.trf.0based.sorted.merged.bed
-sort-bed $trfBed | bedtools merge -i stdin > $trffinal
+bedtools sort -i $trfBed | bedtools merge -i stdin > $trffinal
+# using bedtools sort here beause trf is gzipped
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
 	echo "error in trf conversion"
