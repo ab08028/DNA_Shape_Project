@@ -56,7 +56,7 @@ genomeFasta=brown_bear.fasta
 
 mkdir -p $wd/trf
 cd $wd/trf # maybe this will work
-trf -h -d 2 5 7 80 10 50 12 $wd/$genomeFasta
+trf $wd/$genomeFasta 2 5 7 80 10 50 12 -h -d
 # h: suppresss html
 # d: produce data file 
 
