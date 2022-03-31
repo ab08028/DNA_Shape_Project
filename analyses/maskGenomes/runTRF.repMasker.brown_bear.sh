@@ -56,7 +56,7 @@ fi
 
 mkdir $wd/trf
 cd $wd/trf # maybe this will work
-trf -h -d 2 5 7 80 10 50 12 $genomeFasta
+trf -h -d 2 5 7 80 10 50 12 $wd/$genomeFasta
 # h: suppresss html
 # d: produce data file 
 
