@@ -32,6 +32,12 @@ trfBed=$5 # full path to species trf file *in bed format*  # note for vaquita th
 outdir=/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/$label
 mkdir -p $outdir
 
+echo "files used:" > $outdir/readme
+echo "fai: " $faiFile >> $outdir/readme
+echo "gff/gtf: " $gff_or_gtf >> $outdir/readme
+echo "rep masker: " $repeatMaskerBed >> $outdir/readme
+echo "trf: " $trfBed >> $outdir/readme
+
 
 ########## make negative bed mask files ####
 
@@ -114,7 +120,7 @@ fi
 
 ########### combine into one giant negative mask #############
 echo "combining exons rm and trf"
-bedops --merge $exonfinal $repmaskfinal $trffinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.bed
+bedops --merge $exonfinal $repmaskfinal $trffinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
 	echo "error in merging1"

@@ -79,7 +79,7 @@ fi
 
 
 ########### combine into one giant negative mask #############
-bedops --merge $exonfinal $repeatsfinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.bed
+bedops --merge $exonfinal $repeatsfinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
