@@ -18,7 +18,7 @@ module load bedops/2.4.35
 
 label=$1 # species label
 faiFile=$2 # full path to species fai file 
-gtf_or_gff=$3 # full path to species annotation file (gff or gtf is fine); must be gzipped
+gff_or_gtf=$3 # full path to species annotation file (gff or gtf is fine); must be gzipped
 repeatMaskerBed=$4 # full path to species rep masker file *in bed format *
 trfBed=$5 # full path to species trf file *in bed format*  # note for vaquita that trf and rep mask are alrready combined so need a slightly different script.
 
