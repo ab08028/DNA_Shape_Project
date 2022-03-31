@@ -7,7 +7,10 @@
 
 ########## script to generate bed masks for ref genomes in consistent way #########
 set -euxo pipefail
-
+# super useful: https://gist.github.com/mohanpedala/1e2ff5661761d3abd0385e8223e16425
+# e cancels whole script if any error occurs
+# u exits if there's an undefined variable (saves you from passing empty variables) ** super useful ** 
+# o: useful! 
 module load modules modules-init modules-gs # initialize modules 
 module load bedtools/2.29.2 
 module load bedops/2.4.35
