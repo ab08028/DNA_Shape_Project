@@ -28,16 +28,16 @@ genomeFasta=brown_bear.fasta
 
 ########### run repeat masker ############
 # needs a fair bit of memory (min 10G or gets killed)
-mkdir  -p $wd/RepeatMaskerOutput
-RepeatMasker -species carnivore -pa 5 -dir $wd/repeatmaskeroutput $wd/$genomeFasta
+#mkdir  -p $wd/RepeatMaskerOutput
+#RepeatMasker -species carnivore -pa 5 -dir $wd/repeatmaskeroutput $wd/$genomeFasta
 
-exitVal=$?
-if [ ${exitVal} -ne 0 ]; then
-	echo "error in repmasker"
-	exit 1
-else
-	echo "finished"
-fi
+#exitVal=$?
+#if [ ${exitVal} -ne 0 ]; then
+#	echo "error in repmasker"
+#	exit 1
+#else
+#	echo "finished"
+#fi
 
 
 ########## run trf ##########
@@ -52,7 +52,7 @@ fi
 #4. Minscore: The alignment of a tandem repeat must meet or exceed this alignment score to be reported. For example, if we set the matching weight to 2 and the minimun score to 50, assuming perfect alignment, we will need to align at least 25 characters to meet the minimum score (for example 5 copies with a period of size 5). [not sure if should keep as is ?] 
 #5. Maxperiod: Period size is the program's best guess at the pattern size of the tandem repeat. The program will find all repeats with period size between 1 and 2000, but the output can be limited to a smaller range. [[[ In UCSC this is set to 12 ]]] 
 
-mkdir $wd/trf
+mkdir -p $wd/trf
 cd $wd/trf # maybe this will work
 trf -h -d 2 5 7 80 10 50 12 $wd/$genomeFasta
 # h: suppresss html
