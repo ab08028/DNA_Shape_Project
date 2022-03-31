@@ -69,6 +69,7 @@ else
 	echo "finished"
 fi
 
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $exonfinal > $outdir/TOTALAMOUNTOFSEQUENCE.${exonfinal%.bed}.txt
 # some exons are repeated/overlapping, but with sort/merge that doesn't matter
 
 ######### repeat masker: need to make sure are sorted and bed formatted (not all are )#######
@@ -86,12 +87,8 @@ else
 	echo "finished"
 fi
 
-# at least with dog need to skip header lines -- to convert to bed are all the same ? 
-#only needed to do once for dog: 
-#gunzip canFam3.fa.out.gz
-# from bedops:
-#rmsk2bed < canFam3.fa.out > canFam3.fa.RepeatMasker.sorted.bed 
-# seems like bedtools sort can't handle >3 columsn -- just leads to blank! so can use sort-bed in bedops instead
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $repmaskfinal > $outdir/TOTALAMOUNTOFSEQUENCE.${repmaskfinal%.bed}.txt
+
 
 ############## trf output ################
 # already in bed format ; merge and sort it over 
@@ -106,13 +103,8 @@ if [ ${exitVal} -ne 0 ]; then
 else
 	echo "finished"
 fi
-# once for mice: need to combine across all chrs:
-#cd /net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/REPEATS/trfMaskChrom
-#> mm10.trf.chr1-19.ABcombined.bed # combined by me 
-#for i in {1..19}
-#do
-#cat chr${i}.bed >> mm10.trf.chr1-19_ONLY.ABcombined.bed
-#done 
+
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $trffinal > $outdir/TOTALAMOUNTOFSEQUENCE.${trffinal%.bed}.txt
 
 
 # output want to have a bed file for the 3 masks: coding sequence +-10kb, rep masker, and trf . need to use these for targets and for 
@@ -140,3 +132,8 @@ if [ ${exitVal} -ne 0 ]; then
 else
 	echo "finished"
 fi
+
+###### calculate total amount masked ########
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed > $outdir/TOTALAMOUNTOFSEQUENCE.${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.txt
+
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.bed > $outdir/TOTALAMOUNTOFSEQUENCE.${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.txt

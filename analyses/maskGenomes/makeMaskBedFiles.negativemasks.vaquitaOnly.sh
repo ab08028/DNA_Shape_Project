@@ -63,6 +63,7 @@ if [ ${exitVal} -ne 0 ]; then
 else
 	echo "finished"
 fi
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $exonfinal > $outdir/TOTALAMOUNTOFSEQUENCE.${exonfinal%.bed}.txt
 
 
 # some exons are repeated/overlapping, but with sort/merge that doesn't matter
@@ -79,6 +80,7 @@ else
 	echo "finished"
 fi
 
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $repeatsfinal > $outdir/TOTALAMOUNTOFSEQUENCE.${repeatsfinal%.bed}.txt
 
 ########### combine into one giant negative mask #############
 bedops --merge $exonfinal $repeatsfinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed
@@ -90,3 +92,5 @@ if [ ${exitVal} -ne 0 ]; then
 else
 	echo "finished"
 fi
+
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed > $outdir/TOTALAMOUNTOFSEQUENCE.${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.txt

@@ -1,5 +1,10 @@
 ######## Wrapper script for all species #############
-
+#### this will make/combine negative bed mask files for exons +-10kb from gtf/gff files, rep masker , tandem repeat finder
+# these will get sorted and merged into one big bed file that is a *negative mask* (regions you DONT want ) 
+# want to mask a) ksfs b) spectra c) targets
+# note : no callability masks used (?) have i already used those for mutyper variants (?) I may have. 
+# note that vaquita uses a slightly diff script because JAR combined repmask+trf already
+# there's an excel file that keeps track of these files
 
 # note that vaquita uses a different script #
 
@@ -14,7 +19,7 @@ scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/ana
 
 ############ humans ###########
 label=humans_GRCh38
-faiFile=/net/harris/vol1/home/beichman/reference_genomes/homo_sapiens_ancestor_GRCh38/allChrs.fai # note is ancestral fai, which is fine - still is GrCh38
+faiFile=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/hg38.fa.gz.fai # note is ancestral fai, which is fine - still is GrCh38
 gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/hg38.ensGene.gtf.gz # usin ensembl genes
 repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/repeatmask.sorted.bed
 trfBed=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/hg38.trf.bed.gz
@@ -32,6 +37,15 @@ trfBed=/net/harris/vol1/home/beichman/reference_genomes/minke_whale/minke_whale_
 qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
 
 ###### mouse ###########
+
+# once for mice: need to combine fai across all chrs:
+#cd /net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/REPEATS/trfMaskChrom
+#> mm10.trf.chr1-19.ABcombined.bed # combined by me 
+#for i in {1..19}
+#do
+#cat chr${i}.bed >> mm10.trf.chr1-19_ONLY.ABcombined.bed
+#done 
+
 label=mouse_mm10
 faiFile=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/mm10.fa.ADDEDCHRTONUMBERS.fai
 gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/annotation/mm10.ensGene.gtf.gz
@@ -41,6 +55,12 @@ trfBed=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/REPE
 qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
 
 ########## brown_bear #######
+# convert using bedops:
+# #gunzip [ BROWN BEAR REP MASK OUTPUT]
+# from bedops:
+#rmsk2bed < [ BROWN BEAR REP MASK OUTPUT] > brown_bear.fa.RepeatMasker.sorted.bed 
+# do I need to convert trf output to bed as well? 
+
 label=brown_bear_GCF_003584765.1
 faiFile=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/brown_bear.fasta.fai
 gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/GCF_003584765.1_ASM358476v1_genomic.gff.gz
@@ -51,6 +71,15 @@ trfBed= # RUNNING ON SAGE >> need to convert to bed?
 
 
 ########## dog ##########
+
+
+# need to convert dog repmask output with bedops: 
+#gunzip canFam3.fa.out.gz
+# from bedops:
+#rmsk2bed < canFam3.fa.out > canFam3.fa.RepeatMasker.sorted.bed 
+# seems like bedtools sort can't handle >3 columns -- just leads to blank! so can use sort-bed in bedops instead -- I think this was actually a variable name issue that has been resolved so either should be ok
+
+
 label=dog_canFam3
 faiFile=/net/harris/vol1/home/beichman/reference_genomes/canFam3/canFam3.fa.fai
 gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/canFam3/annotation/canFam3.ensGene.gtf.gz
