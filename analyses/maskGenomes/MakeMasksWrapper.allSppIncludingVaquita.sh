@@ -15,9 +15,9 @@ scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/ana
 ############ humans ###########
 label=humans_GRCh38
 faiFile=/net/harris/vol1/home/beichman/reference_genomes/homo_sapiens_ancestor_GRCh38/allChrs.fai # note is ancestral fai, which is fine - still is GrCh38
-gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/GRCh38_latest_genomic.gff.gz
+gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/hg38.ensGene.gtf.gz # usin ensembl genes
 repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/repeatmask.sorted.bed
-trfBed=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/hg38.trf.bed.gz 
+trfBed=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/hg38.trf.bed.gz
 
 qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
 
