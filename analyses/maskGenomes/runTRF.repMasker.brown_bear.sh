@@ -18,6 +18,7 @@
 module load modules modules-init modules-gs # initialize modules 
 module load trf/4.09 # load trf (slightly older version)
 module load RepeatMasker/4.0.8 
+module load python/2.6
 
 wd=/net/harris/vol1/home/beichman/reference_genomes/brown_bear
 
@@ -69,4 +70,6 @@ else
 	echo "finished"
 fi
 
-
+# need to convert trf *dat file to bed file 
+# https://github.com/hdashnow/TandemRepeatFinder_scripts/blob/master/TRFdat_to_bed.py
+python TRFdat_to_bed.py --dat my_sequence.fasta.2.7.7.80.10.6.6.dat --bed my_sequence.fasta.2.7.7.80.10.6.6.bed

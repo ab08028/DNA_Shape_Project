@@ -58,7 +58,10 @@ qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff
 # convert using bedops:
 # #gunzip [ BROWN BEAR REP MASK OUTPUT]
 # from bedops:
-#rmsk2bed < [ BROWN BEAR REP MASK OUTPUT] > brown_bear.fa.RepeatMasker.sorted.bed 
+#cd /net/harris/vol1/home/beichman/reference_genomes/brown_bear/RepeatMaskerOutput_parallel
+#module load modules modules-init modules-gs # initialize modules 
+#module load bedops/2.4.35
+#rmsk2bed < brown_bear.fasta.out > brown_bear.fasta.RepeatMasker.output.sorted.bed 
 # do I need to convert trf output to bed as well? 
 
 label=brown_bear_GCF_003584765.1
