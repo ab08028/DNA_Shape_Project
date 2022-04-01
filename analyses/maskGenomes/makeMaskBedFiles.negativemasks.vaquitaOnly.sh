@@ -20,7 +20,7 @@ label=$1 # species label
 faiFile=$2 # full path to species fai file 
 gff_or_gtf=$3 # full path to species annotation file (gff or gtf is fine); must be gzipped
 repeatMaskerPlusTrfBed=$4 # full path to combined species rep masker + trf output *in bed format *
-
+cpgIslandsBed=$5
 
 outdir=/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/$label
 mkdir -p $outdir
@@ -68,6 +68,7 @@ awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $exonfinal > ${exonfinal%
 
 # some exons are repeated/overlapping, but with sort/merge that doesn't matter
 
+
 ######### repeat masker + trf : need to make sure are sorted and bed formatted (not all are )#######
 repeatsfinal=$outdir/${label}.repeatsOnly.repmask.trf.NEGATIVEMASK.merged.bed # name outfile
 sort-bed $repeatMaskerPlusTrfBed | bedtools merge -i stdin > $repeatsfinal
@@ -82,7 +83,37 @@ fi
 
 awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $repeatsfinal > ${repeatsfinal%.bed}.TOTALAMOUNTOFSEQUENCE.txt
 
+########## CpG Islands ############
+echo "CpG Islands"
+cpgIslandsFinal=$outdir/${label}.cpgIslands.0based.sorted.merge.dbed
+bedtools sort -i $cpgIslandsBed | bedtools merge -i stdin > $cpgIslandsFinal
+
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in cpg islands conversion"
+	exit 1
+else
+	echo "finished"
+fi
+
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $cpgIslandsFinal > ${cpgIslandsFinal%.bed}.TOTALAMOUNTOFSEQUENCE.txt
+
+
 ########### combine into one giant negative mask #############
+echo "combining exons repmasker and trf and cpgislands"
+bedops --merge $exonfinal $repeatsfinal $cpgIslandsFinal > $outdir/${label}.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in merging"
+	exit 1
+else
+	echo "finished"
+fi
+
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed > $outdir/${label}.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.TOTALAMOUNTOFSEQUENCE.txt
+
+
+########### leave out cpg islands #############
 bedops --merge $exonfinal $repeatsfinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed
 
 exitVal=$?
@@ -93,4 +124,4 @@ else
 	echo "finished"
 fi
 
-awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.TOTALAMOUNTOFSEQUENCE.txt
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.bed > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.TOTALAMOUNTOFSEQUENCE.txt

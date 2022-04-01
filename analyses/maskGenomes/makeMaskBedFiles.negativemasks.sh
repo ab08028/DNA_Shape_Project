@@ -21,7 +21,7 @@ faiFile=$2 # full path to species fai file
 gff_or_gtf=$3 # full path to species annotation file (gff or gtf is fine); must be gzipped
 repeatMaskerBed=$4 # full path to species rep masker file *in bed format *
 trfBed=$5 # full path to species trf file *in bed format*  # note for vaquita that trf and rep mask are alrready combined so need a slightly different script.
-
+cpgIslandsBed=$6 # path to cpg islands bed file 
 # just once for humans: combine .fai files:
 #> allChrs.fai
 #for i in {1..22}
@@ -37,7 +37,7 @@ echo "fai: " $faiFile >> $outdir/readme
 echo "gff/gtf: " $gff_or_gtf >> $outdir/readme
 echo "rep masker: " $repeatMaskerBed >> $outdir/readme
 echo "trf: " $trfBed >> $outdir/readme
-
+echo "cpgislands:" $cpgIslandsBed >> $outdir/redma
 
 ########## make negative bed mask files ####
 
@@ -110,9 +110,39 @@ awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $trffinal > ${trffinal%.b
 # output want to have a bed file for the 3 masks: coding sequence +-10kb, rep masker, and trf . need to use these for targets and for 
 # what about 'callability' ? mapping depth? 
 
+########## CpG Islands ############
+echo "CpG Islands"
+cpgIslandsFinal=$outdir/${label}.cpgIslands.0based.sorted.merge.dbed
+bedtools sort -i $cpgIslandsBed | bedtools merge -i stdin > $cpgIslandsFinal
+
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in cpg islands conversion"
+	exit 1
+else
+	echo "finished"
+fi
+
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $cpgIslandsFinal > ${cpgIslandsFinal%.bed}.TOTALAMOUNTOFSEQUENCE.txt
+
+
 ########### combine into one giant negative mask #############
+echo "combining exons repmasker and trf and cpgislands"
+bedops --merge $exonfinal $repmaskfinal $trffinal $cpgIslandsFinal > $outdir/${label}.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in merging0"
+	exit 1
+else
+	echo "finished"
+fi
+
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed > $outdir/${label}.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.TOTALAMOUNTOFSEQUENCE.txt
+
+
+####### leave out cpg islands ############
 echo "combining exons rm and trf"
-bedops --merge $exonfinal $repmaskfinal $trffinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed
+bedops --merge $exonfinal $repmaskfinal $trffinal > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.bed
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
 	echo "error in merging1"
@@ -121,7 +151,7 @@ else
 	echo "finished"
 fi
 
-awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.bed > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.USETHIS.TOTALAMOUNTOFSEQUENCE.txt
+awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}' $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.bed > $outdir/${label}.exon10kb.repmask.trf.NEGATIVEMASK.merged.TOTALAMOUNTOFSEQUENCE.txt
 
 ####### combine just the repeats (to match JAR's RM+trf) ###########
 echo "combining repeats only (rm and trf)"
