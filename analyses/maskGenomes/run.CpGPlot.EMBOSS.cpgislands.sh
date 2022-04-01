@@ -7,6 +7,8 @@
 #$ -N emboss_cpgplot_brownbear
 ############################ brown bear #########################
 ###### detect cpg islands #######
+set -euo pipefail
+
 module load modules modules-init modules-gs # initialize modules 
 
 module load EMBOSS/6.6.0
@@ -29,6 +31,12 @@ module load EMBOSS/6.6.0
 # http://emboss.sourceforge.net/apps/cvs/emboss/apps/cpgplot.html
 wd=/net/harris/vol1/home/beichman/reference_genomes/brown_bear
 genome=$wd/brown_bear.fasta
-cpgplot $genome -outfeat $wd/cpgplot.emboss.output.cpgislands.gff -auto
+cpgplot $genome -outfeat $wd/cpgplot.emboss.output.cpgislands.gff -auto -graph none
 # auto disables prompts
 # dfaults windows of 100, minoe 0.6, min len of island is 200
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in cpgplot"
+	exit 1
+else
+	echo "finished"
+fi

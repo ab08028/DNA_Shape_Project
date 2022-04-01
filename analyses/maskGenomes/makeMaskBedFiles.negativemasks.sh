@@ -4,7 +4,8 @@
 #$ -e  /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/masks
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
-
+####### need to figure out: splitting into intervals/chromosomes. a new script? fin whale will be most annoying. bear too. 
+# figure out next. 
 ########## script to generate bed masks for ref genomes in consistent way #########
 set -euxo pipefail
 # super useful: https://gist.github.com/mohanpedala/1e2ff5661761d3abd0385e8223e16425
