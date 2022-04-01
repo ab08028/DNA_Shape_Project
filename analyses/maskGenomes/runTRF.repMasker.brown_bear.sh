@@ -18,7 +18,8 @@
 module load modules modules-init modules-gs # initialize modules 
 module load trf/4.09 # load trf (slightly older version)
 module load RepeatMasker/4.0.8 
-module load python/2.6
+module load bedtools/2.29.2 
+module load python/2.7.13
 
 wd=/net/harris/vol1/home/beichman/reference_genomes/brown_bear
 
@@ -71,5 +72,7 @@ else
 fi
 
 # need to convert trf *dat file to bed file 
-# https://github.com/hdashnow/TandemRepeatFinder_scripts/blob/master/TRFdat_to_bed.py
-python TRFdat_to_bed.py --dat my_sequence.fasta.2.7.7.80.10.6.6.dat --bed my_sequence.fasta.2.7.7.80.10.6.6.bed
+# https://github.com/Adamtaranto/TRF2GFF
+python2  /net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/maskGenomes/trf2gff.adamtaranto.py --d $wd/trf/*dat -o $wd/trf/trf.output.converted.gff3
+# then convert to bed and sort and merge 
+awk 'BEGIN {OFS="\t"} {print $1,$4-1,$5}' $wd/trf/trf.output.converted.gff3 | bedtools sort -i stdin | bedtools merge -i stding > $wd/trf/trf.output.sorted.merged.0based.bed

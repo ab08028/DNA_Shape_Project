@@ -67,10 +67,10 @@ qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff
 label=brown_bear_GCF_003584765.1
 faiFile=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/brown_bear.fasta.fai
 gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/GCF_003584765.1_ASM358476v1_genomic.gff.gz
-repeatMaskerBed= # RUNNING ON SAGE --> then need to convert to bed with bedops.
-trfBed= # RUNNING ON SAGE >> need to convert to bed?
+repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/RepeatMaskerOutput_parallel/brown_bear.fasta.RepeatMasker.output.sorted.bed
+trfBed=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/trf/trf.output.sorted.merged.0based.bed
 # STILL RUNNING 
-# qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
+qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
 
 
 ########## dog ##########

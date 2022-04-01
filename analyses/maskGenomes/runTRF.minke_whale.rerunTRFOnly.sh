@@ -10,19 +10,19 @@
 
 # script to run TRF (tandem repeat finder) https://github.com/Benson-Genomics-Lab/TRF
 # and repmasker 
-# on genomes that don't yet have a TRF file. (just brown bear for now; polar bear also)
-# have trf for: humans (covers apes as well), mice, minke whale, vaquita,
-# need it for: brown bear (and polar bear for completeness I suppose)
+# on genomes that don't yet have a TRF file. (brown bear and minke whale (maybe do pb sometime))
+# have trf for: humans (covers apes as well), mice, vaquita,
 # lets do it for dog as well 
 
 module load modules modules-init modules-gs # initialize modules 
 module load trf/4.09 # load trf (slightly older version)
 module load RepeatMasker/4.0.8 
 
-wd=/net/harris/vol1/home/beichman/reference_genomes/brown_bear
+wd=/net/harris/vol1/home/beichman/reference_genomes/minke_whale/minke_whale_genome/GCF_000493695.1_BalAcu1.0
 
 
-genomeFasta=brown_bear.fasta
+
+genomeFasta=BalAcu1.0.fa
 
 
 
