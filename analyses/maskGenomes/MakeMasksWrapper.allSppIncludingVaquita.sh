@@ -33,7 +33,7 @@ label=minke_whale_GCF_000493695.1_BalAcu1.0
 faiFile=/net/harris/vol1/home/beichman/reference_genomes/minke_whale/minke_whale_genome/GCF_000493695.1_BalAcu1.0/BalAcu1.0.fa.fai
 gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/minke_whale/minke_whale_genome/GCF_000493695.1_BalAcu1.0/GCF_000493695.1_BalAcu1.0_genomic.gff.gz
 repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/minke_whale/minke_whale_genome/GCF_000493695.1_BalAcu1.0/GCF_000493695.1_BalAcu1.0_rm.out.bed
-trfBed=/Users/annabelbeichman/Documents/UW/WhaleProject/fin_whales/fin_whale_scripts/fin_whale_spectrum/KeightleyPolarizationMethod_fin_whale/trf.output.sorted.merged.0based.bed
+trfBed=/net/harris/vol1/home/beichman/reference_genomes/minke_whale/minke_whale_genome/GCF_000493695.1_BalAcu1.0/trf/trf.output.sorted.merged.0based.bed
 # note this is version of trf that I ran for minke whale, not the version from ucsc which had weird chr names
 cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/minke_whale/minke_whale_genome/GCF_000493695.1_BalAcu1.0/ucsc/CpG_ExtUnmasked.bed
 
