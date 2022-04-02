@@ -24,7 +24,8 @@ gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotat
 repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/repeatmask.sorted.bed
 trfBed=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/hg38.trf.bed.gz
 cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/humanGRCh38.CpGIslandsTrack.UCSC.bed.gz
-qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed $CpGIslands
+
+qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed $cpgIslands
 
 
 ######## minke whale ########
@@ -35,7 +36,8 @@ repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/minke_whale/min
 trfBed=/Users/annabelbeichman/Documents/UW/WhaleProject/fin_whales/fin_whale_scripts/fin_whale_spectrum/KeightleyPolarizationMethod_fin_whale/trf.output.sorted.merged.0based.bed
 # note this is version of trf that I ran for minke whale, not the version from ucsc which had weird chr names
 cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/minke_whale/minke_whale_genome/GCF_000493695.1_BalAcu1.0/ucsc/CpG_ExtUnmasked.bed
-qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
+
+qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed $cpgIslands
 
 ###### mouse ###########
 
@@ -54,7 +56,7 @@ repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_
 trfBed=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/REPEATS/trfMaskChrom/mm10.trf.chr1-19_ONLY.ABcombined.bed
 cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/mouse/mm10_aka_mm38/CpGIslands_fromUCSC/mm10.CpGIslandsTrack.UCSC.bed.gz
 
-qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
+qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed $cpgIslands
 
 ########## brown_bear #######
 # convert using bedops:
@@ -74,7 +76,7 @@ trfBed=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/trf/trf.outpu
 cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/CpGIslands.fromcpgplot.emboss.output.bed
 # generated rep mask, trf and cpg myself for bears
  
-qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
+qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed $cpgIslands
 
 
 ########## dog ##########
@@ -94,7 +96,7 @@ repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/canFam3/canFam3
 trfBed=/net/harris/vol1/home/beichman/reference_genomes/canFam3/canFam3.trf.bed.gz
 cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/canFam3/canFam3.CpGIslandsTrack.UCSC.bed.gz
 
-qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
+qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed $cpgIslands
 
 ######## vaquita: NOTE HAS A DIFF SCRIPT BECAUSE OF COMBO RM+TRF FILE ############
 
@@ -104,5 +106,5 @@ gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/vaquita/mPhoSin1.pri
 repeatMaskerPlusTrfBed=/net/harris/vol1/home/beichman/reference_genomes/vaquita/mPhoSin1.pri.cur.20190723_rename/mPhoSin1.pri.cur.20190723_rename_repeats_TRF_RM.bed
 cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/vaquita/mPhoSin1.pri.cur.20190723_rename/mPhoSin1.pri.cur.20190723_rename_cpgIslands.bed
 
-qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.vaquitaOnly.sh $label $faiFile $gff_or_gtf $repeatMaskerPlusTrfBed
+qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.vaquitaOnly.sh $label $faiFile $gff_or_gtf $repeatMaskerPlusTrfBed $cpgIslands
 
