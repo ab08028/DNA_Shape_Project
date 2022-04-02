@@ -38,7 +38,7 @@ echo "fai: " $faiFile >> $outdir/readme
 echo "gff/gtf: " $gff_or_gtf >> $outdir/readme
 echo "rep masker: " $repeatMaskerBed >> $outdir/readme
 echo "trf: " $trfBed >> $outdir/readme
-echo "cpgislands:" $cpgIslandsBed >> $outdir/redma
+echo "cpgislands:" $cpgIslandsBed >> $outdir/readme
 
 ########## make negative bed mask files ####
 

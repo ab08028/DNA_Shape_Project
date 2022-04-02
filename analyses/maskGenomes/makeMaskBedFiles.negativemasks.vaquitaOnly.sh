@@ -25,6 +25,13 @@ outdir=/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGen
 mkdir -p $outdir
 
 
+echo "files used:" > $outdir/readme
+echo "fai: " $faiFile >> $outdir/readme
+echo "gff/gtf: " $gff_or_gtf >> $outdir/readme
+echo "rep masker: " $repeatMaskerBed >> $outdir/readme
+echo "trf: " $trfBed >> $outdir/readme
+echo "cpgislands:" $cpgIslandsBed >> $outdir/readme
+
 # then a script where you feed in all the gffs and beds and make a set of masks and one combo mask?
 # want to keep them separate so you can mask on just one at a time
 # don't redo mutyper variants, just redo mutyper ksfs (!) will be much faster
