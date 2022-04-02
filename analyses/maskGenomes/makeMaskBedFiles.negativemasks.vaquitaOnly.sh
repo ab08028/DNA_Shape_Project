@@ -9,7 +9,6 @@
 ########## script to generate bed masks for ref genomes in consistent way #########
 set -euxo pipefail
 
-
 module load modules modules-init modules-gs # initialize modules 
 module load bedtools/2.29.2 
 module load bedops/2.4.35

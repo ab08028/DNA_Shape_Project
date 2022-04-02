@@ -13,6 +13,7 @@ module load modules modules-init modules-gs # initialize modules
 
 module load EMBOSS/6.6.0
 #http://emboss.open-bio.org/rel/rel6/apps/cpgplot.html
+module load bedtools/2.29.2 
 
 # fin whale : already has them masked from vcf. could rerun it on them anway; or could get from Meixi
 # vaquita: JAR provided file
@@ -31,12 +32,16 @@ module load EMBOSS/6.6.0
 # http://emboss.sourceforge.net/apps/cvs/emboss/apps/cpgplot.html
 wd=/net/harris/vol1/home/beichman/reference_genomes/brown_bear
 genome=$wd/brown_bear.fasta
-cpgplot $genome -outfeat $wd/cpgplot.emboss.output.cpgislands.gff -auto -graph none
+cpgplot $genome -outfeat $wd/CpGIslands.fromcpgplot.emboss.output.gff -auto -graph none
 # auto disables prompts
 # dfaults windows of 100, minoe 0.6, min len of island is 200
+exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
 	echo "error in cpgplot"
 	exit 1
 else
 	echo "finished"
 fi
+
+# convert from gff3 to bed file (skip header) and sort/merge:
+grep -v "#" $wd/CpGIslands.fromcpgplot.emboss.output.gff |  awk 'BEGIN {OFS="\t"} {print $1,$4-1,$5}' | bedtools sort -i stdin | bedtools merge -i stdin > $wd/CpGIslands.fromcpgplot.emboss.output.bed

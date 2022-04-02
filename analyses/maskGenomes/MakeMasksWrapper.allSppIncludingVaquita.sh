@@ -71,7 +71,8 @@ faiFile=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/brown_bear.f
 gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/GCF_003584765.1_ASM358476v1_genomic.gff.gz
 repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/RepeatMaskerOutput_parallel/brown_bear.fasta.RepeatMasker.output.sorted.bed
 trfBed=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/trf/trf.output.sorted.merged.0based.bed
-cpgIslands= # need to generate!!! 
+cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/brown_bear/CpGIslands.fromcpgplot.emboss.output.bed
+# generated rep mask, trf and cpg myself for bears
  
 qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed
 
