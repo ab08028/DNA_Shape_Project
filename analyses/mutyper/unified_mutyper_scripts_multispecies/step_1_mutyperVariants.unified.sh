@@ -127,6 +127,9 @@ mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos $chrom_pos 
 # make function:
 myMutyperVariantsFunc() {
 
+"${initialize_subsetifneeded_snippet} | head"
+"${initialize_subsetifneeded_snippet} | ${filter_snippet} | head"
+"${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | head"
 "${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}" 
 
 
