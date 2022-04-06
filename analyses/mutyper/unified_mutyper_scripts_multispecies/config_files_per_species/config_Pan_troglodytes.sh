@@ -55,6 +55,7 @@ vcfNeedsToBeSubsetByChr=TRUE # because it needs to be subset during processing a
 NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/humans_GRCh38/perInterval/chr${interval}.humans_GRCh38.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed" ## ONE NEGATIVE MASK FILE PER INTERVAL
 # apes use same negative mask as humans (no longer using ape callability mask)
 # same negative mask for all apes 
+maskLabel=maskALL
 
 ############ ancestral fasta info ####################
 ancestralFastafilename="/net/harris/vol1/home/beichman/apes/polarized_ref_fastas/hg18_references_with_gagp_ancestral_alleles_exclude_recurrent/Pan_troglodytes_chr${interval}.fa" # made by Michael

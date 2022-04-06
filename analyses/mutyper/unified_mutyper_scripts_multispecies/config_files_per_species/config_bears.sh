@@ -52,7 +52,7 @@ vcfNeedsToBeSubsetByChr=FALSE
 
 ############# *negative* mask (regions you DON'T want to use in spectrum)  ################
 NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/brown_bear_GCF_003584765.1/perInterval/interval${interval}.brown_bear_GCF_003584765.1.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed"
-
+maskLabel=maskALL
 
 ############ ancestral fasta info ####################
 ancestralFastafilename="/net/harris/vol1/home/beichman/bears/analyses/ancestralReferenceFastas/brown_bear/interval_${interval}/MODIFIED.ANCESTRAL.brown_bear.interval_${interval}.fasta"

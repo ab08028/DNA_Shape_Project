@@ -32,7 +32,7 @@ todaysdate=`date +%Y%m%d` # for the log file
 source $configfile
 
 ###### set up outdir/outfiles #######
-wd=/net/harris/vol1/home/beichman/mutyper_results_allspecies/analyses/mutyper/unified_mutyper_results/$label/$species
+wd=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/$label/$species/mutyper_results_masked_${masklabel}
 variantdir=$wd/mutyper_variant_files
 spectrumdir=$wd/mutyper_spectrum_files
 ksfsdir=$wd/mutyper_ksfs_files

@@ -42,7 +42,7 @@ fi
 ######### kmer size  ########
 
 kmersize=7
-label=${kmersize}_mer_masked # can add other notes here 
+label=${kmersize}_mer # can add other notes here 
 
 ########## input vcf files (should be polarized and have non -pol sites removed (except for humans/apes)) ############
 vcfdir="/net/harris/vol1/home/beichman/fin_whale/analyses/keightley_polarization/20211020_focalENP_out1MegNov_out2BalMus/vcfs_with_ancestral_alleles/perInterval"
@@ -52,6 +52,7 @@ vcfNeedsToBeSubsetByChr=FALSE
 
 ############# *negative* mask (regions you DON'T want to use in spectrum)  ################
 NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/minke_whale_GCF_000493695.1_BalAcu1.0/perInterval/interval${interval}.minke_whale_GCF_000493695.1_BalAcu1.0.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed"
+maskLabel=maskALL
 
 
 ############ ancestral fasta info ####################

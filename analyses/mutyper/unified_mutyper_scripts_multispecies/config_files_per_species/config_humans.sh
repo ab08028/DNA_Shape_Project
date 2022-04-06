@@ -52,7 +52,7 @@ vcfNeedsToBeSubsetByChr=FALSE
 
 ############# *negative* mask (regions you DON'T want to use in spectrum)  ################
 NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/humans_GRCh38/perInterval/chr${interval}.humans_GRCh38.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed"
-
+maskLabel=maskALL
 
 ############ ancestral fasta info ####################
 ancestralFastafilename="/net/harris/vol1/home/beichman/reference_genomes/homo_sapiens_ancestor_GRCh38/homo_sapiens_ancestor_${interval}.fa" # note filename doesn't hae chr in it

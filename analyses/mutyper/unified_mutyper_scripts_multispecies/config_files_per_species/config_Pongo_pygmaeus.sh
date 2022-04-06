@@ -54,6 +54,7 @@ vcfNeedsToBeSubsetByChr=TRUE # because it needs to be subset during processing a
 ############# *negative* mask (regions you DON'T want to use in spectrum)  ################
 NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/humans_GRCh38/perInterval/chr${interval}.humans_GRCh38.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed" ## ONE NEGATIVE MASK FILE PER INTERVAL
 # apes use same negative mask as humans (no longer using ape callability mask)
+maskLabel=maskALL
 
 
 ############ ancestral fasta info ####################

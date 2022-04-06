@@ -53,6 +53,7 @@ vcfNeedsToBeSubsetByChr=FALSE
 ############# *negative* mask (regions you DON'T want to use in spectrum)  ################
 NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/vaquita_mPhoSin1/vaquita_mPhoSin1.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed"
 # note for vaquita it's the whole genome mask
+maskLabel=maskALL
 
 ############ ancestral fasta info ####################
 ancestralFastafilename="/net/harris/vol1/home/beichman/vaquita/analyses/ancestralReferenceFasta/MODIFIED.ANCESTRAL.vaquitaAncestral.fasta"

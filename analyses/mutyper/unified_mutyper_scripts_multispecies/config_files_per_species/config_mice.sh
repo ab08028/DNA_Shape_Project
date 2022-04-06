@@ -54,6 +54,7 @@ vcfNeedsToBeSubsetByChr=FALSE
 
 ############# *negative* mask (regions you DON'T want to use in spectrum)  ################
 NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/mouse_mm10/perInterval/chr${interval}.mouse_mm10.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed" 
+maskLabel=maskALL
 
 
 ############ ancestral fasta info ####################
