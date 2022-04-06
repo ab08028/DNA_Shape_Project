@@ -42,7 +42,7 @@ fi
 ######### kmer size  ########
 
 kmersize=7
-label=${kmersize}_mer
+label=${kmersize}_mer_masked # can add other notes here 
 
 ########## input vcf files (should be polarized and have non -pol sites removed (except for humans/apes)) ############
 vcfdir="/net/harris/vol1/home/beichman/fin_whale/analyses/keightley_polarization/20211020_focalENP_out1MegNov_out2BalMus/vcfs_with_ancestral_alleles/perInterval"
@@ -55,7 +55,7 @@ NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksFo
 
 
 ############ ancestral fasta info ####################
-ancestralFastafilename="/net/harris/vol1/home/beichman/fin_whale/analyses/ancestralReferenceFastas/20211020_focalENP_out1MegNov_out2BalMus/FINAL.MODIFIED.ANCESTRAL.interval_${interval}_finWhale_Ancestral_extSFS_gte90-lte10Range_NOTEthisisMinkeWhaleRefGenome.butAncCallsAreforfinWhaleHumpbackBlueWhale_notforMinke.fasta"
+ancestralFastafilename="/net/harris/vol1/home/beichman/fin_whale/analyses/ancestralReferenceFastas/20211020_focalENP_out1MegNov_out2BalMus/FINAL.MODIFIED.ANCESTRAL.interval_${interval}_finWhale_Ancestral_extSFS_gte90-lte10Range_NOTEthisisMinkeWhaleRefGenome.butAncCallsAreforfinWhaleHumpbackBlueWhale_notforMinke.includesCpGandRepeatSites.fasta"
 sep="\s" # separator for ancestral fasta
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 

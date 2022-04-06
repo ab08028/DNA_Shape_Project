@@ -7,7 +7,7 @@ species=humans
 
 
 ##### flags for dealing with genome splitting by chr or interval ########
-interval_or_chr_or_all=chr  # are genomes split into "interval"", "chr" or "allautos" (allautosomes) ; note that chimp vcfs are whole genome but am splitting them up during processing
+interval_or_chr_or_all=chr # are genomes split into "interval"", "chr" or "allautos" (allautosomes) ; note that chimp vcfs are whole genome but am splitting them up during processing
 prepend0=FALSE # TRUE if intervals are counted as 01 02 03 etc. (fin whale); only valid with "interval" (not with chr)
 interval_count=22
 

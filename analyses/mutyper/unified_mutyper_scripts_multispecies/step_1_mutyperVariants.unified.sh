@@ -32,12 +32,13 @@ todaysdate=`date +%Y%m%d` # for the log file
 source $configfile
 
 ###### set up outdir/outfiles #######
-wd=/net/harris/vol1/home/beichman/DNAShape/analyses/mutyper/unified_mutyper_results/$label/$species
+wd=/net/harris/vol1/home/beichman/mutyper_results_allspecies/analyses/mutyper/unified_mutyper_results/$label/$species
 variantdir=$wd/mutyper_variant_files
 spectrumdir=$wd/mutyper_spectrum_files
 ksfsdir=$wd/mutyper_ksfs_files
 
 mkdir -p $wd
+mkdir -p $wd/logs
 mkdir -p $variantdir
 mkdir -p $spectrumdir
 mkdir -p $ksfsdir
@@ -47,7 +48,7 @@ cp $configfile $wd/COPYOFCONGIGFILEUSEDON.${todaysdate}.txt
 
 
 ######## set up log file #########
-log=$wd/${species}.${todaysdate}.mutyper_variants.log
+log=$wd/logs/${species}.${intervallabel}.${todaysdate}.mutyper_variants.log
 > $log
 
 echo "vcffile: $vcfdir/$vcffilename" >> $log
@@ -90,7 +91,7 @@ fi
 if [ $vcfNeedsToBeSubsetByChr = "TRUE" ]
 then
 	echo "need to subset the vcf by chromosome/interval first (needed for apes)" >> $log
-	subset_vcf_snippet='-R $intervalLabel'
+	subset_vcf_snippet='-r $intervalLabel' # note use -r not -R because it's text not a file
 elif [ $vcfNeedsToBeSubsetByChr = "FALSE" ]
 then
 	echo "don't need to subset vcf by chr/interval" >> $log
@@ -126,7 +127,7 @@ mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos $chrom_pos 
 # always start with bcftools view then add in other snippets ; if you don't need to pre-subset the vcf by chr then $subset_vcf_snippet will be empty and it'll just read the vcf
 
 lineOfCode="${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}" 
-echo "FINAL CODE LINE: \n\n" >> $log
+echo "FINAL CODE LINE: " >> $log
 echo "$lineOfCode" >> $log
 
 
