@@ -1,7 +1,7 @@
 #! /bin/bash
 #$ -l h_rt=50:00:00,mfree=6G
-#$ -o /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/mutyper
-#$ -e /net/harris/vol1/home/beichman/DNAShape/reports.nobackup/mutyper
+#$ -o /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_variants
+#$ -e /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_variants
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 
@@ -108,7 +108,7 @@ then
 	rm_inds_snippet=''
 else
 	echo "removing the following individuals : $individualsToExclude " >> $log
-	rm_inds_snippet='-s $individualsToExclude'
+	rm_inds_snippet='-s ^$individualsToExclude'
 fi
 
 

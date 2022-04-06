@@ -1,0 +1,18 @@
+# script checks per species:
+
+# gorilla: check that bad inds aren't present
+ zcat Gorilla_gorilla.int_or_chr_4.mutyper.variants.SomeRevComped.SeeLogForFilters.maskALL.7mer.vcf.gz | grep -v "##" | grep "#" -m1
+
+
+
+# fin whale: check that bad inds aren't present and that some non-PASS sites are present
+
+
+# vaquita: check that relatives are gone
+
+
+# pan tro: check that bad ind is gone
+
+# humans: check that --strict is in the final code
+
+# all apes: make sure that same chr didn't get written out a bunch of times 
