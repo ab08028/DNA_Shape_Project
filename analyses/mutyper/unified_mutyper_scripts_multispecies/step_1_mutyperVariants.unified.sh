@@ -20,51 +20,16 @@ module load bedtools/2.29.2
 
 # for apes, need to go to the interval in question using -R because vcf files aren't per chromosome. 
 
-set -eou pipefail
+set -exou pipefail
 
 configfile=$1
-#interval_or_chr_or_all=$2
-#prepend0=$3
+
 todaysdate=`date +%Y%m%d` # for the log file 
 
 
-########## get interval (or chr) number ############
-# if [ $interval_or_chr_or_all = "interval" ]
-# then
-# 	# prepend 01 02 if needed 
-# 	if [ $prepend0 = "TRUE" ]
-# 	then
-# 		interval=`printf %02d ${SGE_TASK_ID}`
-# 	elif [ $prepend0 = "FALSE" ]
-# 	then
-# 		interval=${SGE_TASK_ID}
-# 	else
-# 		echo "invalid prepend0 option"
-# 		exit 1
-# 	fi
-# 	# set interval label: 
-# 	intervalLabel=interval_${interval}
-# elif [ $interval_or_chr_or_all = "chr" ]
-# then
-# 	interval=${SGE_TASK_ID}
-# 	intervalLabel=chr${interval} # label for output files 
-# elif [ $interval_or_chr_or_all= "allautos" ]
-# then
-# 	interval='' # no intervals 
-# 	intervalLabel="allautos"
-# fi
-# 
-# echo $interval
 
 ############### NOW SOURCE CONFIG FILE ONCE INTERVALS HAVE BEEN SET ###############
 source $configfile
-
-#echo " these are the config settings "
-#cat $configfile
-#echo "end of config settings"
-
-ls $vcfdir/$vcffilename # making sure it exists 
-
 
 ###### set up outdir/outfiles #######
 wd=/net/harris/vol1/home/beichman/DNAShape/analyses/mutyper/unified_mutyper_results/$label/$species
@@ -158,6 +123,7 @@ mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos 0 $strict_s
 ######### need to subset vcf prior to processing? ############
 # requires double quotes (single don't work)
 lineOfCode="${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}" 
+echo "FINAL CODE LINE: \n\n"
 echo $lineOfCode >> $log
 
 # make a function and run it:
