@@ -56,57 +56,7 @@ source $configfile
 #cat $configfile
 #echo "end of config settings"
 
-ls $vcfdir/$vcffilename
-################# restricting to only PASS sites ##################
-if [ $passOption = "TRUE" ]
-then
-	echo "select only PASS sites"
-	pass_snippet='-f PASS' 
-elif [ $passOption = "FALSE" ]
-then
-	echo "not restricting to PASS sites"
-	pass_snippet=''
-else
-	echo "NOT A VALID passOption option"
-	exit 1
-fi
-
-#################### using --strict ######################
-if [ $strictOption = "TRUE" ]
-then
-	echo "using strict for $species - are you sure you want to do this? should be humans only"
-	strict_snippet='--strict'
-elif [ $strictOption = "FALSE" ]
-then
-	echo "not using strict"
-	strict_snippet=''
-else
-	echo "NOT A VALID strictOption option"
-	exit 1
-fi
-
-############ if you need to subset the input vcf by chromosome before processing (apes need this) ########
-if [ $vcfNeedsToBeSubsetByChr = "TRUE" ]
-then
-	echo "need to subset the vcf by chromosome/interval first (needed for apes)"
-	subset_vcf_snippet='-R $intervalLabel'
-elif [ $vcfNeedsToBeSubsetByChr = "FALSE" ]
-then
-	echo "don't need to subset vcf by chr/interval"
-	subset_vcf_snippet=''
-else
-	echo "not a valid vcfNeedsToBeSubsetByChr option"
-fi
-
-##################### removing individuals ###################
-# this checks if variable is empty: 
-if [ -e $individualsToExclude ]
-then
-	echo "no individuals to remove"
-	rm_inds_snippet=''
-else
-	rm_inds_snippet='-s $individualsToExclude'
-fi
+ls $vcfdir/$vcffilename # making sure it exists 
 
 
 ###### set up outdir/outfiles #######
@@ -120,7 +70,73 @@ mkdir -p $variantdir
 mkdir -p $spectrumdir
 mkdir -p $ksfsdir
 
+#make a copy of config file as it was used:
+cp $configfile $wd/COPYOFCONGIGFILEUSEDON.${todaysdate}.txt
+
+
+######## set up log file #########
+log=$wd/${species}.${todaysdate}.mutyper_variants.log
+> $log
+
+echo "vcffile: $vcfdir/$vcffilename" >> $log
+echo "ancestral fasta: $ancestralFastafilename" >> $log
+echo "negative mask: $NEGATIVEMASK" >> $log
+
+######### set up output name ###########
 mutypervariantsoutputname=${species}.int_or_chr_${interval}.mutyper.variants.SomeRevComped.SeeLogForFilters.${kmersize}mer.vcf.gz
+
+################# restricting to only PASS sites ##################
+if [ $passOption = "TRUE" ]
+then
+	echo "select only PASS sites" >> $log
+	pass_snippet='-f PASS' 
+elif [ $passOption = "FALSE" ]
+then
+	echo "not restricting to PASS sites" >> $log
+	pass_snippet=''
+else
+	echo "NOT A VALID passOption option"
+	exit 1
+fi
+
+#################### using --strict ######################
+if [ $strictOption = "TRUE" ]
+then
+	echo "using --strict for $species - are you sure you want to do this? should be humans only" >> $log
+	strict_snippet='--strict'
+elif [ $strictOption = "FALSE" ]
+then
+	echo "not using --strict" >> $log
+	strict_snippet=''
+else
+	echo "NOT A VALID strictOption option"
+	exit 1
+fi
+
+############ if you need to subset the input vcf by chromosome before processing (apes need this) ########
+if [ $vcfNeedsToBeSubsetByChr = "TRUE" ]
+then
+	echo "need to subset the vcf by chromosome/interval first (needed for apes)" >> $log
+	subset_vcf_snippet='-R $intervalLabel'
+elif [ $vcfNeedsToBeSubsetByChr = "FALSE" ]
+then
+	echo "don't need to subset vcf by chr/interval" >> $log
+	subset_vcf_snippet=''
+else
+	echo "not a valid vcfNeedsToBeSubsetByChr option"
+fi
+
+##################### removing individuals ###################
+# this checks if variable is empty: 
+if [ -e $individualsToExclude ]
+then
+	echo "no individuals to remove" >> $log
+	rm_inds_snippet=''
+else
+	echo "removing the following individuals : $individualsToExclude " >> $log
+	rm_inds_snippet='-s $individualsToExclude'
+fi
+
 
 ############ build mutyper variants code #########
 
@@ -135,9 +151,9 @@ mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos 0 $strict_s
 ######### need to subset vcf prior to processing? ############
 # requires double quotes (single don't work)
 lineOfCode="${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}" 
-echo $lineOfCode > $wd/${species}.${todaysdate}.log
+echo $lineOfCode > $wd/${species}.${todaysdate}.mutyper_variants.log
 # always start with bcftools view then add in other snippets ; if you don't need to pre-subset the vcf by chr then $subset_vcf_snippet will be empty and it'll just read the vcf
 
 # run the code: (not yet )
-#### $lineOfCode
+$lineOfCode
 ####### need to deal with intervals/chromosomes --- especially for vaquita. wrapper script? how to pull -t from config file?  
