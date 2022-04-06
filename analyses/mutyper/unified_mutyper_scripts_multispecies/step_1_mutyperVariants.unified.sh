@@ -48,7 +48,7 @@ cp $configfile $wd/COPYOFCONGIGFILEUSEDON.${todaysdate}.txt
 
 
 ######## set up log file #########
-log=$wd/logs/${species}.${intervallabel}.${todaysdate}.mutyper_variants.log
+log=$wd/logs/${species}.${intervalLabel}.${todaysdate}.mutyper_variants.log
 > $log
 
 echo "vcffile: $vcfdir/$vcffilename" >> $log
