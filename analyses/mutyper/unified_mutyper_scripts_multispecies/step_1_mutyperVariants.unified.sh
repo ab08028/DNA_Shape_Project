@@ -158,9 +158,16 @@ mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos 0 $strict_s
 ######### need to subset vcf prior to processing? ############
 # requires double quotes (single don't work)
 lineOfCode="${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}" 
-echo $lineOfCode > $wd/${species}.${todaysdate}.mutyper_variants.log
+echo $lineOfCode >> $log
+
+# make a function and run it:
+myMutyperVariantsFunc() {
+
+	$lineOfCode
+
+}
 # always start with bcftools view then add in other snippets ; if you don't need to pre-subset the vcf by chr then $subset_vcf_snippet will be empty and it'll just read the vcf
 
 # run the code: (not yet )
-$lineOfCode
+myMutyperVariantsFunc
 ####### need to deal with intervals/chromosomes --- especially for vaquita. wrapper script? how to pull -t from config file?  
