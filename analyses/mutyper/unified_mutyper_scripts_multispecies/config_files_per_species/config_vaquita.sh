@@ -46,7 +46,7 @@ label=${kmersize}_mer
 
 ########## input vcf files (should be polarized and have non -pol sites removed (except for humans/apes)) ############
 vcfdir="/net/harris/vol1/home/beichman/vaquita/vcfs/SNPsOnly/polarized/20210216"
-vcffilename="$vcfdir/vaquita_20_simple_PASS_autos_variants_outgroupAlleles_ancAllele.vcf.gz" # note this is autosomes only (so don't need to exclude chrX,Y etc.)
+vcffilename="vaquita_20_simple_PASS_autos_variants_outgroupAlleles_ancAllele.vcf.gz" # note this is autosomes only (so don't need to exclude chrX,Y etc.)
 vcfNeedsToBeSubsetByChr=FALSE
 
 
