@@ -124,20 +124,11 @@ mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos $chrom_pos 
 # requires double quotes (single don't work)
 # always start with bcftools view then add in other snippets ; if you don't need to pre-subset the vcf by chr then $subset_vcf_snippet will be empty and it'll just read the vcf
 
-# make function:
-myMutyperVariantsFunc() {
-ls $vcfdir/$vcffilename
-${initialize_subsetifneeded_snippet} | head
-${initialize_subsetifneeded_snippet} | ${filter_snippet} | head
-${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | head
-${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}
-
-
-}
-#echo "FINAL CODE LINE: \n\n" >> $log
-#echo "$lineOfCode" >> $log
+lineOfCode="${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}" 
+echo "FINAL CODE LINE: \n\n" >> $log
+echo "$lineOfCode" >> $log
 
 
 # run it:
-myMutyperVariantsFunc
+eval $lineOfCode
 
