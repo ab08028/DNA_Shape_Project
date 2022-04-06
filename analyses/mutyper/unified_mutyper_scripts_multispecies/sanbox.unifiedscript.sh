@@ -16,47 +16,45 @@
 set -eou pipefail
 
 configfile=$1
-interval_or_chr_or_all=$2
-prepend0=$3
+#interval_or_chr_or_all=$2
+#prepend0=$3
 todaysdate=`date +%Y%m%d` # for the log file 
 
 
-echo " these are the config settings "
-cat $configfile
-echo "end of config settings"
-
 ########## get interval (or chr) number ############
-if [ $interval_or_chr_or_all = "interval" ]
-then
-	# prepend 01 02 if needed 
-	if [ $prepend0 = "TRUE" ]
-	then
-		interval=`printf %02d ${SGE_TASK_ID}`
-	elif [ $prepend0 = "FALSE" ]
-	then
-		interval=${SGE_TASK_ID}
-	else
-		echo "invalid prepend0 option"
-		exit 1
-	fi
-	# set interval label: 
-	intervalLabel=interval_${interval}
-elif [ $interval_or_chr_or_all = "chr" ]
-then
-	interval=${SGE_TASK_ID}
-	intervalLabel=chr${interval} # label for output files 
-elif [ $interval_or_chr_or_all= "allautos" ]
-then
-	interval='' # no intervals 
-	intervalLabel="allautos"
-fi
+# if [ $interval_or_chr_or_all = "interval" ]
+# then
+# 	# prepend 01 02 if needed 
+# 	if [ $prepend0 = "TRUE" ]
+# 	then
+# 		interval=`printf %02d ${SGE_TASK_ID}`
+# 	elif [ $prepend0 = "FALSE" ]
+# 	then
+# 		interval=${SGE_TASK_ID}
+# 	else
+# 		echo "invalid prepend0 option"
+# 		exit 1
+# 	fi
+# 	# set interval label: 
+# 	intervalLabel=interval_${interval}
+# elif [ $interval_or_chr_or_all = "chr" ]
+# then
+# 	interval=${SGE_TASK_ID}
+# 	intervalLabel=chr${interval} # label for output files 
+# elif [ $interval_or_chr_or_all= "allautos" ]
+# then
+# 	interval='' # no intervals 
+# 	intervalLabel="allautos"
+# fi
+# 
+# echo $interval
 
 ############### NOW SOURCE CONFIG FILE ONCE INTERVALS HAVE BEEN SET ###############
-source $configfile
+sh $configfile
 
-echo " these are the config settings "
-cat $configfile
-echo "end of config settings"
+#echo " these are the config settings "
+#cat $configfile
+#echo "end of config settings"
 
 ls $vcfdir/$vcffilename
 ################# restricting to only PASS sites ##################
