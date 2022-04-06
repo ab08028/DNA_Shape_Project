@@ -5,6 +5,13 @@
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 
+
+module load modules modules-init modules-gs # initialize modules 
+module load python/3.7.7 # need python >3.7
+module load samtools/1.9 # contains bgzip
+module load htslib/1.9 bcftools/1.12 # for filtering out fixed sites (higher version of bcftools)
+module load bedtools/2.29.2
+
 ######## generic script #########
 # need either/or for a few things
 # removing individuals due to quality or other issues (gorilla, chimp, vaquita, fin whale)

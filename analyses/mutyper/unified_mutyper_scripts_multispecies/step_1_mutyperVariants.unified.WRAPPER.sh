@@ -2,7 +2,7 @@
 scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/mutyper/unified_mutyper_scripts_multispecies
 configdir=$scriptdir/config_files_per_species
 
-script=$scriptdir/sanbox.unifiedscript.sh
+script=$scriptdir/step_1_mutyperVariants.unified.sh
 
 speciesList='bears'  # ,mice,fin_whale,
 
