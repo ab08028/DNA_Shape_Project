@@ -129,7 +129,7 @@ echo $lineOfCode >> $log
 # make a function and run it:
 myMutyperVariantsFunc() {
 
-	$lineOfCode
+	"$lineOfCode" # needs double quotes around whole thing otherwise get '|' around pipes.
 
 }
 # always start with bcftools view then add in other snippets ; if you don't need to pre-subset the vcf by chr then $subset_vcf_snippet will be empty and it'll just read the vcf
