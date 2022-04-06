@@ -46,7 +46,7 @@ label=${kmersize}_mer # can add other notes here
 
 ########## input vcf files (should be polarized and have non -pol sites removed (except for humans/apes)) ############
 vcfdir="/net/harris/vol1/home/beichman/fin_whale/analyses/keightley_polarization/20211020_focalENP_out1MegNov_out2BalMus/vcfs_with_ancestral_alleles/perInterval"
-vcffilename="$vcfdir/OnlySitesWithConfidentAncAllelesFromExtSFS.90-10Range.PASSSITESPlusWarnCpGRefSitesONLY.lowqualremoved.JointCalls_f50b4_08_B_VariantFiltration_${interval}.vcf.gz"
+vcffilename="OnlySitesWithConfidentAncAllelesFromExtSFS.90-10Range.PASSSITESPlusWarnCpGRefSitesONLY.lowqualremoved.JointCalls_f50b4_08_B_VariantFiltration_${interval}.vcf.gz"
 vcfNeedsToBeSubsetByChr=FALSE
 
 
