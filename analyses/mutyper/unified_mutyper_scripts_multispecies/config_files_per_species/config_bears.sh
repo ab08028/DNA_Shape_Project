@@ -1,6 +1,7 @@
 #### run config file as a script to set variables ###
 
 
+
 ####### species specific files and parameters: #####
 species=bears
 
@@ -11,7 +12,7 @@ prepend0=FALSE # TRUE if intervals are counted as 01 02 03 etc. (fin whale); onl
 interval_count=31
 
 
-########## set interval value from SGE_TASK_ID ########
+########## set interval value from SGE_TASK_ID (*code is the same for all species*) ########
 if [ $interval_or_chr_or_all = "interval" ]
 then
 	# prepend 01 02 if needed 
@@ -54,8 +55,10 @@ vcfNeedsToBeSubsetByChr=FALSE
 NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/brown_bear_GCF_003584765.1/perInterval/interval${interval}.brown_bear_GCF_003584765.1.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed"
 
 
-############ ancestral fasta ####################
+############ ancestral fasta info ####################
 ancestralFastafilename="/net/harris/vol1/home/beichman/bears/analyses/ancestralReferenceFastas/brown_bear/interval_${interval}/MODIFIED.ANCESTRAL.brown_bear.interval_${interval}.fasta"
+sep="\s" # separator for ancestral fasta
+chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############
 individualsToExclude='' # keep this empty if you don't wasnt to exclude any individuals
