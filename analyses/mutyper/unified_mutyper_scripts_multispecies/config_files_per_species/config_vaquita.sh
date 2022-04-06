@@ -32,7 +32,7 @@ elif [ $interval_or_chr_or_all = "chr" ]
 then
 	interval=${SGE_TASK_ID}
 	intervalLabel=chr${interval} # label for output files 
-elif [ $interval_or_chr_or_all= "allautos" ]
+elif [ $interval_or_chr_or_all = "allautos" ]
 then
 	interval="allautos" # no intervals 
 	intervalLabel="allautos"
