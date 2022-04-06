@@ -114,7 +114,7 @@ fi
 
 # code snippets: 
 # MUST use double quotes! 
-initialize_subsetifneeded_snippet="bcftools view $vcfdir/$vcffilename $subset_vcf_snippet -Ou" # initialize with this. if no subsetting needed it'll just start reading the vcf. saves issues with needing to supply vcf at diff parts of pipe
+initialize_subsetifneeded_snippet="bcftools view $subset_vcf_snippet $vcfdir/$vcffilename -Ou" # initialize with this. if no subsetting needed it'll just start reading the vcf. saves issues with needing to supply vcf at diff parts of pipe
 filter_snippet="bcftools view $rm_inds_snippet -T ^$NEGATIVEMASK -m2 -M2 -v snps $pass_snippet -Ou" # if passOption=False then $pass_snippet will be ''; if no inds to remove it will be blank
 no_fixed_sites_snippet="bcftools view -c 1:minor -Ou" # this will removed 0/0 sites but keep in fixed 1/1 sites
 missing_data_snippet="bcftools view -g ^miss -Ou" # removes missing data 
@@ -127,10 +127,10 @@ mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos $chrom_pos 
 # make function:
 myMutyperVariantsFunc() {
 ls $vcfdir/$vcffilename
-"${initialize_subsetifneeded_snippet} | head"
-"${initialize_subsetifneeded_snippet} | ${filter_snippet} | head"
-"${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | head"
-"${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}" 
+${initialize_subsetifneeded_snippet} | head
+${initialize_subsetifneeded_snippet} | ${filter_snippet} | head
+${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | head
+${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}
 
 
 }
