@@ -58,7 +58,7 @@ echo " these are the config settings "
 cat $configfile
 echo "end of config settings"
 
-ls $vcfdir/$vcffile
+ls $vcfdir/$vcffilename
 ################# restricting to only PASS sites ##################
 if [ $passOption = "TRUE" ]
 then
@@ -111,6 +111,19 @@ else
 fi
 
 
+###### set up outdir/outfiles #######
+wd=/net/harris/vol1/home/beichman/DNAShape/analyses/mutyper/unified_mutyper_results/$label/$species
+variantdir=$wd/mutyper_variant_files/
+spectrumdir=$wd/mutyper_spectrum_files/
+ksfsdir=$wd/mutyper_ksfs_files/
+
+mkdir -p $wd
+mkdir -p $variantdir
+mkdir -p $spectrumdir
+mkdir -p $ksfsdir
+
+mutypervariantsoutputname=${species}.int_or_chr_${interval}.mutyper.variants.SomeRevComped.SeeLogForFilters.${kmersize}mer.vcf.gz
+
 ############ build mutyper variants code #########
 
 # code snippets: 
@@ -119,26 +132,12 @@ initialize_subsetifneeded_snippet="bcftools view $subset_vcf_snippet $vcfdir/$vc
 filter_snippet="bcftools view $rm_inds_snippet -T ^$NEGATIVEMASK -m2 -M2 -v snps $pass_snippet -Ou" # if passOption=False then $pass_snippet will be ''; if no inds to remove it will be blank
 no_fixed_sites_snippet="bcftools view -c 1:minor -Ou" # this will removed 0/0 sites but keep in fixed 1/1 sites
 missing_data_snippet="bcftools view -g ^miss -Ou" # removes missing data 
-mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos 0 $strict_snippet $ancestralFastafilename -  | bcftools convert -Oz -o ${mutypervariantsoutputname}" # if strictoption=FALSE then it will be '' and not used
-
-# could make and run a piece of code instead? with a header and -t and everything? maybe that's the way. and then submit it?
-# but still would need something for fin whale intervals that are 01 02 03 : think about on wednesday! 
-# assemble code:
- # need to do this part at some point: 
-wd=/net/harris/vol1/home/beichman/DNAShape/analyses/mutyper/unified_mutyper_results/$label/$species
-variantdir=$wd/mutyper_variant_files/
-spectrumdir=$wd/mutyper_spectrum_files/
-ksfsdir=$wd/mutyper_ksfs_files/
-
-#mkdir -p $wd
-#mkdir -p $variantdir
-#mkdir -p $spectrumdir
-#mkdir -p $ksfsdir
+mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos 0 $strict_snippet $ancestralFastafilename -  | bcftools convert -Oz -o $variantdir/${mutypervariantsoutputname}" # if strictoption=FALSE then it will be '' and not used
 
 ######### need to subset vcf prior to processing? ############
 # requires double quotes (single don't work)
 lineOfCode="${initialize_subsetifneeded_snippet} | ${filter_snippet} | ${no_fixed_sites_snippet} | ${missing_data_snippet} | ${mutyper_variants_snippet}" 
-echo $lineOfCode > ${species}.${todaysdate}.log
+echo $lineOfCode > $wd/${species}.${todaysdate}.log
 # always start with bcftools view then add in other snippets ; if you don't need to pre-subset the vcf by chr then $subset_vcf_snippet will be empty and it'll just read the vcf
 
 # run the code: (not yet )
