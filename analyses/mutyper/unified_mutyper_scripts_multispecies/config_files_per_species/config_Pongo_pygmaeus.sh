@@ -58,7 +58,6 @@ NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksFo
 
 ############ ancestral fasta info ####################
 ancestralFastafilename="/net/harris/vol1/home/beichman/apes/polarized_ref_fastas/hg18_references_with_gagp_ancestral_alleles_exclude_recurrent/Pongo_pygmaeus_chr${interval}.fa" # made by Michael
-sep="\s" # separator for ancestral fasta
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

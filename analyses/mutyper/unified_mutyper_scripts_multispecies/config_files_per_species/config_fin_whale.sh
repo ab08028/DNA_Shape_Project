@@ -56,7 +56,6 @@ NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksFo
 
 ############ ancestral fasta info ####################
 ancestralFastafilename="/net/harris/vol1/home/beichman/fin_whale/analyses/ancestralReferenceFastas/20211020_focalENP_out1MegNov_out2BalMus/FINAL.MODIFIED.ANCESTRAL.interval_${interval}_finWhale_Ancestral_extSFS_gte90-lte10Range_NOTEthisisMinkeWhaleRefGenome.butAncCallsAreforfinWhaleHumpbackBlueWhale_notforMinke.includesCpGandRepeatSites.fasta"
-sep="\s" # separator for ancestral fasta
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

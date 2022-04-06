@@ -55,8 +55,7 @@ NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksFo
 
 
 ############ ancestral fasta info ####################
-ancestralFastafilename="/net/harris/vol1/home/beichman/reference_genomes/homo_sapiens_ancestor_GRCh38/homo_sapiens_ancestor_chr${interval}.fa"
-sep="\s" # separator for ancestral fasta
+ancestralFastafilename="/net/harris/vol1/home/beichman/reference_genomes/homo_sapiens_ancestor_GRCh38/homo_sapiens_ancestor_${interval}.fa" # note filename doesn't hae chr in it
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

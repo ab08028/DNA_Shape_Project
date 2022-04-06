@@ -58,7 +58,6 @@ NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksFo
 
 ############ ancestral fasta info ####################
 ancestralFastafilename="/net/harris/vol1/home/beichman/mice/analyses/ancestralReferenceFastas/20210225_focalMmd_out1Mmm_out2Ms/FINAL.MODIFIED.ANCESTRAL.chr${interval}_mouseAncestral_extSFS_gte90-lte10Range.fasta"
-sep="\s" # separator for ancestral fasta
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

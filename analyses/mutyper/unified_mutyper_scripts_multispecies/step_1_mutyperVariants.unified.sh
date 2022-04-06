@@ -120,7 +120,7 @@ initialize_subsetifneeded_snippet="bcftools view $subset_vcf_snippet $vcfdir/$vc
 filter_snippet="bcftools view $rm_inds_snippet -T ^$NEGATIVEMASK -m2 -M2 -v snps $pass_snippet -Ou" # if passOption=False then $pass_snippet will be ''; if no inds to remove it will be blank
 no_fixed_sites_snippet="bcftools view -c 1:minor -Ou" # this will removed 0/0 sites but keep in fixed 1/1 sites
 missing_data_snippet="bcftools view -g ^miss -Ou" # removes missing data 
-mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos $chrom_pos --sep $sep $strict_snippet $ancestralFastafilename -  | bcftools convert -Oz -o $variantdir/${mutypervariantsoutputname}" # if strictoption=FALSE then it will be '' and not used
+mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos $chrom_pos $strict_snippet $ancestralFastafilename -  | bcftools convert -Oz -o $variantdir/${mutypervariantsoutputname}" # if strictoption=FALSE then it will be '' and not used
 
 ######### need to subset vcf prior to processing? ############
 # requires double quotes (single don't work)
