@@ -32,7 +32,7 @@ todaysdate=`date +%Y%m%d` # for the log file
 source $configfile
 
 ###### set up outdir/outfiles #######
-wd=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/$label/$species/mutyper_results_masked_${masklabel}
+wd=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/$label/$species/mutyper_results_masked_${maskLabel}
 variantdir=$wd/mutyper_variant_files
 spectrumdir=$wd/mutyper_spectrum_files
 ksfsdir=$wd/mutyper_ksfs_files
@@ -57,7 +57,7 @@ echo "negative mask: $NEGATIVEMASK" >> $log
 
 
 ######### set up output name ###########
-mutypervariantsoutputname=${species}.int_or_chr_${interval}.mutyper.variants.SomeRevComped.SeeLogForFilters.${kmersize}mer.vcf.gz
+mutypervariantsoutputname=${species}.int_or_chr_${interval}.mutyper.variants.SomeRevComped.SeeLogForFilters.${maskLabel}.${kmersize}mer.vcf.gz
 
 ################# restricting to only PASS sites ##################
 if [ $passOption = "TRUE" ]

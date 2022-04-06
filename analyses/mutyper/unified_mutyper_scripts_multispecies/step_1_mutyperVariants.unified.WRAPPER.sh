@@ -21,7 +21,7 @@ then
 	qsub -N ${species} $script $configfile
 
 else
-	qsub -N ${species} -t 1--${interval_count} $script $configfile
+	qsub -N ${species} -t 1-${interval_count} $script $configfile
 fi
 
 done 
