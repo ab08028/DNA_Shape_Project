@@ -50,7 +50,7 @@ todaysdate=`date +%Y%m%d` # for the log file
 # echo $interval
 
 ############### NOW SOURCE CONFIG FILE ONCE INTERVALS HAVE BEEN SET ###############
-sh $configfile
+source $configfile
 
 #echo " these are the config settings "
 #cat $configfile
