@@ -3,13 +3,13 @@
 
 
 ####### species specific files and parameters: #####
-species=bears
+species=fin_whale
 
 
 ##### flags for dealing with genome splitting by chr or interval ########
 interval_or_chr_or_all=interval  # are genomes split into "interval"", "chr" or "allautos" (allautosomes) ; note that chimp vcfs are whole genome but am splitting them up during processing
-prepend0=FALSE # TRUE if intervals are counted as 01 02 03 etc. (fin whale); only valid with "interval" (not with chr)
-interval_count=31
+prepend0=TRUE # TRUE if intervals are counted as 01 02 03 etc. (fin whale); only valid with "interval" (not with chr)
+interval_count=96
 
 
 ########## set interval value from SGE_TASK_ID (*code is the same for all species*) ########
@@ -45,22 +45,22 @@ kmersize=7
 label=${kmersize}_mer
 
 ########## input vcf files (should be polarized and have non -pol sites removed (except for humans/apes)) ############
-vcfdir="/net/harris/vol1/home/beichman/bears/variant_calling/mapped_to_brown_bear/vcfs/vcf_20200916_brown_bear/interval_${interval}/SNPsOnly/phased"
-vcffilename="PHASED.mergedSamples.POLARIZED.SNPs.filt_variants_4b.LowCovIndsREMOVED.nomissfiltapplied.PASS.WARN.Only.CustomFilt.HardFilt.AnnotVar.TrimAlt.ref_brown_bear.int_${interval}.withINFO.vcf.gz"
+vcfdir="/net/harris/vol1/home/beichman/fin_whale/analyses/keightley_polarization/20211020_focalENP_out1MegNov_out2BalMus/vcfs_with_ancestral_alleles/perInterval"
+vcffilename="$vcfdir/OnlySitesWithConfidentAncAllelesFromExtSFS.90-10Range.PASSSITESPlusWarnCpGRefSitesONLY.lowqualremoved.JointCalls_f50b4_08_B_VariantFiltration_${interval}.vcf.gz"
 vcfNeedsToBeSubsetByChr=FALSE
 
 
 ############# *negative* mask (regions you DON'T want to use in spectrum)  ################
-NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/brown_bear_GCF_003584765.1/perInterval/interval${interval}.brown_bear_GCF_003584765.1.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed"
+NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/minke_whale_GCF_000493695.1_BalAcu1.0/perInterval/interval${interval}.minke_whale_GCF_000493695.1_BalAcu1.0.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed"
 
 
 ############ ancestral fasta info ####################
-ancestralFastafilename="/net/harris/vol1/home/beichman/bears/analyses/ancestralReferenceFastas/brown_bear/interval_${interval}/MODIFIED.ANCESTRAL.brown_bear.interval_${interval}.fasta"
+ancestralFastafilename="/net/harris/vol1/home/beichman/fin_whale/analyses/ancestralReferenceFastas/20211020_focalENP_out1MegNov_out2BalMus/FINAL.MODIFIED.ANCESTRAL.interval_${interval}_finWhale_Ancestral_extSFS_gte90-lte10Range_NOTEthisisMinkeWhaleRefGenome.butAncCallsAreforfinWhaleHumpbackBlueWhale_notforMinke.fasta"
 sep="\s" # separator for ancestral fasta
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############
-individualsToExclude='' # keep this empty if you don't wasnt to exclude any individuals
+individualsToExclude='BalAcu02,BalMus01,MegNov01,EubGla01,ENPOR12,ENPAK28' # keep this empty if you don't wasnt to exclude any individuals
 
 ######## divide inds into pops : ##########
 #pops=''
@@ -68,8 +68,7 @@ individualsToExclude='' # keep this empty if you don't wasnt to exclude any indi
 
 
 ####### mutyper variants options ######
-passOption=TRUE  # options: TRUE or FALSE. do you want to only select sites that are PASS? TRUE for most species, except for fin whales
-
+passOption=FALSE  # options: TRUE or FALSE. do you want to only select sites that are PASS? TRUE for most species, except for fin whales where I want to keep in the sites previously filtered as CPGs and Repeats (already removed all otehr bad sites)
 strictOption=FALSE # options: TRUE OR FALSE. 
 # do you want to ignore softmasked sites in ancestral ref fasta? 
 # If TRUE you will ignore those sites, if FALSE you will not ignore them. 

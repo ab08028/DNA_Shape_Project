@@ -3,13 +3,13 @@
 
 
 ####### species specific files and parameters: #####
-species=bears
+species=vaquita
 
 
 ##### flags for dealing with genome splitting by chr or interval ########
-interval_or_chr_or_all=interval  # are genomes split into "interval"", "chr" or "allautos" (allautosomes) ; note that chimp vcfs are whole genome but am splitting them up during processing
+interval_or_chr_or_all=allautos  # are genomes split into "interval"", "chr" or "allautos" (allautosomes) ; note that chimp vcfs are whole genome but am splitting them up during processing
 prepend0=FALSE # TRUE if intervals are counted as 01 02 03 etc. (fin whale); only valid with "interval" (not with chr)
-interval_count=31
+interval_count=NA # not needed because all together in one file 
 
 
 ########## set interval value from SGE_TASK_ID (*code is the same for all species*) ########
@@ -45,22 +45,23 @@ kmersize=7
 label=${kmersize}_mer
 
 ########## input vcf files (should be polarized and have non -pol sites removed (except for humans/apes)) ############
-vcfdir="/net/harris/vol1/home/beichman/bears/variant_calling/mapped_to_brown_bear/vcfs/vcf_20200916_brown_bear/interval_${interval}/SNPsOnly/phased"
-vcffilename="PHASED.mergedSamples.POLARIZED.SNPs.filt_variants_4b.LowCovIndsREMOVED.nomissfiltapplied.PASS.WARN.Only.CustomFilt.HardFilt.AnnotVar.TrimAlt.ref_brown_bear.int_${interval}.withINFO.vcf.gz"
+vcfdir="/net/harris/vol1/home/beichman/vaquita/vcfs/SNPsOnly/polarized/20210216"
+vcffilename="$vcfdir/vaquita_20_simple_PASS_autos_variants_outgroupAlleles_ancAllele.vcf.gz" # note this is autosomes only (so don't need to exclude chrX,Y etc.)
 vcfNeedsToBeSubsetByChr=FALSE
 
 
 ############# *negative* mask (regions you DON'T want to use in spectrum)  ################
-NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/brown_bear_GCF_003584765.1/perInterval/interval${interval}.brown_bear_GCF_003584765.1.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed"
-
+NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/vaquita_mPhoSin1/vaquita_mPhoSin1.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed"
+# note for vaquita it's the whole genome mask
 
 ############ ancestral fasta info ####################
-ancestralFastafilename="/net/harris/vol1/home/beichman/bears/analyses/ancestralReferenceFastas/brown_bear/interval_${interval}/MODIFIED.ANCESTRAL.brown_bear.interval_${interval}.fasta"
+ancestralFastafilename="/net/harris/vol1/home/beichman/vaquita/analyses/ancestralReferenceFasta/MODIFIED.ANCESTRAL.vaquitaAncestral.fasta"
 sep="\s" # separator for ancestral fasta
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############
-individualsToExclude='' # keep this empty if you don't wasnt to exclude any individuals
+individualsToExclude='z0001663,z0004380,z0004393,z0004394,z0185383' # keep this empty if you don't wasnt to exclude any individuals
+# for vaquita, these are relatives of inds left in the dataset
 
 ######## divide inds into pops : ##########
 #pops=''
@@ -70,7 +71,7 @@ individualsToExclude='' # keep this empty if you don't wasnt to exclude any indi
 ####### mutyper variants options ######
 passOption=TRUE  # options: TRUE or FALSE. do you want to only select sites that are PASS? TRUE for most species, except for fin whales
 
-strictOption=FALSE # options: TRUE OR FALSE. 
+strictOption=FALSE # options: TRUE OR FALSE. (doesn't matter for vaquita since is all upper case, but keep as false) 
 # do you want to ignore softmasked sites in ancestral ref fasta? 
 # If TRUE you will ignore those sites, if FALSE you will not ignore them. 
 # Softmasked sites only meaningful in human ancestral ref fasta (indicate sites that couldn't be polarized). 

@@ -54,6 +54,7 @@ echo "vcffile: $vcfdir/$vcffilename" >> $log
 echo "ancestral fasta: $ancestralFastafilename" >> $log
 echo "negative mask: $NEGATIVEMASK" >> $log
 
+
 ######### set up output name ###########
 mutypervariantsoutputname=${species}.int_or_chr_${interval}.mutyper.variants.SomeRevComped.SeeLogForFilters.${kmersize}mer.vcf.gz
 
@@ -129,6 +130,14 @@ echo "FINAL CODE LINE: \n\n" >> $log
 echo "$lineOfCode" >> $log
 
 
-# run it:
+# run it: (need to use eval otherwise bash splits the code strangely)
 eval $lineOfCode
+
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in mutyper variants"
+	exit 1
+else
+	echo "finished"
+fi
 
