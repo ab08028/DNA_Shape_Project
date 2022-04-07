@@ -19,10 +19,10 @@ source $configfile # load species info
 if [ $interval_or_chr_or_all = "allautos" ]
 then
 	# if is all autosomes you don't need intervals: 
-	qsub -N ${species} $script $configfile
+	qsub -N ${species}_targets $script $configfile
 
 else
-	qsub -N ${species} -t 1-${interval_count} $script $configfile
+	qsub -N ${species}_targets -t 1-${interval_count} $script $configfile
 fi
 
 done 

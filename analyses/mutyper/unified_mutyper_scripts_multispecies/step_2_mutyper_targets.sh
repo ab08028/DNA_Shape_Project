@@ -78,8 +78,8 @@ fi
 #################### mask the ancestral fasta using the negative mask file *regions you DONT want * ###########
 #### note that these fastas don't contain any non-autosome chroms (made sure for each species. but you should make sure before running)
 # note this is a HARD MASK (NNNNN) (soft mask wouldn't work without --strict in mutyper variants).
-
-bedtools maskfasta -fi $ancestralFastafilename -bed $NEGATIVEMASK -fo $targetdir/${ancestralFastafilename%.fasta}.NEGATIVEMASKED.temp.fasta
+tempfasta=$targetdir/${species}.${intervalLabel}.NEGATIVEMASKED.temp.fasta
+bedtools maskfasta -fi $ancestralFastafilename -bed $NEGATIVEMASK -fo $tempfasta
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
@@ -94,7 +94,7 @@ fi
 ######## mutyper targets: input the masked fasta ###########
 targetsoutfilename=${species}.int_or_chr_${interval}.mutyper.targets.SeeLogForFilters.${maskLabel}.${kmersize}mer.txt
 
-mutyper targets ${strict_snippet} --chrom_pos $chrom_pos --k $kmersize $targetdir/${ancestralFastafilename%.fasta}.NEGATIVEMASKED.temp.fasta > $targetdir/$targetsoutfilename
+mutyper targets ${strict_snippet} --chrom_pos $chrom_pos --k $kmersize $tempfasta > $targetdir/$targetsoutfilename
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
