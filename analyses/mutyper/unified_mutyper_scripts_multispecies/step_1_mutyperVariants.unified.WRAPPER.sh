@@ -6,7 +6,7 @@ script=$scriptdir/step_1_mutyperVariants.unified.sh
 
 #speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
 #speciesList='Gorilla_gorilla Pan_troglodytes vaquita'
-speciesList=vaquita
+speciesList='bears vaquita'
 # for vaquita need to submit with no intervals 
 
 for species in $speciesList
@@ -22,7 +22,7 @@ then
 	qsub -N ${species}_variants $script $configfile
 
 else
-	qsub -N ${species}_variants -t 1-${interval_count} $script $configfile
+	qsub -N ${species}_variants -t 1-1 $script $configfile
 fi
 
 done 

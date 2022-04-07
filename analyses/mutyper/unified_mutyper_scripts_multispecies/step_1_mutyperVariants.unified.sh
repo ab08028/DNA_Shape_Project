@@ -127,7 +127,7 @@ fi
 maskedancestralfasta=$maskedfastadir/${ancestralFastafilename%.fasta}.HARDMASKED.Ns.${maskLabel}.fasta # set name of fasta that has been masked wtih whatever negative mask you're using
 
 # negative hard-mask your fasta file with NNNNNNs
-bedtools maskfasta -fi $ancenstralFastaDir/$ancestralFastafilename -bed $NEGATIVEMASK -fo $maskedancestralfasta
+bedtools maskfasta -fi $ancestralFastaDir/$ancestralFastafilename -bed $NEGATIVEMASK -fo $maskedancestralfasta
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then
