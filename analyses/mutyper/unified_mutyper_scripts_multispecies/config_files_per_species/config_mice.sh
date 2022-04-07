@@ -58,6 +58,7 @@ maskLabel=maskALL
 
 
 ############ ancestral fasta info ####################
+# make sure doesn't contain non-autosome chrs/scaffs that weren't used in genotype calling (i have confirmed for all my species)
 ancestralFastafilename="/net/harris/vol1/home/beichman/mice/analyses/ancestralReferenceFastas/20210225_focalMmd_out1Mmm_out2Ms/FINAL.MODIFIED.ANCESTRAL.chr${interval}_mouseAncestral_extSFS_gte90-lte10Range.fasta"
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 

@@ -36,12 +36,14 @@ wd=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/$label/$spe
 variantdir=$wd/mutyper_variant_files
 spectrumdir=$wd/mutyper_spectrum_files
 ksfsdir=$wd/mutyper_ksfs_files
+targetdir=$wd/mutyper_target_files
 
 mkdir -p $wd
 mkdir -p $wd/logs
 mkdir -p $variantdir
 mkdir -p $spectrumdir
 mkdir -p $ksfsdir
+mkdir -p $targetdir
 
 ######## set up log file #########
 log=$wd/logs/${species}.${intervalLabel}.${todaysdate}.mutyper_variants.log

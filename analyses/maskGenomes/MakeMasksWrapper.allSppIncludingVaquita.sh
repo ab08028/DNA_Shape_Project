@@ -15,6 +15,9 @@
 #repeatMaskerBed=$4 # full path to species rep masker file *in bed format *
 #trfBed=$5 # full path to species trf file *in bed format*  # note for vaquita that trf and rep mask are alrready combined so need a slightly different script.
 
+
+### note that these genomes may contain regions that weren't called in snp files (like chrX ) -- I have made sure that downstream I subset them to the correct regions
+
 scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/maskGenomes
 
 ############ humans ###########
