@@ -27,3 +27,4 @@ fi
 done 
 
 # want to be able to rerun a single species or interval eventually ? 
+# runs fast for all species except humans

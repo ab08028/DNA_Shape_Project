@@ -43,18 +43,20 @@ mkdir -p $variantdir
 mkdir -p $spectrumdir
 mkdir -p $ksfsdir
 
-#make a copy of config file as it was used:
-cp $configfile $wd/COPYOFCONGIGFILEUSEDON.${todaysdate}.txt
-
-
 ######## set up log file #########
 log=$wd/logs/${species}.${intervalLabel}.${todaysdate}.mutyper_variants.log
 > $log
 
 echo "vcffile: $vcfdir/$vcffilename" >> $log
+echo ""
 echo "ancestral fasta: $ancestralFastafilename" >> $log
+echo ""
 echo "negative mask: $NEGATIVEMASK" >> $log
-
+echo ""
+echo "################## COPY OF CONTIG FILE: ##########################"
+echo ""
+cat $configfile >> $log
+echo "#########################################################"
 
 ######### set up output name ###########
 mutypervariantsoutputname=${species}.int_or_chr_${interval}.mutyper.variants.SomeRevComped.SeeLogForFilters.${maskLabel}.${kmersize}mer.vcf.gz
