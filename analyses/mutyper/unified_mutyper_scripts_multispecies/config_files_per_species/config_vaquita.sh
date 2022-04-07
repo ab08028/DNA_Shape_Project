@@ -57,7 +57,8 @@ maskLabel=maskALL
 
 ############ ancestral fasta info ####################
 # make sure doesn't contain non-autosome chrs/scaffs that weren't used in genotype calling (i have confirmed for all my species)
-ancestralFastafilename="/net/harris/vol1/home/beichman/vaquita/analyses/ancestralReferenceFasta/MODIFIED.ANCESTRAL.vaquitaAncestral.autosomesOnly.chr1-21.fasta" # updated on 20220507 to just have autosomes chr 1-21
+ancestralFastaDir="/net/harris/vol1/home/beichman/vaquita/analyses/ancestralReferenceFasta/"
+ancestralFastafilename="MODIFIED.ANCESTRAL.vaquitaAncestral.autosomesOnly.chr1-21.fasta" # updated on 20220507 to just have autosomes chr 1-21
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

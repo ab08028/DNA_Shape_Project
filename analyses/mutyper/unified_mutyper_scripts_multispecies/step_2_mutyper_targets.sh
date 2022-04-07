@@ -6,12 +6,7 @@
 #$ -M annabel.beichman@gmail.com
 
 ############## mutyper targets ###########
-###### NOTE this step can be run concurrently as mutyper variants 
-# get from config file: intervals; ancestral fasta; negative mask
-# also need to restrict fasta to just those regions that I'm considering (some sort of positive mask)
-# eg bears its only the scaffolds that are in my contigs
-# for humans its chrs 1-22 (autosomes)
-# for vaquita it's autosomes (1-??)
+# must be run after variants because you need the masked fasta file
 
 module load modules modules-init modules-gs # initialize modules 
 module load python/3.7.7 # need python >3.7
@@ -60,6 +55,10 @@ echo "" >> $log
 cat $configfile >> $log
 echo "#########################################################" >> $log
 
+############## masked ancestral fasta (from step 1) ###########
+maskedancestralfasta=$maskedfastadir/${ancestralFastafilename%.fasta}.HARDMASKED.Ns.${maskLabel}.fasta
+
+
 #################### using --strict ######################
 # need strict for humans only
 if [ $strictOption = "TRUE" ]
@@ -75,26 +74,10 @@ else
 	exit 1
 fi
 
-#################### mask the ancestral fasta using the negative mask file *regions you DONT want * ###########
-#### note that these fastas don't contain any non-autosome chroms (made sure for each species. but you should make sure before running)
-# note this is a HARD MASK (NNNNN) (soft mask wouldn't work without --strict in mutyper variants).
-tempfasta=$targetdir/${species}.${intervalLabel}.NEGATIVEMASKED.temp.fasta
-bedtools maskfasta -fi $ancestralFastafilename -bed $NEGATIVEMASK -fo $tempfasta
-
-exitVal=$?
-if [ ${exitVal} -ne 0 ]; then
-	echo "error in bedtools maskfasta"
-	exit 1
-else
-	echo "finished"
-fi
-
-
-
 ######## mutyper targets: input the masked fasta ###########
 targetsoutfilename=${species}.int_or_chr_${interval}.mutyper.targets.SeeLogForFilters.${maskLabel}.${kmersize}mer.txt
 
-mutyper targets ${strict_snippet} --chrom_pos $chrom_pos --k $kmersize $tempfasta > $targetdir/$targetsoutfilename
+mutyper targets ${strict_snippet} --chrom_pos $chrom_pos --k $kmersize $maskedancestralfasta > $targetdir/$targetsoutfilename
 
 exitVal=$?
 if [ ${exitVal} -ne 0 ]; then

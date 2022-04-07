@@ -1,5 +1,7 @@
 ######### Wrapper script to submit mutyper variants #############
-# note can be run concurrently with step_1 (mutyper variants)
+# must be run after step_1 because you need the masked ancestral fasta
+
+
 scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/mutyper/unified_mutyper_scripts_multispecies
 configdir=$scriptdir/config_files_per_species
 
@@ -22,7 +24,7 @@ then
 	qsub -N ${species}_targets $script $configfile
 
 else
-	qsub -N ${species}_targets -t 1-${interval_count} $script $configfile
+	qsub -N ${species}_targets -t 1-1 $script $configfile
 fi
 
 done 

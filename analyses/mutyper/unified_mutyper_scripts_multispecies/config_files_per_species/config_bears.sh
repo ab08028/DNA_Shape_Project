@@ -56,7 +56,8 @@ maskLabel=maskALL
 
 ############ ancestral fasta info ####################
 # make sure doesn't contain non-autosome chrs/scaffs that weren't used in genotype calling (i have confirmed for all my species)
-ancestralFastafilename="/net/harris/vol1/home/beichman/bears/analyses/ancestralReferenceFastas/brown_bear/interval_${interval}/MODIFIED.ANCESTRAL.brown_bear.interval_${interval}.fasta"
+ancestralFastaDir="/net/harris/vol1/home/beichman/bears/analyses/ancestralReferenceFastas/brown_bear/interval_${interval}/"
+ancestralFastafilename="MODIFIED.ANCESTRAL.brown_bear.interval_${interval}.fasta"
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

@@ -59,7 +59,8 @@ maskLabel=maskALL
 
 ############ ancestral fasta info ####################
 # make sure doesn't contain non-autosome chrs/scaffs that weren't used in genotype calling (i have confirmed for all my species)
-ancestralFastafilename="/net/harris/vol1/home/beichman/apes/polarized_ref_fastas/hg18_references_with_gagp_ancestral_alleles_exclude_recurrent/Pan_paniscus_chr${interval}.fa" # made by Michael
+ancestralFastaDir="/net/harris/vol1/home/beichman/apes/polarized_ref_fastas/hg18_references_with_gagp_ancestral_alleles_exclude_recurrent/"
+ancestralFastafilename="Pan_paniscus_chr${interval}.fa" # made by Michael
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

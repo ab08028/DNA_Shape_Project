@@ -56,7 +56,8 @@ maskLabel=maskALL
 
 ############ ancestral fasta info ####################
 # make sure doesn't contain non-autosome chrs/scaffs that weren't used in genotype calling (i have confirmed for all my species)
-ancestralFastafilename="/net/harris/vol1/home/beichman/reference_genomes/homo_sapiens_ancestor_GRCh38/homo_sapiens_ancestor_${interval}.fa" # note filename doesn't hae chr in it
+ancestralFastaDir="/net/harris/vol1/home/beichman/reference_genomes/homo_sapiens_ancestor_GRCh38/"
+ancestralFastafilename="homo_sapiens_ancestor_${interval}.fa" # note filename doesn't hae chr in it
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

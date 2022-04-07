@@ -57,7 +57,8 @@ maskLabel=maskALL
 
 ############ ancestral fasta info ####################
 # make sure doesn't contain non-autosome chrs/scaffs that weren't used in genotype calling (i have confirmed for all my species)
-ancestralFastafilename="/net/harris/vol1/home/beichman/fin_whale/analyses/ancestralReferenceFastas/20211020_focalENP_out1MegNov_out2BalMus/FINAL.MODIFIED.ANCESTRAL.interval_${interval}_finWhale_Ancestral_extSFS_gte90-lte10Range_NOTEthisisMinkeWhaleRefGenome.butAncCallsAreforfinWhaleHumpbackBlueWhale_notforMinke.includesCpGandRepeatSites.fasta"
+ancestralFastaDir="/net/harris/vol1/home/beichman/fin_whale/analyses/ancestralReferenceFastas/20211020_focalENP_out1MegNov_out2BalMus/"
+ancestralFastafilename="FINAL.MODIFIED.ANCESTRAL.interval_${interval}_finWhale_Ancestral_extSFS_gte90-lte10Range_NOTEthisisMinkeWhaleRefGenome.butAncCallsAreforfinWhaleHumpbackBlueWhale_notforMinke.includesCpGandRepeatSites.fasta"
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

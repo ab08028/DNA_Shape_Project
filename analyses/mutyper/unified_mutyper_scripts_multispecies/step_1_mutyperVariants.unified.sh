@@ -37,6 +37,7 @@ variantdir=$wd/mutyper_variant_files
 spectrumdir=$wd/mutyper_spectrum_files
 ksfsdir=$wd/mutyper_ksfs_files
 targetdir=$wd/mutyper_target_files
+maskedfastadir=$wd/masked_ancestral_fasta_files
 
 mkdir -p $wd
 mkdir -p $wd/logs
@@ -44,6 +45,7 @@ mkdir -p $variantdir
 mkdir -p $spectrumdir
 mkdir -p $ksfsdir
 mkdir -p $targetdir
+mkdir -p $maskedfastadir
 
 ######## set up log file #########
 log=$wd/logs/${species}.${intervalLabel}.${todaysdate}.mutyper_variants.log
@@ -51,7 +53,7 @@ log=$wd/logs/${species}.${intervalLabel}.${todaysdate}.mutyper_variants.log
 
 echo "vcffile: $vcfdir/$vcffilename" >> $log
 echo "" >> $log
-echo "ancestral fasta: $ancestralFastafilename" >> $log
+echo "ancestral fasta: $ancestralFastaDir/$ancestralFastafilename (note that I used the masked version for mutyper variants and targets)" >> $log
 echo "" >> $log
 echo "negative mask: $NEGATIVEMASK" >> $log
 echo "" >> $log
@@ -116,6 +118,25 @@ else
 fi
 
 
+####################### first, mask the ancestral fasta file ##############
+# I'm doing this out of an abundance of caution to avoid 7mers that extend into a masked region that shouldn't get called #############
+#################### mask the ancestral fasta using the negative mask file *regions you DONT want * ###########
+#### note that these fastas don't contain any non-autosome chroms (made sure for each species. but you should make sure before running)
+# note this is a HARD MASK (NNNNN) (soft mask wouldn't work without --strict in mutyper variants).
+
+maskedancestralfasta=$maskedfastadir/${ancestralFastafilename%.fasta}.HARDMASKED.Ns.${maskLabel}.fasta # set name of fasta that has been masked wtih whatever negative mask you're using
+
+# negative hard-mask your fasta file with NNNNNNs
+bedtools maskfasta -fi $ancenstralFastaDir/$ancestralFastafilename -bed $NEGATIVEMASK -fo $maskedancestralfasta
+
+exitVal=$?
+if [ ${exitVal} -ne 0 ]; then
+	echo "error in bedtools maskfasta"
+	exit 1
+else
+	echo "finished"
+fi
+
 ############ build mutyper variants code #########
 
 # code snippets: 
@@ -124,7 +145,8 @@ initialize_subsetifneeded_snippet="bcftools view $subset_vcf_snippet $vcfdir/$vc
 filter_snippet="bcftools view $rm_inds_snippet -T ^$NEGATIVEMASK -m2 -M2 -v snps $pass_snippet -Ou" # if passOption=False then $pass_snippet will be ''; if no inds to remove it will be blank
 no_fixed_sites_snippet="bcftools view -c 1:minor -Ou" # this will removed 0/0 sites but keep in fixed 1/1 sites
 missing_data_snippet="bcftools view -g ^miss -Ou" # removes missing data 
-mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos $chrom_pos $strict_snippet $ancestralFastafilename -  | bcftools convert -Oz -o $variantdir/${mutypervariantsoutputname}" # if strictoption=FALSE then it will be '' and not used
+# note: am using masked ancestral fasta here just in case 7mer extended sequence context overlaps with a masked region (dont want to include)
+mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos $chrom_pos $strict_snippet $maskedancestralfasta -  | bcftools convert -Oz -o $variantdir/${mutypervariantsoutputname}" # if strictoption=FALSE then it will be '' and not used
 
 ######### need to subset vcf prior to processing? ############
 # requires double quotes (single don't work)
