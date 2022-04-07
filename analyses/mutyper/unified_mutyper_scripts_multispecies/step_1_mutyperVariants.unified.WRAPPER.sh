@@ -4,9 +4,9 @@ configdir=$scriptdir/config_files_per_species
 
 script=$scriptdir/step_1_mutyperVariants.unified.sh
 
-#speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
+speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
 #speciesList='Gorilla_gorilla Pan_troglodytes vaquita'
-speciesList='bears vaquita'
+
 # for vaquita need to submit with no intervals 
 
 for species in $speciesList
@@ -22,10 +22,7 @@ then
 	qsub -N ${species}_variants $script $configfile
 
 else
-	qsub -N ${species}_variants -t 1-1 $script $configfile
+	qsub -N ${species}_variants -t 1-${interval_count} $script $configfile
 fi
 
 done 
-
-# want to be able to rerun a single species or interval eventually ? 
-# runs fast for all species except humans
