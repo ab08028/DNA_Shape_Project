@@ -41,7 +41,7 @@ echo $species
 # use = with [] and == with [[]]
 if [ $species = "Gorilla" ]
 then
-indsToRemove='Gorilla_gorilla_gorilla-X00108_Abe,Gorilla_gorilla_gorilla-KB7973_Porta'
+indsToRemove='Gorilla_gorilla_gorilla-X00108_Abe,Gorilla_gorilla_gorilla-KB7973_Porta' 
 elif [ $species = "Pan_troglodytes" ]
 then
 indsToRemove='Pan_troglodytes_ellioti-Banyo'

@@ -56,7 +56,7 @@ NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksFo
 maskLabel=maskALL
 
 ############ ancestral fasta info ####################
-ancestralFastafilename="/net/harris/vol1/home/beichman/vaquita/analyses/ancestralReferenceFasta/MODIFIED.ANCESTRAL.vaquitaAncestral.fasta"
+ancestralFastafilename="/net/harris/vol1/home/beichman/vaquita/analyses/ancestralReferenceFasta/MODIFIED.ANCESTRAL.vaquitaAncestral.autosomesOnly.chr1-21.fasta" # updated on 20220507 to just have autosomes chr 1-21
 chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahblah)
 
 ########### individuals to exclude ############

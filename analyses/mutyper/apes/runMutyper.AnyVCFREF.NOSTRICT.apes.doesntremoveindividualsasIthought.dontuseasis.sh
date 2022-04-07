@@ -57,35 +57,37 @@ zcat ${whole_callability_mask} | grep -w $label | awk 'BEGIN {OFS="\t"}; {print 
 # 20211101 modified from will's code 
 # adding bed mask 
 # need to remove sepcific inds for chimp and gorilla -- how? 
-
-if individualsToExclude=="none"
-then
-
-bcftools view -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize --sep "\s" $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
-
-exitVal=$?
-if [ ${exitVal} -ne 0 ]; then
-	echo "error in mutyper variants"
-	exit 1
-else
-	echo "finished"
-fi
-
-elif individualsToExclude!="none"
-
-then
-bcftools view -s ^$individualsToExclude -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou  $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
-exitVal=$?
-
-if [ ${exitVal} -ne 0 ]; then
-	echo "error in mutyper variants"
-	exit 1
-else
-	echo "finished"
-fi
-
-
-fi
+# ############# NOTE!!!!!!!!!!!!!!!!!!!!!! on 20220504 I realized that the below code isn't functional, so I hadn't removed these gorilla individuals from the dataset
+#### maybe that's why gorillas are a bit weird? only affects gorilla and one chimp so not so bad, but not great!!! 
+####### DON'T USE AS IS, DOESN'T WORK CORRECLTY (WRONG VARIABLE)
+# if individualsToExclude=="none"
+# then
+# 
+# bcftools view -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize --sep "\s" $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
+# 
+# exitVal=$?
+# if [ ${exitVal} -ne 0 ]; then
+# 	echo "error in mutyper variants"
+# 	exit 1
+# else
+# 	echo "finished"
+# fi
+# 
+# elif individualsToExclude!="none"
+# 
+# then
+# bcftools view -s ^$individualsToExclude -c 1:minor -R ${chr_callability_mask} -m2 -M2 -v snps -f PASS -Ou  $vcffilename | bcftools view -g ^miss -Ou |  mutyper variants --k $kmersize $refgenome - | bcftools convert -Oz -o ${variantsoutfile} # from WIll's code, different way to output bcftools output
+# exitVal=$?
+# 
+# if [ ${exitVal} -ne 0 ]; then
+# 	echo "error in mutyper variants"
+# 	exit 1
+# else
+# 	echo "finished"
+# fi
+# 
+# 
+# fi
 
 ######## skipping spectrum for now; just need 7mer ksfs #########
 

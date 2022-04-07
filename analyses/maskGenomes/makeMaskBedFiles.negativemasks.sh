@@ -113,7 +113,7 @@ awk -F'\t' 'BEGIN{SUM=0}{ SUM+=$3-$2 }END{print SUM}'  $trffinal > ${trffinal%.b
 
 ########## CpG Islands ############
 echo "CpG Islands"
-cpgIslandsFinal=$outdir/${label}.cpgIslands.0based.sorted.merge.dbed
+cpgIslandsFinal=$outdir/${label}.cpgIslands.0based.sorted.merged.bed
 bedtools sort -i $cpgIslandsBed | bedtools merge -i stdin > $cpgIslandsFinal
 
 exitVal=$?

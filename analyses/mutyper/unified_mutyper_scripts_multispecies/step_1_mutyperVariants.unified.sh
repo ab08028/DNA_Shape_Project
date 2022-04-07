@@ -48,15 +48,15 @@ log=$wd/logs/${species}.${intervalLabel}.${todaysdate}.mutyper_variants.log
 > $log
 
 echo "vcffile: $vcfdir/$vcffilename" >> $log
-echo ""
+echo "" >> $log
 echo "ancestral fasta: $ancestralFastafilename" >> $log
-echo ""
+echo "" >> $log
 echo "negative mask: $NEGATIVEMASK" >> $log
-echo ""
-echo "################## COPY OF CONTIG FILE: ##########################"
-echo ""
+echo "" >> $log
+echo "################## COPY OF CONTIG FILE: ##########################" >> $log
+echo "" >> $log
 cat $configfile >> $log
-echo "#########################################################"
+echo "#########################################################" >> $log
 
 ######### set up output name ###########
 mutypervariantsoutputname=${species}.int_or_chr_${interval}.mutyper.variants.SomeRevComped.SeeLogForFilters.${maskLabel}.${kmersize}mer.vcf.gz
