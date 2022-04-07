@@ -134,7 +134,7 @@ if [ ${exitVal} -ne 0 ]; then
 	echo "error in bedtools maskfasta"
 	exit 1
 else
-	echo "finished"
+	echo "done with bedtools maskfasta"
 fi
 
 ############ build mutyper variants code #########
@@ -165,6 +165,6 @@ if [ ${exitVal} -ne 0 ]; then
 	echo "error in mutyper variants"
 	exit 1
 else
-	echo "finished"
+	echo "finished script"
 fi
 
