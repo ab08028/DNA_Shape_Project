@@ -76,7 +76,7 @@ then
 		exit 1
 	else
 		echo "done with per pop spectrum"
-	
+	fi
 	# per individual (for pca):
 	bcftools view -c 1:minor $mutypervariantsoutputname | mutyper spectra --randomize - > $spectrumdir/${species}.int_or_chr_${interval}.mutyper.spectrum.SeeLogForFilters.${maskLabel}.${kmersize}mer.PERINDIVIDUAL.RANDOMIZEDWITHINPOPULATION.txt
 
@@ -87,11 +87,12 @@ then
 		exit 1
 	else
 		echo "finished script"
-fi
+	fi
 
 else
 	echo "splitting into pops: $pops" >> $log
 	for pop in $pops
+	do
 		echo -e "starting $pop"
 		popfile=$poplistdir/${pop}.${popfilesuffix} 
 
@@ -110,7 +111,7 @@ else
 			exit 1
 		else
 			echo "done with per pop spectrum"
-		
+		fi
 		
 		# per individual (for pca):
 		bcftools view -S $popfile $mutypervariantsoutputname |  bcftools view -c 1:minor  | mutyper spectra --randomize - > $spectrumpopdir/${species}.${pop}.int_or_chr_${interval}.mutyper.spectrum.SeeLogForFilters.${maskLabel}.${kmersize}mer.PERINDIVIDUAL.RANDOMIZEDWITHINPOPULATION.txt
@@ -120,6 +121,8 @@ else
 			exit 1
 		else
 			echo "finished script"
+		fi
+	done
 			
 fi
 ######## TO FIGURE OUT: HAVEN'T FIGURED OUT RANDOMIZE ACROSS POPULATIONS WHILE STILL REMOVING FIXED SITES BETWEEN POPULATIONS (NEED TO FIGURE THIS OUT FOR KSFS TOO)
