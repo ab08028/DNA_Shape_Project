@@ -70,7 +70,7 @@ then
 	# all individuals summarized spectrum: (still calling it PERPOPULATION for consistency)
 	bcftools view -c 1:minor $variantdir/$mutypervariantsoutputname | mutyper spectra --population - > $spectrumdir/${species}.int_or_chr_${interval}.mutyper.spectrum.SeeLogForFilters.${maskLabel}.${kmersize}mer.PERPOPULATION.txt
 	
-		
+	exitVal=$?
 	if [ ${exitVal} -ne 0 ]; then
 		echo "error in mutyper spectrum"
 		exit 1
@@ -81,7 +81,7 @@ then
 	bcftools view -c 1:minor $variantdir/$mutypervariantsoutputname | mutyper spectra --randomize - > $spectrumdir/${species}.int_or_chr_${interval}.mutyper.spectrum.SeeLogForFilters.${maskLabel}.${kmersize}mer.PERINDIVIDUAL.RANDOMIZEDWITHINPOPULATION.txt
 
 	
-	
+	exitVal=$?
 	if [ ${exitVal} -ne 0 ]; then
 		echo "error in mutyper spectrum"
 		exit 1
@@ -106,6 +106,7 @@ else
 		# per population:
 		bcftools view -S $popfile $variantdir/$mutypervariantsoutputname |  bcftools view -c 1:minor  | mutyper spectra --population - > $spectrumpopdir/${species}.${pop}.int_or_chr_${interval}.mutyper.spectrum.SeeLogForFilters.${maskLabel}.${kmersize}mer.PERPOPULATION.txt
 		
+		exitVal=$?
 		if [ ${exitVal} -ne 0 ]; then
 			echo "error in mutyper spectrum"
 			exit 1
@@ -116,6 +117,7 @@ else
 		# per individual (for pca):
 		bcftools view -S $popfile $variantdir/$mutypervariantsoutputname |  bcftools view -c 1:minor  | mutyper spectra --randomize - > $spectrumpopdir/${species}.${pop}.int_or_chr_${interval}.mutyper.spectrum.SeeLogForFilters.${maskLabel}.${kmersize}mer.PERINDIVIDUAL.RANDOMIZEDWITHINPOPULATION.txt
 
+		exitVal=$?
 		if [ ${exitVal} -ne 0 ]; then
 			echo "error in mutyper spectrum"
 			exit 1
