@@ -59,7 +59,7 @@ echo "pops:" $pops
 if [ -z $pops ] # if no pops defined
 then
 	echo "not splitting into pops" >> $log
-	bcftools view -c 1:minor $mutypervariantsoutputname | mutyper ksfs - > $ksfsdir/${species}.int_or_chr_${interval}.mutyper.ksfs.SeeLogForFilters.${maskLabel}.${kmersize}mer.txt
+	bcftools view -c 1:minor $variantdir/$mutypervariantsoutputname | mutyper ksfs - > $ksfsdir/${species}.int_or_chr_${interval}.mutyper.ksfs.SeeLogForFilters.${maskLabel}.${kmersize}mer.txt
 else
 	echo "splitting into pops: $pops" >> $log
 	for pop in $pops
@@ -75,7 +75,7 @@ else
 		# NOTE this REMOVES in fixed sites per population (sites fixed across all inds have already been removed)
 
 		# per population:
-		bcftools view -S $popfile $mutypervariantsoutputname |  bcftools view -c 1:minor  | mutyper ksfs - > $ksfspopdir/${species}.${pop}.int_or_chr_${interval}.mutyper.ksfs.SeeLogForFilters.${maskLabel}.${kmersize}mer.txt
+		bcftools view -S $popfile variantdir/$mutypervariantsoutputname |  bcftools view -c 1:minor  | mutyper ksfs - > $ksfspopdir/${species}.${pop}.int_or_chr_${interval}.mutyper.ksfs.SeeLogForFilters.${maskLabel}.${kmersize}mer.txt
 		done
 
 fi
