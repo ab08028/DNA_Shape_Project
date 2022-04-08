@@ -107,8 +107,9 @@ else
 fi
 
 ##################### removing individuals ###################
-# this checks if variable is empty: 
-if [ -e $individualsToExclude ]
+# this checks if variable is empty using -z (-z is TRUE if variable is empty or is '' ); previously had this as -e and it still worked but -z is more correct I think. 
+# z is TRUE if string is EMPTY
+if [ -z $individualsToExclude ]
 then
 	echo "no individuals to remove" >> $log
 	rm_inds_snippet=''

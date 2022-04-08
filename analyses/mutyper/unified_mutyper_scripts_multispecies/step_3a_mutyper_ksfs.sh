@@ -55,14 +55,15 @@ mutypervariantsoutputname=${species}.int_or_chr_${interval}.mutyper.variants.Som
 ######### iterate through populations if pops are provided #######
 # if no pops provided, all inds are part of the population 
 # if there aren't any pops defined then run without subsetting inds out: 
-
-if [ -ne $pops ] # if no pops defined
+echo "pops:" $pops
+if [ -z $pops ] # if no pops defined
 then
 	echo "not splitting into pops" >> $log
 	bcftools view -S $popfile $ALLFREQSvariantsOutfile |  bcftools view -c 1:minor  | mutyper ksfs - > $ksfsdir/${species}.int_or_chr_${interval}.mutyper.ksfs.SeeLogForFilters.${maskLabel}.${kmersize}mer.txt
 else
 	echo "splitting into pops: $pops" >> $log
 	for pop in $pops
+		do
 		echo -e "starting $pop"
 		popfile=$poplistdir/${pop}.${popfilesuffix} 
 
@@ -75,6 +76,7 @@ else
 
 		# per population:
 		bcftools view -S $popfile $mutypervariantsoutputname |  bcftools view -c 1:minor  | mutyper ksfs - > $ksfspopdir/${species}.${pop}.int_or_chr_${interval}.mutyper.ksfs.SeeLogForFilters.${maskLabel}.${kmersize}mer.txt
+		done
 
 fi
 
