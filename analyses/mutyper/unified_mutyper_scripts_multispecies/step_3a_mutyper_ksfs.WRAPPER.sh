@@ -15,6 +15,10 @@ do
 configfile=$configdir/config_${species}.sh
 source $configfile # load species info 
 
+#make error file:
+mkdir -p /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_ksfs
+
+
 # for vaquita need to submit with no intervals 
 if [ $interval_or_chr_or_all = "allautos" ]
 then

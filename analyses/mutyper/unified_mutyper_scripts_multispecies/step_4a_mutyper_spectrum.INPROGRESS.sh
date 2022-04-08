@@ -1,9 +1,16 @@
 #! /bin/bash
 #$ -l h_rt=50:00:00,mfree=6G
-#$ -o /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_targets
-#$ -e /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_targets
+#$ -o /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_spectrum
+#$ -e /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_spectrum
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
+
+############ haven't figured out yet:  still trying to solve fixed variation vs shared variation isssue between pops/species 
+# how much of an issue is this? would affect: fin whale (GOC enp); bears (ABC AND PB); 
+# issue is that you can either separate by pop prior ot individual spectra to eliminate fixed 1/1 sites (good) or you can keep pops together to eliminate shared variation (good)
+# but currently cannot do *BOTH* which is what we need to do. not sure how critical this will be. currently erring on side of eliminating fixed 1/1 variation within a pop and randomize among inds of a pop
+# if I wanted to do this for apes would need to merge vcfs (did that somewhere)
+# seems like a bigger deal for hamming distance, but probably not critical for this analysis, except for dogs/wolves. 
 
 ############## mutyper spectrum #################
 # must be run after variants because you need the masked fasta file (can be run concurrently with targets/ksfs)
