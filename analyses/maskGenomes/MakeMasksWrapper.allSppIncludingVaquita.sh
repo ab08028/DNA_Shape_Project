@@ -20,7 +20,7 @@
 
 scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/maskGenomes
 
-############ humans ###########
+############ humans (mapped to hg38) ###########
 label=humans_GRCh38
 faiFile=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/hg38.fa.gz.fai # note is ancestral fai, which is fine - still is GrCh38
 gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotation/hg38.ensGene.gtf.gz # usin ensembl genes
@@ -30,6 +30,17 @@ cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/human_GRCh38_annotat
 
 qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed $cpgIslands
 
+
+####### apes (mapped to hg18) ######
+### important: because apes are mapped to an older version of the human genome, the hg38 mask is NOT COMPATIBLE so they need their own mask:
+label=apes_mapped_to_hg18
+faiFile=/net/harris/vol1/home/beichman/reference_genomes/human_hg18_OLDVERSIONOFGENOMETHATAPESWEREMAPPEDTO_DONTUSEFORNONAPES/hg18.chrom.sizes # note just is the first 2 cols of a .fai file (from ucsc; should work ok)
+gff_or_gtf=/net/harris/vol1/home/beichman/reference_genomes/human_hg18_OLDVERSIONOFGENOMETHATAPESWEREMAPPEDTO_DONTUSEFORNONAPES/hg18.EnsembleGenes.UCSC.gtf.gz
+repeatMaskerBed=/net/harris/vol1/home/beichman/reference_genomes/human_hg18_OLDVERSIONOFGENOMETHATAPESWEREMAPPEDTO_DONTUSEFORNONAPES/hg18.RepeatMasker.UCSC.bed
+trfBed=/net/harris/vol1/home/beichman/reference_genomes/human_hg18_OLDVERSIONOFGENOMETHATAPESWEREMAPPEDTO_DONTUSEFORNONAPES/hg18.TRF.SimpleRepeats.UCSC.bed.gz
+cpgIslands=/net/harris/vol1/home/beichman/reference_genomes/human_hg18_OLDVERSIONOFGENOMETHATAPESWEREMAPPEDTO_DONTUSEFORNONAPES/hg18.CpGIslands.UCSC.bed.gz
+
+qsub -N $label $scriptdir/makeMaskBedFiles.negativemasks.sh $label $faiFile $gff_or_gtf $repeatMaskerBed $trfBed $cpgIslands
 
 ######## minke whale ########
 label=minke_whale_GCF_000493695.1_BalAcu1.0

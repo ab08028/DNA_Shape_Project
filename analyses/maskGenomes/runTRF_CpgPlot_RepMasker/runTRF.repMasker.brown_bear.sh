@@ -73,6 +73,6 @@ fi
 
 # need to convert trf *dat file to bed file 
 # https://github.com/Adamtaranto/TRF2GFF
-python2  /net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/maskGenomes/trf2gff.adamtaranto.py --d $wd/trf/*dat -o $wd/trf/trf.output.converted.gff3
+python2  /net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/maskGenomes/runTRF_CpgPlot_RepMasker/trf2gff.adamtaranto.py --d $wd/trf/*dat -o $wd/trf/trf.output.converted.gff3
 # then convert to bed and sort and merge 
 awk 'BEGIN {OFS="\t"} {print $1,$4-1,$5}' $wd/trf/trf.output.converted.gff3 | bedtools sort -i stdin | bedtools merge -i stding > $wd/trf/trf.output.sorted.merged.0based.bed

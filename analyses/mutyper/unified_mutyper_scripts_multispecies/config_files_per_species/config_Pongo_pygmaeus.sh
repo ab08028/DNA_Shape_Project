@@ -52,8 +52,8 @@ vcfNeedsToBeSubsetByChr=TRUE # because it needs to be subset during processing a
 
 
 ############# *negative* mask (regions you DON'T want to use in spectrum)  ################
-NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/humans_GRCh38/perInterval/chr${interval}.humans_GRCh38.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed" ## ONE NEGATIVE MASK FILE PER INTERVAL
-# apes use same negative mask as humans (no longer using ape callability mask)
+NEGATIVEMASK="/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/apes_mapped_to_hg18/perInterval/chr${interval}.apes_mapped_to_hg18.exon10kb.repmask.trf.cpgIslands.NEGATIVEMASK.merged.USETHIS.bed" # ONE MASK FILE PER INTERVAL
+# note: apes cannot use same negative mask as humans because are mapped to diff ref genomes (humans: hg38; apes: hg18 old), so have made a different hg18 specific mask for the apes
 maskLabel=maskALL
 
 
@@ -67,7 +67,7 @@ chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahbla
 individualsToExclude=''
 
 ######## divide inds into pops : ##########
-#popFile=
+pops='' # have it blank if no pops to split into and don't need to define other terms
 
 
 ####### mutyper variants options ######

@@ -143,7 +143,7 @@ fi
 # MUST use double quotes! 
 initialize_subsetifneeded_snippet="bcftools view $subset_vcf_snippet $vcfdir/$vcffilename -Ou" # initialize with this. if no subsetting needed it'll just start reading the vcf. saves issues with needing to supply vcf at diff parts of pipe
 filter_snippet="bcftools view $rm_inds_snippet -T ^$NEGATIVEMASK -m2 -M2 -v snps $pass_snippet -Ou" # if passOption=False then $pass_snippet will be ''; if no inds to remove it will be blank
-no_fixed_sites_snippet="bcftools view -c 1:minor -Ou" # this will removed 0/0 sites but keep in fixed 1/1 sites
+no_fixed_sites_snippet="bcftools view -c 1:minor -Ou" # this will removed sites that are fixed 0/0 or 1/1 across the whole dataset after bad inds removed (will still have fixed sites within populations)
 missing_data_snippet="bcftools view -g ^miss -Ou" # removes missing data 
 # note: am using masked ancestral fasta here just in case 7mer extended sequence context overlaps with a masked region (dont want to include)
 mutyper_variants_snippet="mutyper variants --k $kmersize --chrom_pos $chrom_pos $strict_snippet $maskedancestralfasta -  | bcftools convert -Oz -o $variantdir/${mutypervariantsoutputname}" # if strictoption=FALSE then it will be '' and not used

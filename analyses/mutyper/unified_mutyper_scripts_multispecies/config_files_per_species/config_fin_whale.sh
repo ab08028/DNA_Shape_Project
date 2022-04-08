@@ -65,8 +65,9 @@ chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahbla
 individualsToExclude='BalAcu02,BalMus01,MegNov01,EubGla01,ENPOR12,ENPAK28' # keep this empty if you don't wasnt to exclude any individuals
 
 ######## divide inds into pops : ##########
-#pops=''
-#popFileDir=
+pops='ENP GOC'
+poplistdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/fin_whale_spectrum/samples/
+popfilesuffix=".txt" # format pop.txt
 
 
 ####### mutyper variants options ######

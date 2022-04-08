@@ -28,6 +28,18 @@ awk -v chr=chr${i} 'BEGIN {OFS="\t"} {if($1==chr)print}' $wd/$negativemask_allch
 done
 
 
+##### apes mapped to hg18 #########
+label=apes_mapped_to_hg18
+wd=/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/apes_mapped_to_hg18
+mkdir $wd/perInterval
+negativemask_allchr=${label}.${suffixForMask}
+for i in {1..22} # 22 for humans/apes 
+do
+awk -v chr=chr${i} 'BEGIN {OFS="\t"} {if($1==chr)print}' $wd/$negativemask_allchr > $wd/perInterval/chr${i}.${negativemask_allchr}
+
+
+done
+
 ### dogs:
 label=dog_canFam3
 wd=/net/harris/vol1/home/beichman/reference_genomes/unifiedBedMasksForAllGenomes/$label

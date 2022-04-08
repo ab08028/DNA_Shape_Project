@@ -66,8 +66,8 @@ individualsToExclude='z0001663,z0004380,z0004393,z0004394,z0185383' # keep this 
 # for vaquita, these are relatives of inds left in the dataset
 
 ######## divide inds into pops : ##########
-#pops=''
-#popFileDir=
+pops='' # have it blank if no pops to split into and don't need to define other terms
+
 
 
 ####### mutyper variants options ######

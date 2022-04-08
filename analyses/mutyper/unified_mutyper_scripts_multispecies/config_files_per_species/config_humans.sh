@@ -64,7 +64,9 @@ chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahbla
 individualsToExclude='' # keep this empty if you don't wasnt to exclude any individuals
 
 ######## divide inds into pops : ##########
-#popFile=
+pops='AFR AMR EAS EUR SAS'
+poplistdir=/net/harris/vol1/home/beichman/humans/sample_information/
+popfilesuffix=".sampleList.txt" # format pop.sampleList.txt
 
 
 ####### mutyper variants options ######

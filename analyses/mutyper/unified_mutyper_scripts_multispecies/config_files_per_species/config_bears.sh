@@ -64,9 +64,9 @@ chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahbla
 individualsToExclude='' # keep this empty if you don't wasnt to exclude any individuals
 
 ######## divide inds into pops : ##########
-#pops=''
-#popFileDir=
-
+pops='EUR ABC PB'
+poplistdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/BearAdmixtureProject/samples/populationFilesForMutyper
+popfilesuffix=".txt" # format pop.txt
 
 ####### mutyper variants options ######
 passOption=TRUE  # options: TRUE or FALSE. do you want to only select sites that are PASS? TRUE for most species, except for fin whales

@@ -67,8 +67,9 @@ chrom_pos=0 # 0-based position of chr name in fasta (e.g. >chr1 blahlbah blahbla
 individualsToExclude='' # keep this empty if you don't wasnt to exclude any individuals
 
 ######## divide inds into pops : ##########
-#pops=''
-#popFileDir=
+pops='Mmd Mmc Mmm Ms'
+poplistdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/BearAdmixtureProject/samples/mouseSamples/populationFilesForMutyper
+popfilesuffix=".txt" # format pop.txt
 
 
 ####### mutyper variants options ######

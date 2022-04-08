@@ -46,7 +46,7 @@ mkdir -p $targetdir
 
 log=$wd/logs/${species}.${intervalLabel}.${todaysdate}.mutyper_targets.log
 > $log
-echo "ancestral fasta: $ancestralFastafilename" >> $log
+echo "ancestral fasta: $ancestralFastafilename (note am using negative masked version of fasta)" >> $log
 echo "" >> $log
 echo "negative mask: $NEGATIVEMASK" >> $log
 echo "" >> $log
