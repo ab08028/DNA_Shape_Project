@@ -65,7 +65,7 @@ else
 	for pop in $pops
 		do
 		echo -e "starting $pop"
-		popfile=$poplistdir/${pop}.${popfilesuffix} 
+		popfile=$poplistdir/${pop}${popfilesuffix}  # suffix is in format .sampleList.txt or .txt
 
 		ksfspopdir=$ksfsdir/$pop
 		mkdir -p $ksfspopdir
