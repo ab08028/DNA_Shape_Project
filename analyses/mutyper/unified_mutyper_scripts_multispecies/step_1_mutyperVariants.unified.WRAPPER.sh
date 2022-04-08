@@ -6,7 +6,7 @@ script=$scriptdir/step_1_mutyperVariants.unified.sh
 
 speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
 #speciesList='Gorilla_gorilla Pan_troglodytes vaquita'
-
+#speciesList='Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
 # for vaquita need to submit with no intervals 
 
 for species in $speciesList

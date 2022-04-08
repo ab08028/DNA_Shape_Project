@@ -35,13 +35,14 @@ variantdir=$wd/mutyper_variant_files
 spectrumdir=$wd/mutyper_spectrum_files
 ksfsdir=$wd/mutyper_ksfs_files
 targetdir=$wd/mutyper_target_files
+maskedfastadir=$wd/masked_ancestral_fasta_files
 
-mkdir -p $wd
-mkdir -p $wd/logs
-mkdir -p $variantdir
-mkdir -p $spectrumdir
-mkdir -p $ksfsdir
-mkdir -p $targetdir
+#mkdir -p $wd
+#mkdir -p $wd/logs
+#mkdir -p $variantdir
+#mkdir -p $spectrumdir
+#mkdir -p $ksfsdir
+#mkdir -p $targetdir
 
 
 log=$wd/logs/${species}.${intervalLabel}.${todaysdate}.mutyper_targets.log
