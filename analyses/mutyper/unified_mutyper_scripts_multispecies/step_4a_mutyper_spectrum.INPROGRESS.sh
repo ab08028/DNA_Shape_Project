@@ -94,7 +94,7 @@ else
 	for pop in $pops
 	do
 		echo -e "starting $pop"
-		popfile=$poplistdir/${pop}.${popfilesuffix} 
+		popfile=$poplistdir/${pop}${popfilesuffix} 
 
 		spectrumpopdir=$spectrumdir/$pop
 		mkdir -p $spectrumpopdir
