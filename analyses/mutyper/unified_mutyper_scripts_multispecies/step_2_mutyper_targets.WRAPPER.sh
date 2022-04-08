@@ -7,8 +7,8 @@ configdir=$scriptdir/config_files_per_species
 
 script=$scriptdir/step_2_mutyper_targets.sh 
 
-# speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
-speciesList='bears vaquita'
+speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
+#speciesList='bears vaquita'
 for species in $speciesList
 do
 
@@ -22,7 +22,7 @@ then
 	qsub -N ${species}_targets $script $configfile
 
 else
-	qsub -N ${species}_targets -t 1-1 $script $configfile # -t 1-${interval_count}
+	qsub -N ${species}_targets -t 1-${interval_count} $script $configfile # -t 1-${interval_count}
 fi
 
 done 

@@ -7,8 +7,8 @@ configdir=$scriptdir/config_files_per_species
 
 script=$scriptdir/step_3a_mutyper_ksfs.sh 
 
-speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
-
+#speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
+speciesList="bears vaquita"
 for species in $speciesList
 do
 
@@ -19,10 +19,10 @@ source $configfile # load species info
 if [ $interval_or_chr_or_all = "allautos" ]
 then
 	# if is all autosomes you don't need intervals: 
-	qsub -N ${species}_targets $script $configfile
+	qsub -N ${species}_ksfs $script $configfile
 
 else
-	qsub -N ${species}_targets -t 1-${interval_count} $script $configfile ### -t 1-${interval_count}
+	qsub -N ${species}_ksfs -t 1-1 $script $configfile ### -t 1-${interval_count}
 fi
 
 done 

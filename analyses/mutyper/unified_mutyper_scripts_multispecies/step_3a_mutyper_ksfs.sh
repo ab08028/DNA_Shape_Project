@@ -1,7 +1,7 @@
 #! /bin/bash
 #$ -l h_rt=50:00:00,mfree=6G
-#$ -o /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_targets
-#$ -e /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_targets
+#$ -o /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_ksfs
+#$ -e /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_ksfs
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 
