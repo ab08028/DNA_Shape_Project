@@ -45,7 +45,7 @@ getPopsFromIndir <- function(indir) {
 
 
 ######### sum up ksfs ########
-sumupksfsacrossintervalsANDpopulations <- function(poplist,intervals,indir) {
+sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,indir) {
   allKSFSes = data.frame()
   if(poplist!="") {
   for(pop in poplist){
@@ -83,9 +83,9 @@ sumupksfsacrossintervalsANDpopulations <- function(poplist,intervals,indir) {
 }
 
 ##### unified function ####
-unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,pops,indir,outdir){
+unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,indir,outdir){
   intervals=getIntervals(intervalCount,prepend0)
-  poplist=getPopsFromIndir(pops,species)
+  poplist=getPopsFromIndir(indir)
   allKSFSes_summed = sumupksfsacrossintervalsANDpopulations(poplist,intervals,indir)
   return(allKSFSes_summed)
 }
