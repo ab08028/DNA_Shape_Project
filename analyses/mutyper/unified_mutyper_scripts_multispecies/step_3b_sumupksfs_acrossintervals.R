@@ -51,6 +51,7 @@ getPopsFromIndir <- function(indir) {
 
 
 ######### sum up ksfs ########
+# note for species that don't have intervals, the interval count is set as "allautos" (vaquita) so this still works fine. 
 sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,indir) {
   allKSFSes = data.frame()
   if(!is.na(poplist)!=0) {

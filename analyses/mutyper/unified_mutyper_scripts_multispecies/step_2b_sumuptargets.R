@@ -37,6 +37,8 @@ getIntervals <- function(intervalCount,prepend0) {
 
 
 ######### sum up targets ########
+# note for species that don't have intervals, the interval count is set as "allautos" (vaquita) so this still works fine. 
+
 sumuptargets <- function(species,intervals,indir) {
   allTargets=data.frame() # must clear between species 
   for(interval in intervals){
@@ -66,7 +68,7 @@ unifiedFunction_sumuptargets <- function(species,intervalCount,prepend0,indir){
 }
 
 ##### run it #######
-allTargetsSummedOverIntervals=unifiedFunction_sumupksfs(species,intervalCount,prepend0,indir)
+allTargetsSummedOverIntervals=unifiedFunction_sumuptargets(species,intervalCount,prepend0,indir)
 
 ##### write it out #######
 write.table(alltargets_summed,paste0(outdir,species,".summedup",inputfilesuffix),row.names = F,quote=F,sep="\t")
