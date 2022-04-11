@@ -62,7 +62,6 @@ sumuptargets <- function(species,intervals,indir) {
 ##### unified function ####
 unifiedFunction_sumuptargets <- function(species,intervalCount,prepend0,indir){
   intervals=getIntervals(intervalCount,prepend0)
-  poplist=getPopsFromIndir(indir)
   allTargetsSummedOverIntervals = sumuptargets(species,poplist,intervals,indir)
   return(allTargetsSummedOverIntervals)
 }
