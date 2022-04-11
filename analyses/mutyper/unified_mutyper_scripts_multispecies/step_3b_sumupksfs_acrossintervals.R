@@ -9,8 +9,15 @@ outdir=as.character(args[2])
 species=as.character(args[3])
 intervalCount=as.character(args[4])
 prepend0=as.character(args[5])
-pops=as.character(args[6]) # may be empty
 
+######## going to get the pops from the dirs that are in the indir (if no dirs then it's no pops) #######
+pops=list.dirs(indir,full.names=F,recursive = F) 
+if(length(pops)==0){
+  print("no populations, using all inds")
+} else {
+  print("using pops:")
+  print(pops)
+}
 ######## get the number of intervals ########
 getIntervals <- function(intervalCount,prepend0) {
   
@@ -33,12 +40,12 @@ getIntervals <- function(intervalCount,prepend0) {
 # pops are fed in as a string like 'AMR EUR SAS'
 # so need to strsplit on whitespace and make a list
 getPops <- function(pops,species) {
-  if(pops!="") {
+  if(!missing(pops)) {
     poplist=strsplit(pops," ")[[1]] # the [[1]] isn't selecting hte first entry, it is instead turning it into a list instead of a sublist
     print("splitting into pops: ")
     print(poplist)
     return(poplist)
-  } else if(pops=="") {
+  } else if(missing(pops)) {
     print(paste0("no pops to split into"))
     poplist=""
   } else {
@@ -91,7 +98,7 @@ sumupksfsacrossintervalsANDpopulations <- function(poplist,intervals,indir) {
 unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,pops,indir,outdir){
   intervals=getIntervals(intervalCount,prepend0)
   poplist=getPops(pops,species)
-  allKSFSes_summed = sumupksfs(poplist,intervals,indir)
+  allKSFSes_summed = sumupksfsacrossintervalsANDpopulations(poplist,intervals,indir)
   return(allKSFSes_summed)
 }
 
