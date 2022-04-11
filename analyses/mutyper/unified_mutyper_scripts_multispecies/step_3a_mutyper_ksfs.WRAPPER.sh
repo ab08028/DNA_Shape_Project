@@ -7,6 +7,9 @@ configdir=$scriptdir/config_files_per_species
 
 script=$scriptdir/step_3a_mutyper_ksfs.sh 
 
+mkdir -p /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_ksfs
+
+
 speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
 #speciesList="bears" # vaquita"
 for species in $speciesList
@@ -16,7 +19,6 @@ configfile=$configdir/config_${species}.sh
 source $configfile # load species info 
 
 #make error file:
-mkdir -p /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_ksfs
 
 
 # for vaquita need to submit with no intervals 
@@ -26,7 +28,7 @@ then
 	qsub -N ${species}_ksfs $script $configfile
 
 else
-	qsub -N ${species}_ksfs -t 1-1 $script $configfile ### -t 1-${interval_count}
+	qsub -N ${species}_ksfs -t 1-${interval_count} $script $configfile ### -t 1-${interval_count}
 fi
 
 done 
