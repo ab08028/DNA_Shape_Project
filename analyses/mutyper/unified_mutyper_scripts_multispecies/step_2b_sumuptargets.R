@@ -71,4 +71,4 @@ unifiedFunction_sumuptargets <- function(species,intervalCount,prepend0,indir){
 allTargetsSummedOverIntervals=unifiedFunction_sumuptargets(species,intervalCount,prepend0,indir)
 
 ##### write it out #######
-write.table(alltargets_summed,paste0(outdir,species,".summedup",inputfilesuffix),row.names = F,quote=F,sep="\t")
+write.table(allTargetsSummedOverIntervals,paste0(outdir,species,".summedup",inputfilesuffix),row.names = F,quote=F,sep="\t")
