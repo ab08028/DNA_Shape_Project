@@ -1,7 +1,7 @@
 #! /bin/bash
-#$ -l h_rt=50:00:00,mfree=6G
-#$ -o /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_spectrum
-#$ -e /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_spectrum
+#$ -l h_rt=50:00:00,mfree=30G
+#$ -o /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_ksfs
+#$ -e /net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/reports.nobackup/mutyper_ksfs
 #$ -m bea
 #$ -M annabel.beichman@gmail.com
 #$ -N sumup_ksfs
@@ -17,8 +17,9 @@ script=$scriptdir/step_3b_sumupksfs_acrossintervals.R
 configdir=$scriptdir/config_files_per_species
 
 
-speciesList='mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus humans'
+#speciesList='mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus humans'
 #speciesList="bears vaquita"
+speciesList="humans" # note that humans is slow and takes a lot of memory
 for species in $speciesList
 do
 echo "starting $species"
