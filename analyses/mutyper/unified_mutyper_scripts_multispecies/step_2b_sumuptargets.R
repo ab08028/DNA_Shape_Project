@@ -43,7 +43,7 @@ getIntervals <- function(intervalCount,prepend0) {
 sumuptargets <- function(species,intervals,indir) {
   allTargets=data.frame() # must clear between species 
   for(interval in intervals){
-    input=read.table(paste(indir,species,".int_or_chr_",interval,inputfilesuffix))
+    input=read.table(paste0(indir,species,".int_or_chr_",interval,inputfilesuffix))
     colnames(input) <- c("target","count")
     input$interval <- as.character(interval)
     input_melt <- melt(input,id.vars = c("target","interval"))
