@@ -17,8 +17,8 @@ script=$scriptdir/step_2b_sumuptargets.R
 configdir=$scriptdir/config_files_per_species
 
 
-#speciesList='mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus humans'
-speciesList="bears vaquita"
+speciesList='mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus humans'
+#speciesList="bears vaquita"
 for species in $speciesList
 do
 echo "starting $species"
@@ -38,3 +38,5 @@ Rscript $script $indir $outdir $species $interval_count $prepend0 $inputfilesuff
 
 
 done
+
+# a way to check that it added correctly : head -n1 * | awk 'BEGIN {sum=0} {sum+=$2} END {print sum}' (doing this across target files this should equal summed up AAAAAAA )
