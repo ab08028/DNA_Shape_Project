@@ -83,7 +83,7 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
 }
 
 ##### unified function ####
-unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,indir,outdir){
+unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,indir){
   intervals=getIntervals(intervalCount,prepend0)
   poplist=getPopsFromIndir(indir)
   allKSFSes_summed = sumupksfsacrossintervalsANDpopulations(poplist,intervals,indir)
@@ -91,7 +91,7 @@ unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,indir,outdi
 }
 
 ##### run it #######
-allKSFSes_summed=unifiedFunction_sumupksfs(species,intervalCount,prepend0,pops,indir,outdir)
+allKSFSes_summed=unifiedFunction_sumupksfs(species,intervalCount,prepend0,pops,indir)
 
 ##### write it out #######
 write.table(allKSFSes_summed,paste0(outdir,species,".summedup.ksfs.allpops.txt"),row.names = F,quote=F,sep="\t")
