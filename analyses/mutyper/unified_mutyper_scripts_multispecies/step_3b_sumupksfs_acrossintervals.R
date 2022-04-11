@@ -97,8 +97,6 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
     }
   }
   
-  allKSFSes_summed <- allKSFSes %>% group_by(species,population,variable,sample_frequency) %>%
-    summarise(totalSites=sum(value))
   return(allKSFSes_summed)
 }
 
