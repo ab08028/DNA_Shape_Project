@@ -35,7 +35,7 @@ mkdir -p $outdir
 
 #echo $indir
 #echo $outdir
-Rscript $script $indir $outdir $species $interval_count $prepend0
+Rscript $script $indir $outdir $species $interval_count $prepend0 $inputfilesuffix
 
 
 done

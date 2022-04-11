@@ -11,6 +11,7 @@ outdir=paste0(as.character(args[2]) ,"/")
 species=as.character(args[3])
 intervalCount=as.character(args[4])
 prepend0=as.character(args[5])
+inputfilesuffix=as.character(args[6])
 
 print(paste0("starting", species))
 print(paste0("interval count:", intervalCount))
