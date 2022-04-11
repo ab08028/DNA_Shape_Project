@@ -47,13 +47,13 @@ getPopsFromIndir <- function(indir) {
 ######### sum up ksfs ########
 sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,indir) {
   allKSFSes = data.frame()
-  if(poplist!="") {
+  if(length(poplist)!=0) {
   for(pop in poplist){
     print(paste0("starting ",pop))
     for(interval in intervals){
       print(interval)
       popdir=paste0(indir,"/",pop,"/") # this will differ for other species annoying
-      ksfs=read.table(paste0(popdir,species,".",pop,".int_or_chr_",interval,".mutyper.ksfs.SeeLogForFilters.maskALL.7mer.txt",header=T))
+      ksfs=read.table(paste0(popdir,species,".",pop,".int_or_chr_",interval,".mutyper.ksfs.SeeLogForFilters.maskALL.7mer.txt"),header=T)
       ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
       ksfs_melt$interval <- as.character(interval)
       ksfs_melt$species <- species
@@ -68,7 +68,7 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
   } else {
     for(interval in intervals){
       print(interval)
-      ksfs=read.table(paste0(indir,species,".int_or_chr_",interval,".mutyper.ksfs.SeeLogForFilters.maskALL.7mer.txt",header=T))
+      ksfs=read.table(paste0(indir,species,".int_or_chr_",interval,".mutyper.ksfs.SeeLogForFilters.maskALL.7mer.txt"),header=T)
       ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
       ksfs_melt$interval <- as.character(interval)
       ksfs_melt$species <- species
