@@ -86,7 +86,7 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
 unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,indir){
   intervals=getIntervals(intervalCount,prepend0)
   poplist=getPopsFromIndir(indir)
-  allKSFSes_summed = sumupksfsacrossintervalsANDpopulations(poplist,intervals,indir)
+  allKSFSes_summed = sumupksfsacrossintervalsANDpopulations(species,poplist,intervals,indir)
   return(allKSFSes_summed)
 }
 
