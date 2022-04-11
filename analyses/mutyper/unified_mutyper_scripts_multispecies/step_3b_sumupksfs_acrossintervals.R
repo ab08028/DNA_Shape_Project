@@ -52,8 +52,9 @@ getPopsFromIndir <- function(indir) {
 
 ######### sum up ksfs ########
 # note for species that don't have intervals, the interval count is set as "allautos" (vaquita) so this still works fine. 
+# need to make a change because humans are so big. add as you go instead of at the end. 
 sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,indir) {
-  allKSFSes = data.frame()
+  allKSFSes_summedUp = data.frame()
   if(!is.na(poplist)!=0) {
   for(pop in poplist){
     print(paste0("starting ",pop))
@@ -62,10 +63,13 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       popdir=paste0(indir,"/",pop,"/") # this will differ for other species annoying
       ksfs=read.table(paste0(popdir,species,".",pop,".int_or_chr_",interval,inputfilesuffix),header=T)
       ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
-      ksfs_melt$interval <- as.character(interval)
+      colnames(ksfs_melt) <- c("sample_frequency","variable","totalSites")
+      ksfs_melt$population <- pop
       ksfs_melt$species <- species
-      ksfs_melt$population <- pop 
-      allKSFSes=bind_rows(allKSFSes,ksfs_melt)
+      # combine with previous sum and then sum up again: 
+      allKSFSes_summedUp=bind_rows(allKSFSes_summedUp,ksfs_melt)
+      allKSFSes_summedUp <- allKSFSes_summedUp %>% group_by(variable,sample_frequency,population,species) %>%  # need to group by population
+        summarise(totalSites=sum(totalSites))
       # to save vector memory, then remove the ksfs from memory:
       rm(ksfs_melt)
       rm(ksfs)
@@ -80,10 +84,13 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       print(interval)
       ksfs=read.table(paste0(indir,species,".int_or_chr_",interval,inputfilesuffix),header=T)
       ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
-      ksfs_melt$interval <- as.character(interval)
+      colnames(ksfs_melt) <- c("sample_frequency","variable","totalSites")
+      ksfs_melt$population <- pop
       ksfs_melt$species <- species
-      ksfs_melt$population <- species # just put in species for pop
-      allKSFSes=bind_rows(allKSFSes,ksfs_melt)
+      # combine with previous sum and then sum up again: 
+      allKSFSes_summedUp=bind_rows(allKSFSes_summedUp,ksfs_melt)
+      allKSFSes_summedUp <- allKSFSes_summedUp %>% group_by(variable,sample_frequency,opulation,species) %>% 
+        summarise(totalSites=sum(totalSites))
       # to save vector memory, then remove the ksfs from memory:
       rm(ksfs_melt)
       rm(ksfs)
