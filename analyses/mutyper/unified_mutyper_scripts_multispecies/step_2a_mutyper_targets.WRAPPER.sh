@@ -5,7 +5,7 @@
 scriptdir=/net/harris/vol1/home/beichman/scriptsAndGitDirs/DNA_Shape_Project/analyses/mutyper/unified_mutyper_scripts_multispecies
 configdir=$scriptdir/config_files_per_species
 
-script=$scriptdir/step_2_mutyper_targets.sh 
+script=$scriptdir/step_2a_mutyper_targets.sh 
 
 speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
 #speciesList='bears vaquita'

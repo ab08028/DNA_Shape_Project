@@ -29,6 +29,8 @@ source $configfile # load species info l
 
 indir=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/${label}/${species}/mutyper_results_masked_${maskLabel}/mutyper_ksfs_files/
 outdir=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/${label}/allspecies_summed_up_over_intervals_forTransfer/${species}/mutyper_results_masked_${maskLabel}/mutyper_ksfs_files
+inputfilesuffix=".mutyper.ksfs.SeeLogForFilters.${maskLabel}.${kmersize}mer.txt"
+
 mkdir -p $outdir
 
 #echo $indir

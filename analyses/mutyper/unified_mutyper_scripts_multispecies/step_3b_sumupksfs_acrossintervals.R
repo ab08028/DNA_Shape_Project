@@ -11,6 +11,7 @@ outdir=paste0(as.character(args[2]) ,"/")
 species=as.character(args[3])
 intervalCount=as.character(args[4])
 prepend0=as.character(args[5])
+inputfilesuffix=as.character(args[6])
 
 print(paste0("starting", species))
 print(paste0("interval count:", intervalCount))
@@ -58,7 +59,7 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
     for(interval in intervals){
       print(interval)
       popdir=paste0(indir,"/",pop,"/") # this will differ for other species annoying
-      ksfs=read.table(paste0(popdir,species,".",pop,".int_or_chr_",interval,".mutyper.ksfs.SeeLogForFilters.maskALL.7mer.txt"),header=T)
+      ksfs=read.table(paste0(popdir,species,".",pop,".int_or_chr_",interval,inputfilesuffix),header=T)
       ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
       ksfs_melt$interval <- as.character(interval)
       ksfs_melt$species <- species
@@ -76,7 +77,7 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
   } else {
     for(interval in intervals){
       print(interval)
-      ksfs=read.table(paste0(indir,species,".int_or_chr_",interval,".mutyper.ksfs.SeeLogForFilters.maskALL.7mer.txt"),header=T)
+      ksfs=read.table(paste0(indir,species,".int_or_chr_",interval,inputfilesuffix),header=T)
       ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
       ksfs_melt$interval <- as.character(interval)
       ksfs_melt$species <- species
@@ -105,4 +106,4 @@ unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,indir){
 allKSFSes_summed=unifiedFunction_sumupksfs(species,intervalCount,prepend0,indir)
 
 ##### write it out #######
-write.table(allKSFSes_summed,paste0(outdir,species,".summedup.ksfs.allpops.txt"),row.names = F,quote=F,sep="\t")
+write.table(allKSFSes_summed,paste0(outdir,species,".summedup",inputfilesuffix),row.names = F,quote=F,sep="\t")
