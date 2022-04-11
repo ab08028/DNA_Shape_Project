@@ -1,4 +1,6 @@
 # want to run for each species separately, but do pops within the script
+require(reshape2)
+require(dplyr)
 
 args = commandArgs(trailingOnly=TRUE) # supply args
 # first arg will be species
@@ -35,7 +37,7 @@ getPopsFromIndir <- function(indir) {
   poplist=list.dirs(indir,full.names=F,recursive = F) 
   if(length(poplist)==0){
     print("no populations, using all inds")
-    poplist=""
+    poplist=NA
   } else {
     print("using pops:")
     print(poplist)
@@ -47,7 +49,7 @@ getPopsFromIndir <- function(indir) {
 ######### sum up ksfs ########
 sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,indir) {
   allKSFSes = data.frame()
-  if(length(poplist)!=0) {
+  if(!is.na(poplist)!=0) {
   for(pop in poplist){
     print(paste0("starting ",pop))
     for(interval in intervals){
