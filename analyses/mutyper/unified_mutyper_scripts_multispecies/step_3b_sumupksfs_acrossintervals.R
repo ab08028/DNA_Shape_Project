@@ -12,6 +12,9 @@ species=as.character(args[3])
 intervalCount=as.character(args[4])
 prepend0=as.character(args[5])
 
+print(paste0("starting", species))
+print(paste0("interval count:", intervalCount))
+
 ######## going to get the pops from the dirs that are in the indir (if no dirs then it's no pops) #######
 
 ######## get the number of intervals ########

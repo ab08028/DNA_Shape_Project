@@ -17,22 +17,23 @@ script=$scriptdir/step_3b_sumupksfs_acrossintervals.R
 configdir=$scriptdir/config_files_per_species
 
 
-#speciesList='humans mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus'
-speciesList="bears vaquita"
+speciesList='mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus humans'
+#speciesList="bears vaquita"
 for species in $speciesList
 do
+echo "starting $species"
 
 configfile=$configdir/config_${species}.sh
 source $configfile # load species info l 
 # these are coming from config file: $species $interval_count $prepend0; but pops are coming from the indir 
 
-indir=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/${label}/${species}/mutyper_results_masked_maskALL/mutyper_ksfs_files/
-outdir=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/${label}/allspecies_summed_up_over_intervals_forTransfer/${species}
+indir=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/${label}/${species}/mutyper_results_masked_${maskLabel}/mutyper_ksfs_files/
+outdir=/net/harris/vol1/home/beichman/allspecies_mutyper_results_unified/${label}/allspecies_summed_up_over_intervals_forTransfer/${species}/mutyper_results_masked_${maskLabel}/mutyper_ksfs_files
 mkdir -p $outdir
 
 #echo $indir
 #echo $outdir
- Rscript $script $indir $outdir $species $interval_count $prepend0
+Rscript $script $indir $outdir $species $interval_count $prepend0
 
 
 done
