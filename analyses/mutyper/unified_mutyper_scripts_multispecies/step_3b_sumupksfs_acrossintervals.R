@@ -6,8 +6,8 @@ args = commandArgs(trailingOnly=TRUE) # supply args
 # first arg will be species
 # second arg will be ? 
 
-indir=as.character(args[1]) 
-outdir=as.character(args[2]) 
+indir=paste0(as.character(args[1]),"/")
+outdir=paste0(as.character(args[2]) ,"/")
 species=as.character(args[3])
 intervalCount=as.character(args[4])
 prepend0=as.character(args[5])
@@ -61,6 +61,9 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       ksfs_melt$species <- species
       ksfs_melt$population <- pop 
       allKSFSes=bind_rows(allKSFSes,ksfs_melt)
+      # to save vector memory, then remove the ksfs from memory:
+      rm(ksfs_melt)
+      rm(ksfs)
     }
     #   # a check for uniqueness -- make sure the values of each sfs aren't the same (a sign that you accidentally read in the same sfs many times ) so am making sure that the freq=1 bins aren't all the same.
     if(length(unique(allKSFSes[allKSFSes$sample_frequency==1,]$value))==1){ # if this reduces down to one then you've added the same SFS together a bunch of times. 
@@ -76,6 +79,9 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       ksfs_melt$species <- species
       ksfs_melt$population <- species # just put in species for pop
       allKSFSes=bind_rows(allKSFSes,ksfs_melt)
+      # to save vector memory, then remove the ksfs from memory:
+      rm(ksfs_melt)
+      rm(ksfs)
     }
   }
   
