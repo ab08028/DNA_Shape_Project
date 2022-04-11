@@ -91,7 +91,7 @@ unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,indir){
 }
 
 ##### run it #######
-allKSFSes_summed=unifiedFunction_sumupksfs(species,intervalCount,prepend0,pops,indir)
+allKSFSes_summed=unifiedFunction_sumupksfs(species,intervalCount,prepend0,indir)
 
 ##### write it out #######
 write.table(allKSFSes_summed,paste0(outdir,species,".summedup.ksfs.allpops.txt"),row.names = F,quote=F,sep="\t")
