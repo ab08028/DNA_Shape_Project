@@ -55,7 +55,7 @@ getPopsFromIndir <- function(indir) {
 # need to make a change because humans are so big. add as you go instead of at the end. 
 sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,indir) {
   allKSFSes_summedUp = data.frame()
-  if(!is.na(poplist)!=0) {
+  if(!is.na(poplist)) {
   for(pop in poplist){
     print(paste0("starting ",pop))
     for(interval in intervals){
