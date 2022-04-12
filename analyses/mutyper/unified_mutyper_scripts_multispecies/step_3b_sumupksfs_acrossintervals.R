@@ -74,10 +74,6 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       rm(ksfs_melt)
       rm(ksfs)
     }
-    #   # a check for uniqueness -- make sure the values of each sfs aren't the same (a sign that you accidentally read in the same sfs many times ) so am making sure that the freq=1 bins aren't all the same.
-    if(length(unique(allKSFSes[allKSFSes$sample_frequency==1,]$value))==1){ # if this reduces down to one then you've added the same SFS together a bunch of times. 
-      stop("are you reading the same SFS in??")
-    }
   }
   } else {
     for(interval in intervals){
