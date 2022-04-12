@@ -63,13 +63,15 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       popdir=paste0(indir,"/",pop,"/") # this will differ for other species annoying
       ksfs=read.table(paste0(popdir,species,".",pop,".int_or_chr_",interval,inputfilesuffix),header=T)
       ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
-      colnames(ksfs_melt) <- c("sample_frequency","variable","totalSites")
+      colnames(ksfs_melt) <- c("sample_frequency","mutation_type","totalSites")
       ksfs_melt$population <- pop
       ksfs_melt$species <- species
       # combine with previous sum and then sum up again: 
       allKSFSes_summedUp=bind_rows(allKSFSes_summedUp,ksfs_melt)
-      allKSFSes_summedUp <- allKSFSes_summedUp %>% group_by(variable,sample_frequency,population,species) %>%  # need to group by population
-        summarise(totalSites=sum(totalSites))
+      allKSFSes_summedUp <- allKSFSes_summedUp %>% 
+        group_by(mutation_type,sample_frequency,population,species) %>%  # need to group by population
+        summarise(totalSites=sum(totalSites)) %>%
+        ungroup()
       # to save vector memory, then remove the ksfs from memory:
       rm(ksfs_melt)
       rm(ksfs)
@@ -80,13 +82,15 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       print(interval)
       ksfs=read.table(paste0(indir,species,".int_or_chr_",interval,inputfilesuffix),header=T)
       ksfs_melt <- melt(ksfs,id.vars = c("sample_frequency"))
-      colnames(ksfs_melt) <- c("sample_frequency","variable","totalSites")
-      ksfs_melt$population <- pop
+      colnames(ksfs_melt) <- c("sample_frequency","mutation_type","totalSites")
+      ksfs_melt$population <- species # just label pop as the whole species
       ksfs_melt$species <- species
       # combine with previous sum and then sum up again: 
       allKSFSes_summedUp=bind_rows(allKSFSes_summedUp,ksfs_melt)
-      allKSFSes_summedUp <- allKSFSes_summedUp %>% group_by(variable,sample_frequency,opulation,species) %>% 
-        summarise(totalSites=sum(totalSites))
+      allKSFSes_summedUp <- allKSFSes_summedUp %>% 
+        group_by(mutation_type,sample_frequency,population,species) %>% 
+        summarise(totalSites=sum(totalSites)) %>%
+        ungroup()
       # to save vector memory, then remove the ksfs from memory:
       rm(ksfs_melt)
       rm(ksfs)

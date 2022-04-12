@@ -55,7 +55,8 @@ sumuptargets <- function(species,intervals,indir) {
   allTargetsSummedOverIntervals <- allTargets %>%
     group_by(target,species) %>% # added insurance; should just be one species though
     summarise(countOverAllIntervals=sum(value)) %>%
-    select(target,countOverAllIntervals)
+    select(target,countOverAllIntervals) 
+  
   return(allTargetsSummedOverIntervals)
 }
 
