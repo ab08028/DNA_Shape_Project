@@ -52,11 +52,11 @@ getPopsFromIndir <- function(indir) {
 
 ######### sum up ksfs ########
 # note for species that don't have intervals, the interval count is set as "allautos" (vaquita) so this still works fine. 
-# need to make a change because humans are so big. add as you go instead of at the end. 
-sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,indir) {
-  allKSFSes_summedUp = data.frame()
+# need to make a change because humans are so big. add as you go instead of at the end and delete as you go.
+sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,indir,inputfilesuffix,outdir) {
   if(!anyNA(poplist)) { # checks if poplist is NA (contains NA)
   for(pop in poplist){
+    allKSFSes_summedUp_perpop = data.frame()
     print(paste0("starting ",pop))
     for(interval in intervals){
       print(interval)
@@ -67,8 +67,8 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       ksfs_melt$population <- pop
       ksfs_melt$species <- species
       # combine with previous sum and then sum up again: 
-      allKSFSes_summedUp=bind_rows(allKSFSes_summedUp,ksfs_melt)
-      allKSFSes_summedUp <- allKSFSes_summedUp %>% 
+      allKSFSes_summedUp_perpop=bind_rows(allKSFSes_summedUp_perpop,ksfs_melt)
+      allKSFSes_summedUp_perpop <- allKSFSes_summedUp_perpop %>% 
         group_by(mutation_type,sample_frequency,population,species) %>%  # need to group by population
         summarise(totalSites=sum(totalSites)) %>%
         ungroup()
@@ -76,8 +76,11 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       rm(ksfs_melt)
       rm(ksfs)
     }
+    write.table(allKSFSes_summedUp_perpop,paste0(outdir,species,"_",pop,".summedup",inputfilesuffix),row.names = F,quote=F,sep="\t")
+    rm(allKSFSes_summedUp_perpop)
   }
   } else {
+    allKSFSes_summedUp = data.frame()
     for(interval in intervals){
       print(interval)
       ksfs=read.table(paste0(indir,species,".int_or_chr_",interval,inputfilesuffix),header=T)
@@ -95,21 +98,20 @@ sumupksfsacrossintervalsANDpopulations <- function(species,poplist,intervals,ind
       rm(ksfs_melt)
       rm(ksfs)
     }
+    write.table(allKSFSes_summedUp,paste0(outdir,species,".summedup",inputfilesuffix),row.names = F,quote=F,sep="\t")
+    rm(allKSFSes_summedUp)
   }
   
-  return(allKSFSes_summedUp)
 }
 
 ##### unified function ####
-unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,indir){
+unifiedFunction_sumupksfs <- function(species,intervalCount,prepend0,indir,inputfilesuffix,outdir){
   intervals=getIntervals(intervalCount,prepend0)
   poplist=getPopsFromIndir(indir)
-  allKSFSes_summed = sumupksfsacrossintervalsANDpopulations(species,poplist,intervals,indir)
-  return(allKSFSes_summed)
+  # sum up and write out: 
+  sumupksfsacrossintervalsANDpopulations(species,poplist,intervals,indir,inputfilesuffix,outdir)
 }
 
-##### run it #######
-allKSFSes_summed=unifiedFunction_sumupksfs(species,intervalCount,prepend0,indir)
+##### run it (will write out) #######
+unifiedFunction_sumupksfs(species,intervalCount,prepend0,indir,inputfilesuffix,outdir)
 
-##### write it out #######
-write.table(allKSFSes_summed,paste0(outdir,species,".summedup",inputfilesuffix),row.names = F,quote=F,sep="\t")
