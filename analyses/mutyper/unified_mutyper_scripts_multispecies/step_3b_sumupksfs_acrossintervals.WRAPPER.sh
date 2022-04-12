@@ -20,6 +20,7 @@ configdir=$scriptdir/config_files_per_species
 #speciesList='mice bears fin_whale vaquita Gorilla_gorilla Pan_troglodytes Pan_paniscus Pongo_abelii Pongo_pygmaeus humans' # doing humans last because that is when it may crash due to mem issues
 #speciesList="bears vaquita"
 speciesList="humans" # note that humans is slow and takes a lot of memory
+#speciesList='bears'
 for species in $speciesList
 do
 echo "starting $species"
